@@ -41,7 +41,7 @@ public class BlockFuel extends Block {
 	
 	public Icon getIconFromDamage(int value)
 	{
-		System.out.println("Someone is asking for my damage! " + value);
+		//System.out.println("Someone is asking for my damage! " + value);
 		return iconArray[value];
 	}
 	
@@ -75,7 +75,7 @@ public class BlockFuel extends Block {
      */
     public int damageDropped(int par1)
     {
-		System.out.println("Someone is asking for my damage dropped! " + par1);
+		//System.out.println("Someone is asking for my damage dropped! " + par1);
         return par1;
     }
     
@@ -87,6 +87,7 @@ public class BlockFuel extends Block {
     /**
      * Drops the block items with a specified chance of dropping the specified items
      */
+    //TODO: Verify this works
     public void dropBlockAsItemWithChance(World par1World, int par2, int par3, int par4, int par5, float par6, int par7)
     {
         super.dropBlockAsItemWithChance(par1World, par2, par3, par4, par5, par6, par7);

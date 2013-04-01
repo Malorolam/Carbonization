@@ -72,7 +72,6 @@ public class CarbonizationGenMinable extends WorldGenerator
                                 if (var39 * var39 + var42 * var42 + var45 * var45 < 1.0D && (block != null && block.blockID == block.stone.blockID))
                                 {
                                     par1World.setBlock(var38, var41, var44, this.minableBlockId, minableBlockMeta, 2);
-                                    return true;
                                 }
                             }
                         }
@@ -81,7 +80,7 @@ public class CarbonizationGenMinable extends WorldGenerator
             }
         }
 
-        return false;
+        return true;
     }
 
     public boolean generateDirt(World par1World, Random par2Random, int x, int y, int z)
@@ -129,7 +128,6 @@ public class CarbonizationGenMinable extends WorldGenerator
                                 if (var39 * var39 + var42 * var42 + var45 * var45 < 1.0D && (block != null && block.blockID == block.dirt.blockID))
                                 {
                                     par1World.setBlock(var38, var41, var44, this.minableBlockId, minableBlockMeta, 2);
-                                    return true;
                                 }
                             }
                         }
@@ -138,7 +136,7 @@ public class CarbonizationGenMinable extends WorldGenerator
             }
         }
 
-        return false;
+        return true;
     }
 
     /**

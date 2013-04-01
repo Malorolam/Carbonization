@@ -27,8 +27,9 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 import thermalexpansion.api.crafting.CraftingHelpers;
 import thermalexpansion.api.crafting.CraftingManagers;
-import ic2.api.Ic2Recipes;
-import ic2.api.Items;
+//TODO: Uncomment when IC2 out
+//import ic2.api.Ic2Recipes;
+//import ic2.api.Items;
 
 @Mod(modid="carbonization", name="Carbonization", version="0.65")
 @NetworkMod(clientSideRequired=true, serverSideRequired=false, channels={"CarbonizationChn"}, packetHandler = PacketHandler.class)
@@ -295,7 +296,8 @@ public class carbonization {
 				System.out.println("Oh dear, something broke with Thermal Expansion.  Prod Mal so he can fix it.");
 			}
 		}
-		
+		//TODO: Uncomment when IC2 is released
+/**NO IC2 YET		
 		if(Loader.isModLoaded("IC2"))
 		{
 			try
@@ -359,7 +361,7 @@ public class carbonization {
 				System.out.println("Oh dear, something broke with IC2.  Prod Mal so he can fix it.");
 			}
 		}
-		else
+		else*/
 		{
 			//no IC2, so we use our iron furnace and refined iron
 			GameRegistry.addRecipe(new ItemStack(furnaceBlock,1,0), new Object[]{" I ", "I I", "IFI", 'I', Item.ingotIron, 'F', Block.furnaceIdle});
