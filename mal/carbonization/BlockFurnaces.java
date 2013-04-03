@@ -218,9 +218,10 @@ public class BlockFurnaces extends BlockContainer
      * Returns the block texture based on the side being looked at.  Args: side, metadata
      */
     @Override
+    @SideOnly(Side.CLIENT)
     public Icon getBlockTextureFromSideAndMetadata(int side, int metadata)
     {    	
-    	//get the correct metadata and split it into side and metadata values
+    	//get the correct metadata for the furnace type
     	metadata = metadata*2 + ((isActive)?1:0);
     	
     	if(metadata < FurnaceTypes.values().length)
@@ -393,3 +394,13 @@ public class BlockFurnaces extends BlockContainer
 		return null;
 	}
 }
+/*******************************************************************************
+* Copyright (c) 2013 Malorolam.
+* 
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the GNU Public License v3.0
+* which accompanies this distribution, and is available at
+* http://www.gnu.org/licenses/gpl.html
+* 
+* 
+*********************************************************************************/

@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Icon;
@@ -20,6 +21,61 @@ public class ItemDust extends Item {
 		this.setMaxDamage(0);
 		this.setUnlocalizedName("ItemDust");
 		this.setCreativeTab(CreativeTabs.tabMaterials);
+	}
+	
+	public void addInformation(ItemStack is, EntityPlayer ep, List list, boolean bool)
+	{
+		switch(is.getItemDamage())
+		{
+		case 0:
+			list.add(setTooltipData("Ground up burnt wood.",ColorReference.DARKGREY));
+			list.add(setTooltipData("Some impurities present.", ColorReference.DARKGREY));
+			break;
+		case 1:
+			list.add(setTooltipData("Very moist chunks of fuel",ColorReference.DARKGREY));
+			list.add(setTooltipData("with many impurities present.", ColorReference.DARKGREY));
+			break;
+		case 2:
+			list.add(setTooltipData("Chunks of fuel with many",ColorReference.DARKGREY));
+			list.add(setTooltipData("impurities present.", ColorReference.DARKGREY));
+			break;
+		case 3:
+			list.add(setTooltipData("Ground up fuel made of some",ColorReference.DARKGREY));
+			list.add(setTooltipData("carbon with many impurities.", ColorReference.DARKGREY));
+			break;
+		case 4:
+			list.add(setTooltipData("Ground up fuel made of mostly",ColorReference.DARKGREY));
+			list.add(setTooltipData("carbon with impurities present.", ColorReference.DARKGREY));
+			break;
+		case 5:
+			list.add(setTooltipData("Ground up fuel made of mostly",ColorReference.DARKGREY));
+			list.add(setTooltipData("carbon with some impurities.", ColorReference.DARKGREY));
+			break;
+		case 6:
+			list.add(setTooltipData("Ground up fuel made of mostly", ColorReference.DARKGREY));
+			list.add(setTooltipData("carbon with little impurities.", ColorReference.DARKGREY));
+			break;
+		case 7:
+			list.add(setTooltipData("Ground up fuel made of entirely", ColorReference.DARKGREY));
+			list.add(setTooltipData("carbon with few other components.", ColorReference.DARKGREY));
+			break;
+		case 8:
+			list.add(setTooltipData("A very fine charcoal dust.", ColorReference.DARKGREY));
+			list.add(setTooltipData("Useful in filtration and", ColorReference.ORANGE));
+			list.add(setTooltipData("purification applications", ColorReference.ORANGE));
+			break;
+		default:
+			list.add(setTooltipData("This isn't a fuel!",ColorReference.DARKRED));
+			list.add(setTooltipData("Tell Mal about it.", ColorReference.DARKRED));
+		}
+	}
+	
+	//The tool tip information
+	private String setTooltipData(String data, ColorReference cr)
+	{
+		String colorValue = cr.getCode();
+		
+		return colorValue+data;
 	}
 	
 	@Override
@@ -141,3 +197,13 @@ public class ItemDust extends Item {
 		return name;
 	}
 }
+/*******************************************************************************
+* Copyright (c) 2013 Malorolam.
+* 
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the GNU Public License v3.0
+* which accompanies this distribution, and is available at
+* http://www.gnu.org/licenses/gpl.html
+* 
+* 
+*********************************************************************************/

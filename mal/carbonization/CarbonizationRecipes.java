@@ -18,9 +18,11 @@ public class CarbonizationRecipes
     private Map smeltingList = new HashMap();
     private Map experienceList = new HashMap();
     private Map cookTimeList = new HashMap();
+    private Map minTierList = new HashMap();
     private HashMap<List<Integer>, ItemStack> metaSmeltingList = new HashMap<List<Integer>, ItemStack>();
     private HashMap<List<Integer>, Float> metaExperience = new HashMap<List<Integer>, Float>();
     private HashMap<List<Integer>, Integer> metaCookTime = new HashMap<List<Integer>, Integer>();
+    private HashMap<List<Integer>, Integer> metaMinTier = new HashMap<List<Integer>, Integer>();
 
     /**
      * Used to call methods addSmelting and getSmeltingResult.
@@ -43,12 +45,16 @@ public class CarbonizationRecipes
     
     /**
      * Add a special smelting recipe with alternate cook time
+     * params:
+     * itemID, metadata, itemstack, experience, cookTime, minTier
+     * minTier is the minimum tier of machine that will accept the recipe, where a value of 0 will work with all machines
      */
-    public void addSmelting(int itemID, int metadata, ItemStack itemstack, float experience, int cookTime)
+    public void addSmelting(int itemID, int metadata, ItemStack itemstack, float experience, int cookTime, int minTier)
     {
         metaSmeltingList.put(Arrays.asList(itemID, metadata), itemstack);
         metaExperience.put(Arrays.asList(itemID, metadata), experience);
         metaCookTime.put(Arrays.asList(itemID, metadata), cookTime);
+        metaMinTier.put(Arrays.asList(itemID,metadata), minTier);
     }
 
     /**
@@ -112,9 +118,37 @@ public class CarbonizationRecipes
         }
         return (ret < 0 ? -1 : ret);
     }
+    
+    public int getMinTier(ItemStack item)
+    {
+    	if(item == null || item.getItem() == null)
+    	{
+    		return -1;
+    	}
+    	int ret = -1;
+    	if (metaMinTier.containsKey(Arrays.asList(item.itemID, item.getItemDamage())))
+    	{
+    		ret = metaMinTier.get(Arrays.asList(item.itemID, item.getItemDamage()));
+    	}
+    	if (minTierList.containsKey(item.itemID))
+    	{
+    		ret = ((Integer)minTierList.get(item.itemID)).intValue();
+    	}
+    	return (ret < 0?-1:ret);
+    }
 
     public Map<List<Integer>, ItemStack> getMetaSmeltingList()
     {
         return metaSmeltingList;
     }
 }
+/*******************************************************************************
+* Copyright (c) 2013 Malorolam.
+* 
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the GNU Public License v3.0
+* which accompanies this distribution, and is available at
+* http://www.gnu.org/licenses/gpl.html
+* 
+* 
+*********************************************************************************/

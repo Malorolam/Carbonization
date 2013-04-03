@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
@@ -23,6 +24,48 @@ public class ItemFuel extends Item {
 		this.setMaxDamage(0);
 		this.setUnlocalizedName("ItemFuel");
 		this.setCreativeTab(CreativeTabs.tabMaterials);
+	}
+	
+	public void addInformation(ItemStack is, EntityPlayer ep, List list, boolean bool)
+	{
+		switch(is.getItemDamage())
+		{
+		case 0:
+			list.add(setTooltipData("A low-value fuel found",ColorReference.DARKGREY));
+			list.add(setTooltipData("in wet areas.", ColorReference.DARKGREY));
+			break;
+		case 1:
+			list.add(setTooltipData("A low-value fuel found",ColorReference.DARKGREY));
+			list.add(setTooltipData("in upper layers of soil.", ColorReference.DARKGREY));
+			break;
+		case 2:
+			list.add(setTooltipData("A medium-value fuel found",ColorReference.DARKGREY));
+			list.add(setTooltipData("in middle stone layers.", ColorReference.DARKGREY));
+			break;
+		case 3:
+			list.add(setTooltipData("A medium-value fuel found",ColorReference.DARKGREY));
+			list.add(setTooltipData("in middle stone layers.", ColorReference.DARKGREY));
+			break;
+		case 4:
+			list.add(setTooltipData("A high-value fuel found",ColorReference.DARKGREY));
+			list.add(setTooltipData("in deep stone layers.", ColorReference.DARKGREY));
+			break;
+		case 5:
+			list.add(setTooltipData("A solid chunk of carbon found",ColorReference.DARKGREY));
+			list.add(setTooltipData("deep in the earth.", ColorReference.DARKGREY));
+			break;
+		default:
+			list.add(setTooltipData("This isn't a fuel!",ColorReference.DARKRED));
+			list.add(setTooltipData("Tell Mal about it.", ColorReference.DARKRED));
+		}
+	}
+	
+	//The tool tip information
+	private String setTooltipData(String data, ColorReference cr)
+	{
+		String colorValue = cr.getCode();
+		
+		return colorValue+data;
 	}
 	
 	@Override
@@ -122,3 +165,13 @@ public class ItemFuel extends Item {
         par3List.add(new ItemStack(par1, 1, 5));
     }
 }
+/*******************************************************************************
+* Copyright (c) 2013 Malorolam.
+* 
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the GNU Public License v3.0
+* which accompanies this distribution, and is available at
+* http://www.gnu.org/licenses/gpl.html
+* 
+* 
+*********************************************************************************/

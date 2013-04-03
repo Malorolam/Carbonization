@@ -6,6 +6,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Icon;
@@ -19,6 +20,48 @@ public class ItemIngots extends Item {
 		this.setMaxDamage(0);
 		this.setUnlocalizedName("ItemIngots");
 		this.setCreativeTab(CreativeTabs.tabMaterials);
+	}
+	
+	public void addInformation(ItemStack is, EntityPlayer ep, List list, boolean bool)
+	{
+		//find the right metadata value
+		switch(is.getItemDamage())
+		{
+		case 0://refined iron
+			list.add(setTooltipData("A purified iron", ColorReference.LIGHTGREEN));
+			list.add(setTooltipData("with better properties", ColorReference.LIGHTGREEN));
+			list.add(setTooltipData("Tier 0 Material", ColorReference.DARKCYAN));
+			break;
+		case 1://pig iron
+			list.add(setTooltipData("The presence of extra carbon", ColorReference.LIGHTGREEN));
+			list.add(setTooltipData("makes an intermediate material", ColorReference.LIGHTGREEN));
+			list.add(setTooltipData("that isn't too useful.", ColorReference.LIGHTGREEN));
+			list.add(setTooltipData("Tier 1 Material", ColorReference.DARKCYAN));
+			break;
+		case 2://mild steel
+			list.add(setTooltipData("Purification of excess carbon", ColorReference.LIGHTGREEN));
+			list.add(setTooltipData("and impurities improves properties", ColorReference.LIGHTGREEN));
+			list.add(setTooltipData("in this low carbon material.", ColorReference.LIGHTGREEN));
+			list.add(setTooltipData("Tier 2 Material", ColorReference.DARKCYAN));
+			break;
+		case 3://steel
+			list.add(setTooltipData("A typical mid-carbon steel", ColorReference.LIGHTGREEN));
+			list.add(setTooltipData("with multiple applications.", ColorReference.LIGHTGREEN));
+			list.add(setTooltipData("Tier 2 Material", ColorReference.DARKCYAN));
+			break;
+		default:
+			list.add(setTooltipData("This isn't even an ingot!",ColorReference.DARKRED));
+			list.add(setTooltipData("Tell Mal about it so he can fix it.", ColorReference.LIGHTRED));
+			list.add(setTooltipData("Tier Error Material", ColorReference.DARKCYAN));
+		}
+	}
+	
+	//The tool tip information
+	private String setTooltipData(String data, ColorReference cr)
+	{
+		String colorValue = cr.getCode();
+		
+		return colorValue+data;
 	}
 	
 	@Override
@@ -105,3 +148,13 @@ public class ItemIngots extends Item {
         par3List.add(new ItemStack(par1, 1, 3));
     }
 }
+/*******************************************************************************
+* Copyright (c) 2013 Malorolam.
+* 
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the GNU Public License v3.0
+* which accompanies this distribution, and is available at
+* http://www.gnu.org/licenses/gpl.html
+* 
+* 
+*********************************************************************************/

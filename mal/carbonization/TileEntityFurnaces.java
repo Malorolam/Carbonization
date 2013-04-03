@@ -49,6 +49,9 @@ public class TileEntityFurnaces extends TileEntity implements IInventory, net.mi
     public int metadata;
     private boolean usesExtraTime=false;
     private byte facing=2;
+    
+    //The tier of the machine, used to limit recipes to certain tech tiers
+    public int tier;
 
     /** The number of ticks that the furnace will keep burning */
     public int furnaceBurnTime = 0;
@@ -76,18 +79,22 @@ public class TileEntityFurnaces extends TileEntity implements IInventory, net.mi
     	{
     	case 0://iron
     		furnaceCookTimeMultiplyer=0.75;
+    		tier = 1;
     		//furnaceMaxCookTime=150;
     		break;
     	case 1://insulated
     		furnaceCookTimeMultiplyer=0.625;
+    		tier = 2;
     		//furnaceMaxCookTime=125;
     		break;
     	case 2://steel
     		furnaceCookTimeMultiplyer=0.5;
+    		tier = 3;
     		//furnaceMaxCookTime=100;
     		break;
     	default:
     		furnaceCookTimeMultiplyer=10;
+    		tier = 1;
     		//furnaceMaxCookTime=2000;
     	}
     }
@@ -231,6 +238,7 @@ public class TileEntityFurnaces extends TileEntity implements IInventory, net.mi
         this.furnaceCookTimeMultiplyer = nbt.getDouble("CookTimeMultiplyer");
         this.currentItemBurnTime = getItemBurnTime(this.furnaceItemStacks[1]);
         this.facing = nbt.getByte("facing");
+        this.tier = nbt.getInteger("Tier");
     }
 
     /**
@@ -259,6 +267,7 @@ public class TileEntityFurnaces extends TileEntity implements IInventory, net.mi
 
         nbt.setTag("Items", var2);
         nbt.setByte("facing", facing);
+        nbt.setInteger("Tier", tier);
     }
 
     /**
@@ -410,7 +419,8 @@ public class TileEntityFurnaces extends TileEntity implements IInventory, net.mi
         else
         {
 	        ItemStack var2 = CarbonizationRecipes.smelting().getSmeltingResult(this.furnaceItemStacks[0]);
-	        if (var2 != null)
+	        int tier = CarbonizationRecipes.smelting().getMinTier(this.furnaceItemStacks[0]);
+	        if (var2 != null && this.tier>= tier)
 	        {
 	        	if (this.furnaceItemStacks[2] == null) return true;
 	        	if (!this.furnaceItemStacks[2].isItemEqual(var2)) return false;
@@ -647,3 +657,13 @@ public class TileEntityFurnaces extends TileEntity implements IInventory, net.mi
 		return j != 0 || i != 1 || itemstack.itemID == Item.bucketEmpty.itemID;
 	}
 }
+/*******************************************************************************
+* Copyright (c) 2013 Malorolam.
+* 
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the GNU Public License v3.0
+* which accompanies this distribution, and is available at
+* http://www.gnu.org/licenses/gpl.html
+* 
+* 
+*********************************************************************************/
