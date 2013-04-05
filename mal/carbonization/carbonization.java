@@ -430,9 +430,12 @@ public class carbonization {
 	{
 		if(!ic2)
 			CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(furnaceBlock,1,0), 
-					new Object[]{" I ", "I I", "IFI", 'I' ,"ingotRefinedIron", 'F', Block.furnaceIdle}));
-		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(furnaceBlock,1,2), 
-				new Object[]{"III", "IFI", "BBB", 'I' ,"ingotRefinedIron", 'F', new ItemStack(furnaceBlock,1,1), 'B', Block.brick}));
+					new Object[]{" I ", "I I", "IFI", 'I' ,Item.ingotIron, 'F', Block.furnaceIdle}));
+		else
+			CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(furnaceBlock,1,0), 
+					new Object[]{"   ", "III", "IFI", 'I' ,Item.ingotIron, 'F', Block.furnaceIdle}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(furnaceBlock,1,1), 
+				new Object[]{"III", "IFI", "BBB", 'I' ,"ingotRefinedIron", 'F', new ItemStack(furnaceBlock,1,0), 'B', Block.brick}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(furnaceBlock,1,2), 
 				new Object[]{"SSS", "SFS", "SSS", 'S' ,"ingotSteel", 'F', new ItemStack(furnaceBlock,1,1)}));
 	}

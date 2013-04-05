@@ -48,8 +48,10 @@ public class BlockFurnaces extends BlockContainer
 
     protected BlockFurnaces(int par1, boolean par2)
     {
-        super(par1, Material.rock);
+        super(par1, Material.ground);
         this.setUnlocalizedName("IronFurnace");
+        this.setHardness(3.0f);
+        this.setResistance(20f);
         this.isActive = par2;
         this.setCreativeTab(CreativeTabs.tabDecorations);
     }

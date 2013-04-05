@@ -24,7 +24,7 @@ private Icon[] iconArray = new Icon[4];
 		this.setUnlocalizedName("BlockStructure");
 		this.setStepSound(Block.soundMetalFootstep);
 		this.setHardness(3.0f);
-		this.setResistance(2000.0f);
+		this.setResistance(25.0f);
 		this.setCreativeTab(CreativeTabs.tabDecorations);
 	}
 	

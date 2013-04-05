@@ -41,7 +41,7 @@ public class ItemIngots extends Item {
 		case 2://mild steel
 			list.add(setTooltipData("Purification of excess carbon", ColorReference.LIGHTGREEN));
 			list.add(setTooltipData("and impurities improves properties", ColorReference.LIGHTGREEN));
-			list.add(setTooltipData("in this low carbon material.", ColorReference.LIGHTGREEN));
+			list.add(setTooltipData("in this high carbon material.", ColorReference.LIGHTGREEN));
 			list.add(setTooltipData("Tier 2 Material", ColorReference.DARKCYAN));
 			break;
 		case 3://steel

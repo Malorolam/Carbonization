@@ -30,7 +30,7 @@ public class ItemBlockStructure extends ItemBlock {
 			list.add(setTooltipData("Tier 2 Structure", ColorReference.DARKCYAN));
 			break;
 		case 2://mild steel
-			list.add(setTooltipData("Made from a low-carbon steel", ColorReference.LIGHTGREEN));
+			list.add(setTooltipData("Made from a high-carbon steel", ColorReference.LIGHTGREEN));
 			list.add(setTooltipData("Tier 3 Structure", ColorReference.DARKCYAN));
 			break;
 		case 3://steel

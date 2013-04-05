@@ -23,7 +23,7 @@ public class WorldgeneratorCarbonization implements IWorldGenerator {
 		default:
 		{
 			//make gen for each fuel
-			//peat is > 40
+			//peat is > 50
 			//lignite is 30-50
 			//sub-bituminous is 25-40
 			//bituminous is 20-30
@@ -31,13 +31,13 @@ public class WorldgeneratorCarbonization implements IWorldGenerator {
 			//graphite is 0-15
 			//limit peat to "wet" biomes
 			BiomeGenBase b = world.getBiomeGenForCoords(chunkX, chunkZ);
-			if (b.biomeName=="Ocean"||b.biomeName=="Swampland"||b.biomeName=="River"||b.biomeName=="FrozenOcean"||b.biomeName=="FrozenRiver"||b.biomeName=="Jungle")
-				generateDirtSurface(world, random, chunkX*16, 30, 60, chunkZ*16, 0, 30, 5);
-			generateDirtSurface(world, random, chunkX*16, 30, 20, chunkZ*16, 1, 30, 4);
-			generateSurface(world, random, chunkX*16, 25, 15, chunkZ*16, 2, 25, 5);
-			generateSurface(world, random, chunkX*16, 20, 10, chunkZ*16, 3, 20, 4);
-			generateSurface(world, random, chunkX*16, 10, 10, chunkZ*16, 4, 8, 3);
-			generateSurface(world, random, chunkX*16, 0, 15, chunkZ*16, 5, 15, 3);
+			if (b.biomeName=="Ocean"||b.biomeName=="Swampland"||b.biomeName=="FrozenOcean"||b.biomeName=="FrozenRiver"||b.biomeName=="Jungle")
+				generateDirtSurface(world, random, chunkX*16, 50, 30, chunkZ*16, 0, 30, 5);
+			generateDirtSurface(world, random, chunkX*16, 30, 20, chunkZ*16, 1, 20, 4);
+			generateSurface(world, random, chunkX*16, 25, 15, chunkZ*16, 2, 15, 4);
+			generateSurface(world, random, chunkX*16, 20, 10, chunkZ*16, 3, 10, 3);
+			generateSurface(world, random, chunkX*16, 10, 10, chunkZ*16, 4, 8, 4);
+			generateSurface(world, random, chunkX*16, 0, 15, chunkZ*16, 5, 10, 3);
 		}
 		}
 
