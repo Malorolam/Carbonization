@@ -1,19 +1,18 @@
 package mal.carbonization.multiblock;
 
-import net.minecraft.block.Block;
-//Stores a block and it's location
-public class Multiblock {
-
-	public Block block;
-	public int x, y, z;
+/*
+ * Probably won't use this for anything
+ */
+public enum MultiBlockShape {
+	FURNACE();
 	
-	public Multiblock(Block block, int x, int y, int z)
+	//private int[][][] shape;
+	
+	private MultiBlockShape()
 	{
-		this.block = block;
-		this.x = x;
-		this.y = y;
-		this.z = z;
+		//this.shape = shape;
 	}
+
 }
 /*******************************************************************************
 * Copyright (c) 2013 Malorolam.

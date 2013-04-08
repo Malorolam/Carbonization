@@ -48,6 +48,8 @@ public class carbonization {
 	public static BlockFurnaces furnaceBlock;
 	public static BlockFurnaces furnaceBlockActive;
 	public static BlockStructure structureBlock;
+	public static TestBlock testBlock;
+	
 	int fuelID=9540;
 	int dustID = 9541;
 	int itemID = 9542;
@@ -120,6 +122,9 @@ public class carbonization {
 		//Item.itemsList[blockID] = new ItemBlockFuels(blockID-256);
 		Item.itemsList[furnaceID] = new ItemBlockFurnaces(furnaceID-256,furnaceBlock);
 		//Item.itemsList[structureID] = new ItemBlockStructure(structureID-256);
+		//TODO: remember to disable on releases
+		testBlock = new TestBlock(structureID+1,Material.rock);
+		GameRegistry.registerBlock(testBlock, ItemTestBlock.class, "testBlock");
 		
 		hhpulv.setContainerItem(hhpulv);
 		hhcomp.setContainerItem(hhcomp);
