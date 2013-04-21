@@ -4,15 +4,36 @@ import net.minecraft.block.Block;
 //Stores a block and it's location
 public class Multiblock {
 
-	public Block block;
-	public int x, y, z;
+	public int blockID;
+	public byte blockMetadata;
 	
-	public Multiblock(Block block, int x, int y, int z)
+	public Multiblock(int blockID, byte metadata)
 	{
-		this.block = block;
-		this.x = x;
-		this.y = y;
-		this.z = z;
+		this.blockID = blockID;
+		this.blockMetadata = metadata;
+	}
+	
+	public Multiblock(int blockID, int metadata)
+	{
+		this.blockID = blockID;
+		this.blockMetadata = (byte)metadata;
+	}
+	
+	public boolean compare(Multiblock multiblock, boolean useMetadata)
+	{
+		if(multiblock == null)
+			return false;
+		
+		if(useMetadata)
+		{
+			if(this.blockID==multiblock.blockID && this.blockMetadata == multiblock.blockMetadata)
+				return true;
+		}
+		else
+			if(this.blockID==multiblock.blockID)
+				return true;
+		
+		return false;
 	}
 }
 /*******************************************************************************

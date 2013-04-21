@@ -6,25 +6,155 @@ import net.minecraft.world.World;
 //Totally doesn't work right...
 public class MultiBlockInstantiator {
 
-	private MBType type;
 	
-	public MultiBlockInstantiator(MBType type)
+	public MultiBlockInstantiator()
 	{
-		this.type = type;
 	}
 	
+	/*
+	 * Continuously compare our pattern to what is in the world until there is a match and we return the offset
+	 */
+	public static int[] matchPattern(MultiBlockMatcher mbMatch, int startX, int startY, int startZ, World world, Multiblock parentBlock)
+	{
+		/**
+		 * There are only a limited number of orientations that we will consider valid
+		 * Mainly, the command block (starting position) must be on a side
+		 * We can also figure out which face based off of where the air is, since we know that a common valid position will have
+		 * air on opposite sides
+		 * 
+		 * this may be able to be made more efficient
+		 */
+		int[] offset = new int[3];
+		Multiblock[][][] pattern = mbMatch.getPattern();
+		
+		//Figure out if we have an easy calculation
+		int sideAxis;
+		if(world.getBlockId(startX+1, startY, startZ)==0 && world.getBlockId(startX-1, startY, startZ)==0)//x axis alignment
+			sideAxis = 0;
+		else if(world.getBlockId(startX, startY+1, startZ)==0 && world.getBlockId(startX, startY-1, startZ)==0)//y axis alignment
+			sideAxis = 1;
+		else if(world.getBlockId(startX, startY, startZ+1)==0 && world.getBlockId(startX, startY, startZ-1)==0)//z axis alignment
+			sideAxis = 2;
+		else//we are sad and have to do lots of calculations now :[
+			sideAxis = -1;
+		
+		System.out.println(sideAxis);
+		
+		//now we have limited the options to hopefully 2 planes to iterate through
+		//We loop through the two axises that are used
+		if(sideAxis == 0)//x axis calculations
+		{
+			offset[0] = 0;
+			
+			for(int j=0; j<mbMatch.getPattern()[0].length; j++)
+				for(int k=0; k<mbMatch.getPattern()[0][0].length; k++)
+				{
+					MultiBlockMatcher test_matcher = new MultiBlockMatcher(pattern.length, pattern[0].length, pattern[0][0].length);
+					createWorldMultiBlock(test_matcher, startX, startY+j, startZ+k, pattern.length, pattern[0].length, pattern[0][0].length, world);
+					if(mbMatch.comparePatternWithSubstitutions(test_matcher.getPattern(), parentBlock, 1))
+					{
+						offset[1] = j;
+						offset[2] = k;
+						return offset;
+					}
+					
+					createWorldMultiBlock(test_matcher, startX-pattern.length, startY+j, startZ+k, pattern.length, pattern[0].length, pattern[0][0].length, world);
+					if(mbMatch.comparePatternWithSubstitutions(test_matcher.getPattern(), parentBlock, 1))
+					{
+						offset[0] = pattern.length;
+						offset[1] = j;
+						offset[2] = k;
+						return offset;
+					}
+				}
+		}
+		if(sideAxis == 1)//y axis calculations
+		{
+			offset[0] = 0;
+			
+			for(int i=0; i<mbMatch.getPattern().length; i++)
+				for(int k=0; k<mbMatch.getPattern()[0][0].length; k++)
+				{
+					MultiBlockMatcher test_matcher = new MultiBlockMatcher(pattern.length, pattern[0].length, pattern[0][0].length);
+					createWorldMultiBlock(test_matcher, startX+i, startY, startZ+k, pattern.length, pattern[0].length, pattern[0][0].length, world);
+					if(mbMatch.comparePatternWithSubstitutions(test_matcher.getPattern(), parentBlock, 1))
+					{
+						offset[0] = i;
+						offset[1] = 0;
+						offset[2] = k;
+						return offset;
+					}
+					
+					createWorldMultiBlock(test_matcher, startX+i, startY-pattern[0].length, startZ+k, pattern.length, pattern[0].length, pattern[0][0].length, world);
+					if(mbMatch.comparePatternWithSubstitutions(test_matcher.getPattern(), parentBlock, 1))
+					{
+						offset[0] = i;
+						offset[1] = pattern[0].length;
+						offset[2] = k;
+						return offset;
+					}
+				}
+		}
+		if(sideAxis == 2)//z axis calculations
+		{
+			offset[0] = 0;
+			
+			for(int i=0; i<mbMatch.getPattern().length; i++)
+				for(int j=0; j<mbMatch.getPattern()[0].length; j++)
+				{
+					MultiBlockMatcher test_matcher = new MultiBlockMatcher(pattern.length, pattern[0].length, pattern[0][0].length);
+					createWorldMultiBlock(test_matcher, startX+i, startY+j, startZ, pattern.length, pattern[0].length, pattern[0][0].length, world);
+					if(mbMatch.comparePatternWithSubstitutions(test_matcher.getPattern(), parentBlock, 1))
+					{
+						offset[0] = i;
+						offset[1] = j;
+						offset[2] = 0;
+						return offset;
+					}
+					
+					createWorldMultiBlock(test_matcher, startX+i, startY+j, startZ-pattern[0][0].length, pattern.length, pattern[0].length, pattern[0][0].length, world);
+					if(mbMatch.comparePatternWithSubstitutions(test_matcher.getPattern(), parentBlock, 1))
+					{
+						offset[0] = i;
+						offset[1] = j;
+						offset[2] = pattern[0][0].length;
+						return offset;
+					}
+				}
+		}
+		if(sideAxis == -1)//the dreaded full axis calculations, since there is no information we have to examine every possible position
+		{
+			for(int i = 1-pattern.length; i<pattern.length; i++)
+				for(int j=1-pattern[0].length; j<pattern[0].length; j++)
+					for(int k=1-pattern[0][0].length; k<pattern[0][0].length; k++)
+					{
+						MultiBlockMatcher test_matcher = new MultiBlockMatcher(pattern.length, pattern[0].length, pattern[0][0].length);
+						createWorldMultiBlock(test_matcher, startX+i, startY+j, startZ+k, pattern.length, pattern[0].length, pattern[0][0].length, world);
+						if(mbMatch.comparePatternWithSubstitutions(test_matcher.getPattern(), parentBlock, 1))
+						{
+							offset[0] = i;
+							offset[1] = j;
+							offset[2] = k;
+							return offset;
+						}
+					}
+					
+		}
+		return null;
+	}
 	/*
 	 * Build a multiblock from a successful pattern
 	 */
 	public static boolean createMultiBlock(MultiBlockMatcher mbMatch, int x, int y, int z, World world)
 	{
-		int[][][] pattern = mbMatch.getPattern();
+		Multiblock[][][] pattern = mbMatch.getPattern();
 		//For testing purposes, just start at 1,1,1 from the initiation location 
 		for(int i = 0; i<pattern.length; i++)
 			for(int j=0;j<pattern[0].length;j++) 
 				for(int k=0;k<pattern[0][0].length;k++)
 				{
-					world.setBlock(x+i, y+j, z+k, pattern[i][j][k], 0, 2);
+					boolean succ = world.setBlock(x+i, y+j, z+k, pattern[i][j][k].blockID, pattern[i][j][k].blockMetadata, 2);
+					//System.out.println(succ);
 				}
 		return true;
 	}
@@ -39,12 +169,12 @@ public class MultiBlockInstantiator {
 				for(int k=0; k<mbMatch.getPattern()[0][0].length;k++)
 				{
 					//We don't want to pick up a tile entity'd block, so make sure there isn't one here
-					if(world.getBlockTileEntity(i+startX, j+startY, k+startZ) != null)
+					/*if(world.getBlockTileEntity(i+startX, j+startY, k+startZ) != null)
 					{
 						System.err.println("Detect process failed at indices: "+i+", "+j+", "+k+": Tile Entity Present.");
 						return false;
-					}
-					boolean succ = mbMatch.setBlock(i, j, k, world.getBlockId(i+startX, j+startY, k+startZ));
+					}*/
+					boolean succ = mbMatch.setBlock(i, j, k, world.getBlockId(i+startX, j+startY, k+startZ), (byte)world.getBlockMetadata(i+startX, j+startY, k+startZ));
 					if(succ==false)
 					{
 						System.err.println("Detect process failed at indices: "+i+", "+j+", "+k+": Previous process failed.");
@@ -52,66 +182,6 @@ public class MultiBlockInstantiator {
 					}
 				}
 		return true;
-	}
-}
-
-/*
- * This stores all the different structures and any requirements that they may have
- */
-enum MBType {
-	
-	FURNACE(9,3,9, 3,3,3, true, "HollowCube");
-	
-	private int[] maxValues;
-	private int[] minValues;
-	private boolean requiresBlocks;
-	private String requiredShape;
-	
-	private MBType(int maxX, int maxY, int maxZ, int minX, int minY, int minZ, boolean requiresSpecialBlocks, String requiredShape)
-	{
-		maxValues = new int[3];
-		maxValues[0]=maxX;
-		maxValues[1]=maxY;
-		maxValues[2]=maxZ;
-		
-		minValues = new int[3];
-		minValues[0] = minX;
-		minValues[1] = minY;
-		minValues[2] = minZ;
-		
-		requiresBlocks = requiresSpecialBlocks;
-		this.requiredShape = requiredShape;
-	}
-	
-	public String getRequiredShape()
-	{
-		return requiredShape;
-	}
-	
-	public boolean getRequiresSpecialBlocks()
-	{
-		return requiresBlocks;
-	}
-	
-	/*
-	 * x => 0
-	 * y => 1
-	 * z => 2
-	 */
-	public int getMaxDimension(int dim)
-	{
-		if(dim>=0 && dim<maxValues.length)
-			return maxValues[dim];
-		else
-			return 0;
-	}
-	
-	public int getMinDimension(int dim)
-	{
-		if(dim>=0 && dim<minValues.length)
-			return minValues[dim];
-		else
-			return 0;
 	}
 }
 /*******************************************************************************
