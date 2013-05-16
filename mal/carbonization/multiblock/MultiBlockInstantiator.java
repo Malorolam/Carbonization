@@ -26,6 +26,7 @@ public class MultiBlockInstantiator {
 		 */
 		int[] offset = new int[3];
 		Multiblock[][][] pattern = mbMatch.getPattern();
+		MultiBlockMatcher test_matcher = new MultiBlockMatcher(pattern.length, pattern[0].length, pattern[0][0].length);
 		
 		//Figure out if we have an easy calculation
 		int sideAxis;
@@ -49,8 +50,7 @@ public class MultiBlockInstantiator {
 			for(int j=0; j<mbMatch.getPattern()[0].length; j++)
 				for(int k=0; k<mbMatch.getPattern()[0][0].length; k++)
 				{
-					MultiBlockMatcher test_matcher = new MultiBlockMatcher(pattern.length, pattern[0].length, pattern[0][0].length);
-					createWorldMultiBlock(test_matcher, startX, startY+j, startZ+k, pattern.length, pattern[0].length, pattern[0][0].length, world);
+					createWorldMultiBlock(test_matcher, startX, startY-j, startZ-k, pattern.length, pattern[0].length, pattern[0][0].length, world);
 					if(mbMatch.comparePatternWithSubstitutions(test_matcher.getPattern(), parentBlock, 1))
 					{
 						offset[1] = j;
@@ -58,10 +58,10 @@ public class MultiBlockInstantiator {
 						return offset;
 					}
 					
-					createWorldMultiBlock(test_matcher, startX-pattern.length, startY+j, startZ+k, pattern.length, pattern[0].length, pattern[0][0].length, world);
+					createWorldMultiBlock(test_matcher, startX-pattern.length, startY-j, startZ-k, pattern.length, pattern[0].length, pattern[0][0].length, world);
 					if(mbMatch.comparePatternWithSubstitutions(test_matcher.getPattern(), parentBlock, 1))
 					{
-						offset[0] = pattern.length;
+						offset[0] = -pattern.length;
 						offset[1] = j;
 						offset[2] = k;
 						return offset;
@@ -75,8 +75,7 @@ public class MultiBlockInstantiator {
 			for(int i=0; i<mbMatch.getPattern().length; i++)
 				for(int k=0; k<mbMatch.getPattern()[0][0].length; k++)
 				{
-					MultiBlockMatcher test_matcher = new MultiBlockMatcher(pattern.length, pattern[0].length, pattern[0][0].length);
-					createWorldMultiBlock(test_matcher, startX+i, startY, startZ+k, pattern.length, pattern[0].length, pattern[0][0].length, world);
+					createWorldMultiBlock(test_matcher, startX-i, startY, startZ-k, pattern.length, pattern[0].length, pattern[0][0].length, world);
 					if(mbMatch.comparePatternWithSubstitutions(test_matcher.getPattern(), parentBlock, 1))
 					{
 						offset[0] = i;
@@ -85,7 +84,7 @@ public class MultiBlockInstantiator {
 						return offset;
 					}
 					
-					createWorldMultiBlock(test_matcher, startX+i, startY-pattern[0].length, startZ+k, pattern.length, pattern[0].length, pattern[0][0].length, world);
+					createWorldMultiBlock(test_matcher, startX-i, startY-pattern[0].length, startZ-k, pattern.length, pattern[0].length, pattern[0][0].length, world);
 					if(mbMatch.comparePatternWithSubstitutions(test_matcher.getPattern(), parentBlock, 1))
 					{
 						offset[0] = i;
@@ -102,22 +101,21 @@ public class MultiBlockInstantiator {
 			for(int i=0; i<mbMatch.getPattern().length; i++)
 				for(int j=0; j<mbMatch.getPattern()[0].length; j++)
 				{
-					MultiBlockMatcher test_matcher = new MultiBlockMatcher(pattern.length, pattern[0].length, pattern[0][0].length);
-					createWorldMultiBlock(test_matcher, startX+i, startY+j, startZ, pattern.length, pattern[0].length, pattern[0][0].length, world);
-					if(mbMatch.comparePatternWithSubstitutions(test_matcher.getPattern(), parentBlock, 1))
-					{
-						offset[0] = i;
-						offset[1] = j;
-						offset[2] = 0;
-						return offset;
-					}
-					
-					createWorldMultiBlock(test_matcher, startX+i, startY+j, startZ-pattern[0][0].length, pattern.length, pattern[0].length, pattern[0][0].length, world);
+					createWorldMultiBlock(test_matcher, startX-i, startY-j, startZ, pattern.length, pattern[0].length, pattern[0][0].length, world);
 					if(mbMatch.comparePatternWithSubstitutions(test_matcher.getPattern(), parentBlock, 1))
 					{
 						offset[0] = i;
 						offset[1] = j;
 						offset[2] = pattern[0][0].length;
+						return offset;
+					}
+					
+					createWorldMultiBlock(test_matcher, startX+i, startY+j, startZ+pattern[0][0].length, pattern.length, pattern[0].length, pattern[0][0].length, world);
+					if(mbMatch.comparePatternWithSubstitutions(test_matcher.getPattern(), parentBlock, 1))
+					{
+						offset[0] = i;
+						offset[1] = j;
+						offset[2] = 0;
 						return offset;
 					}
 				}
@@ -128,8 +126,7 @@ public class MultiBlockInstantiator {
 				for(int j=1-pattern[0].length; j<pattern[0].length; j++)
 					for(int k=1-pattern[0][0].length; k<pattern[0][0].length; k++)
 					{
-						MultiBlockMatcher test_matcher = new MultiBlockMatcher(pattern.length, pattern[0].length, pattern[0][0].length);
-						createWorldMultiBlock(test_matcher, startX+i, startY+j, startZ+k, pattern.length, pattern[0].length, pattern[0][0].length, world);
+						createWorldMultiBlock(test_matcher, startX-i, startY-j, startZ-k, pattern.length, pattern[0].length, pattern[0][0].length, world);
 						if(mbMatch.comparePatternWithSubstitutions(test_matcher.getPattern(), parentBlock, 1))
 						{
 							offset[0] = i;

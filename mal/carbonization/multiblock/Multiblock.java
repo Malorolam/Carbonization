@@ -33,6 +33,13 @@ public class Multiblock {
 			if(this.blockID==multiblock.blockID)
 				return true;
 		
+		System.out.print("Blocks not the same");
+		if(this.blockID!=multiblock.blockID)
+			System.out.print(": BlockID: "+this.blockID+"!="+multiblock.blockID);
+		if(this.blockMetadata!=multiblock.blockMetadata)
+			System.out.print(": Metadata: "+this.blockMetadata+"!="+multiblock.blockMetadata);
+		System.out.println(".");
+		
 		return false;
 	}
 }

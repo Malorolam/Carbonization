@@ -10,24 +10,28 @@ public class TileEntityTest extends TileEntity {
 
 	private MultiBlockMatcher match;
 	private MultiBlockMatcher mbEmpty;
-	int xdiff = 9;
-	int ydiff = 6;
-	int zdiff = 9;
+	int xdiff = 3;
+	int ydiff = 3;
+	int zdiff = 3;
 	
 	public TileEntityTest()
 	{
 		match = new MultiBlockMatcher(xdiff, ydiff, zdiff);
 		mbEmpty = new MultiBlockMatcher(xdiff, ydiff, zdiff);
-		match.buildBasedHollowSolid(0, 0, 0, 8, 5, 8, carbonization.structureBlock.blockID, (byte)0, carbonization.structureBlock.blockID, (byte)1, 1);
+		match.buildBasedHollowSolid(0, 0, 0, 2, 2, 2, carbonization.structureBlock.blockID, (byte)0, carbonization.structureBlock.blockID, (byte)1, 1);
 	}
 	
 	public void activate(int x, int y, int z, World world)
 	{
 		int[] value = MultiBlockInstantiator.matchPattern(match, x, y, z, world, new Multiblock(world.getBlockId(x, y, z), world.getBlockMetadata(x, y, z)));
 		
-		System.out.println(value[0]+", "+value[1]+", "+value[2]);
 		if(value != null)
-			MultiBlockInstantiator.createMultiBlock(mbEmpty, x+value[0], y+value[1], z+value[2], world);
+		{
+			MultiBlockInstantiator.createMultiBlock(mbEmpty, x-value[0], y-value[1], z-value[2], world);
+			System.out.println(value[0]+", "+value[1]+", "+value[2]);
+		}
+		else
+			System.out.println("Null");
 	}
 }
 /*******************************************************************************

@@ -43,7 +43,10 @@ public class MultiBlockMatcher {
 	{
 		//easy bits first, see if they are the same dimensions
 		if(pattern.length != test_pattern.length || pattern[0].length != test_pattern[0].length || pattern[0][0].length != test_pattern[0][0].length)
+		{
+			System.out.println("Compare process failed: Patterns not the same size.");
 			return false;
+		}
 		
 		//now the fun bit, go through the entire (meep) pattern until we reach the end or find a different value
 		for(int i = 0; i<pattern.length; i++)
@@ -54,8 +57,12 @@ public class MultiBlockMatcher {
 					if(excludeFirstBlock && i==0&&j==0&&k==0)
 							exclude = true;
 					if(pattern[i][j][k].compare(test_pattern[i][j][k],true) && !exclude)
+					{
+						System.out.println("Compare process ended at index ("+i+", "+j+", "+k+") with failed match.");
 						return false;
+					}
 				}
+		System.out.println("Compare process completed with success.");
 		return true;
 	}
 	
@@ -73,12 +80,18 @@ public class MultiBlockMatcher {
 	public boolean comparePatternWithSubstitutions(Multiblock[][][] test_pattern, Multiblock exceptionBlock, int exceptionCount)
 	{
 		//Make sure that there is an exception block in the first place
-		if(exceptionBlock == null)
+		if(exceptionBlock == null || exceptionCount==0)
+		{
+			System.out.println("No exceptions allowed, using basic comparison instead.");
 			return comparePattern(test_pattern);
+		}
 		
 		//easy bits first, see if they are the same dimensions
 		if(pattern.length != test_pattern.length || pattern[0].length != test_pattern[0].length || pattern[0][0].length != test_pattern[0][0].length)
+		{
+			System.out.println("Compare process failed: Patterns not the same size.");
 			return false;
+		}
 		
 		int count = 0;
 		
@@ -89,16 +102,21 @@ public class MultiBlockMatcher {
 				{
 					if(!pattern[i][j][k].compare(test_pattern[i][j][k],true))
 					{
-						if(pattern[i][j][k].compare(exceptionBlock,true) && count<exceptionCount)
+						if(test_pattern[i][j][k].compare(exceptionBlock,true) && count<exceptionCount)
 						{
 							count++;
+							System.out.println("Compare process bypassed substituted block ID: " + exceptionBlock.blockID + ", metadata: " + exceptionBlock.blockMetadata
+									+ "; instances bypassed: "+count+"/"+exceptionCount+".");
+								
 						}
 						else
 						{
+							System.out.println("Compare process ended at index ("+i+", "+j+", "+k+") with failed match.");
 							return false;
 						}
 					}
 				}
+		System.out.println("Compare process completed with success.");
 		return true;
 	}
 	
