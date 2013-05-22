@@ -36,12 +36,12 @@ private Icon[] iconArray = new Icon[4];
 		iconArray[2] = ir.registerIcon("carbonization:mildSteelStructureTexture");
 		iconArray[3] = ir.registerIcon("carbonization:steelStructureTexture");
 	}
-
 	
-	public Icon getIconFromDamage(int value)
+	@Override
+	public Icon getIcon(int side, int metadata)
 	{
 		//System.out.println("Someone is asking for my damage! " + value);
-		return iconArray[value];
+		return iconArray[metadata];
 	}
 	
     /**

@@ -221,7 +221,7 @@ public class BlockFurnaces extends BlockContainer
      */
     @Override
     @SideOnly(Side.CLIENT)
-    public Icon getBlockTextureFromSideAndMetadata(int side, int metadata)
+    public Icon getIcon(int side, int metadata)
     {    	
     	//get the correct metadata for the furnace type
     	metadata = metadata*2 + ((isActive)?1:0);
@@ -387,7 +387,7 @@ public class BlockFurnaces extends BlockContainer
      */
     public int getComparatorInputOverride(World par1World, int par2, int par3, int par4, int par5)
     {
-        return Container.func_94526_b((IInventory)par1World.getBlockTileEntity(par2, par3, par4));
+        return Container.calcRedstoneFromInventory((IInventory)par1World.getBlockTileEntity(par2, par3, par4));
     }
 
 	@Override

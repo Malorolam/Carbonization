@@ -9,6 +9,7 @@ import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
+import net.minecraftforge.oredict.OreDictionary;
 
 public class CarbonizationRecipes
 {
@@ -46,15 +47,41 @@ public class CarbonizationRecipes
     /**
      * Add a special smelting recipe with alternate cook time
      * params:
-     * itemID, metadata, itemstack, experience, cookTime, minTier
+     * input, output, experience, cookTime, minTier
+     * input may be an ItemStack or a String for use with the OreDictionary
+     * cookTime is how long the recipe takes to complete in ticks
      * minTier is the minimum tier of machine that will accept the recipe, where a value of 0 will work with all machines
      */
-    public void addSmelting(int itemID, int metadata, ItemStack itemstack, float experience, int cookTime, int minTier)
+    public void addSmelting(Object input, ItemStack output, float experience, int cookTime, int minTier)
     {
-        metaSmeltingList.put(Arrays.asList(itemID, metadata), itemstack);
-        metaExperience.put(Arrays.asList(itemID, metadata), experience);
-        metaCookTime.put(Arrays.asList(itemID, metadata), cookTime);
-        metaMinTier.put(Arrays.asList(itemID,metadata), minTier);
+    	int itemID;
+    	int metadata;
+    	if(input instanceof ItemStack)
+    	{
+    		itemID = ((ItemStack) input).itemID;
+    		metadata = ((ItemStack) input).getItemDamage();
+            metaSmeltingList.put(Arrays.asList(itemID, metadata), output);
+            metaExperience.put(Arrays.asList(itemID, metadata), experience);
+            metaCookTime.put(Arrays.asList(itemID, metadata), cookTime);
+            metaMinTier.put(Arrays.asList(itemID,metadata), minTier);
+    	}
+    	else if(input instanceof String)
+    	{
+    		for(int i = 0; i < OreDictionary.getOres((String)input).size(); i++)
+    		{
+    			itemID = OreDictionary.getOres((String)input).get(i).itemID;
+    			metadata = OreDictionary.getOres((String)input).get(i).getItemDamage();
+    	        metaSmeltingList.put(Arrays.asList(itemID, metadata), output);
+    	        metaExperience.put(Arrays.asList(itemID, metadata), experience);
+    	        metaCookTime.put(Arrays.asList(itemID, metadata), cookTime);
+    	        metaMinTier.put(Arrays.asList(itemID,metadata), minTier);
+    		}
+    	}
+    	else
+    	{
+    		System.err.println("ERROR LEVEL: DAFUQ...  Tell Mal to fix his recipe handler...");
+    	}
+
     }
 
     /**

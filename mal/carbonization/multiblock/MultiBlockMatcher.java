@@ -75,6 +75,16 @@ public class MultiBlockMatcher {
 	}
 	
 	/*
+	 * Compare a specific block of the input pattern, indicated by the index
+	 */
+	public boolean comparePatternBlock(Multiblock[][][] test_pattern, int i, int j, int k)
+	{
+		if(test_pattern[i][j][k].compare(pattern[i][j][k], true))
+			return true;
+		return false;
+	}
+	
+	/*
 	 * Compare the input pattern, allowing for a block to be substituted a set number of times instead of the pattern
 	 */
 	public boolean comparePatternWithSubstitutions(Multiblock[][][] test_pattern, Multiblock exceptionBlock, int exceptionCount)
@@ -253,18 +263,24 @@ public class MultiBlockMatcher {
 			return false;
 		}
 		
-		//make sure that with the wallThickness there is a solid and it isn't sticking walls in itself
-		if(wallThickness <= 0 || wallThickness >= Math.max(Math.max(xdiff/2, ydiff/2), zdiff/2))
+		//if any wall is smaller then 3 (0-2) then there can't be a hollow inside it, so don't bother and use the solid code instead
+		if(maxX-minX < 2 || maxY-minY < 2 || maxZ-minZ < 2)
 		{
-			System.err.println("Build Hollow Solid process failed: Wall thickness invalid.");
+			System.err.println("Build Hollow Solid process redundant: Geometry Invalid, using Build Solid instead.");
+			return buildSolid(minX, minY, minZ, maxX, maxY, maxZ, blockID, metadata);
+		}
+		
+		//make sure that with the wallThickness there is a solid and it isn't sticking walls in itself
+		if(wallThickness <= 0 || (wallThickness*2 > maxX-minX && wallThickness*2 > maxY-minY && wallThickness*2 > maxZ-minZ))
+		{
+			System.err.println("Build Hollow Solid process failed: Wall thickness invalid: " + wallThickness);
 			return false;
 		}
 		
 		boolean success=true;
 		
-		//Now build the solid one wall at a time
-		//after each step make sure it didn't fail
-		//After a corner axis is completed, other processes on that axis must be reduced to prevent issues
+		//Now build the solid positive space first
+		//then negative space
 		//Exterior shape
 		success=buildSolid(minX, minY, minZ, maxX, maxY, maxZ, blockID, metadata);
 		if(success==false)

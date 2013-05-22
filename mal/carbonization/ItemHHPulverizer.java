@@ -34,9 +34,9 @@ public class ItemHHPulverizer extends Item {
 	}
 	
 	@Override
-	public void updateIcons(IconRegister ir)
+	public void registerIcons(IconRegister ir)
 	{
-		this.iconIndex = ir.registerIcon("carbonization:hhPulverizerTexture");
+		this.itemIcon = ir.registerIcon("carbonization:hhPulverizerTexture");
 	}
 	
 	@Override

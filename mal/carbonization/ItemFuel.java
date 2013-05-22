@@ -91,7 +91,7 @@ public class ItemFuel extends Item {
 	}
 	
 	@Override
-	public void updateIcons(IconRegister ir)
+	public void registerIcons(IconRegister ir)
 	{
 		iconArray[0] = ir.registerIcon("carbonization:peatBarTexture");
 		iconArray[1] = ir.registerIcon("carbonization:ligniteBarTexture");

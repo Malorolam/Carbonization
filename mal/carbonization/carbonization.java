@@ -1,6 +1,6 @@
 package mal.carbonization;
 
-import ic2.api.Items;
+import ic2.api.item.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.item.Item;
@@ -29,9 +29,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 import thermalexpansion.api.crafting.CraftingHelpers;
 import thermalexpansion.api.crafting.CraftingManagers;
-//TODO: Uncomment when IC2 out
-//import ic2.api.Ic2Recipes;
-//import ic2.api.Items;
+import ic2.api.recipe.*;
 
 @Mod(modid="carbonization", name="Carbonization", version="0.6")
 @NetworkMod(clientSideRequired=true, serverSideRequired=false, channels={"CarbonizationChn"}, packetHandler = PacketHandler.class)
@@ -181,6 +179,7 @@ public class carbonization {
 		LanguageRegistry.addName(new ItemStack(misc, 1, 0), "Pencil");
 		LanguageRegistry.addName(new ItemStack(misc, 1, 1), "Cleansing Potion");
 		LanguageRegistry.addName(new ItemStack(misc, 1, 2), "\"Cleansing\" Potion");
+		LanguageRegistry.addName(new ItemStack(misc, 1, 3), "Carbon Chunk");
 		
 		//Machines
 		LanguageRegistry.addName(new ItemStack(furnaceBlock,1,0), "Iron Furnace");
@@ -224,7 +223,7 @@ public class carbonization {
 		OreDictionary.registerOre("dustACharcoal", new ItemStack(dust,1,8));
 		OreDictionary.registerOre("ingotRefinedIron", new ItemStack(ingots,1,0));
 		OreDictionary.registerOre("ingotPigIron", new ItemStack(ingots,1,1));
-		OreDictionary.registerOre("ingotLCSteel", new ItemStack(ingots,1,2));
+		OreDictionary.registerOre("ingotHCSteel", new ItemStack(ingots,1,2));
 		OreDictionary.registerOre("ingotSteel", new ItemStack(ingots,1,3));
 		
 		//make the fuel work with the correct tools
@@ -258,7 +257,7 @@ public class carbonization {
 		generateMash();
 		generateSmithing(ic);
 		generateConversions(ic, te);
-		generateTools();
+		generateTools(ic);
 		generateMachines(ic);
 		generateStructure();
 	}
@@ -288,32 +287,27 @@ public class carbonization {
 		GameRegistry.addShapelessRecipe(new ItemStack(fuel,1,5), new Object[]{HHComp, new ItemStack(dust,1,7)});
 	}
 	
-	private void generateSmithing(boolean ic2)
+	private void generateSmithing(boolean ic)
 	{
-		//we have ic2, so use thier iron instead
-		if(ic2)
-		{
-			//TODO: Fix when IC2 is out
-			//refined iron into pig iron
-			CarbonizationRecipes.smelting().addSmelting(ingots.itemID, 0, new ItemStack(ingots,1,1), 5, (50*difficultyMod), 1);
-		}
-		else
+		//we have ic2, so use their iron instead
+		if(!ic)
 		{
 			//iron into refined iron
 			FurnaceRecipes.smelting().addSmelting(new ItemStack(Item.ingotIron).itemID, new ItemStack(ingots,1,0), 5);
-			//refined iron into pig iron
-			CarbonizationRecipes.smelting().addSmelting(ingots.itemID, 0, new ItemStack(ingots,1,1), 5, (50*difficultyMod), 1);
 		}
+
+		//refined iron into pig iron
+		CarbonizationRecipes.smelting().addSmelting("ingotRefinedIron", new ItemStack(ingots,1,1), 5, (50*difficultyMod), 1);
 		//pig iron into mild steel
-		CarbonizationRecipes.smelting().addSmelting(ingots.itemID, 1, new ItemStack(ingots,1,2), 5, (75*difficultyMod), 2);
+		CarbonizationRecipes.smelting().addSmelting("ingotPigIron", new ItemStack(ingots,1,2), 5, (75*difficultyMod), 2);
 		//mild steel into steel
-		CarbonizationRecipes.smelting().addSmelting(ingots.itemID, 2, new ItemStack(ingots,1,3), 5, (100*difficultyMod), 2);
+		CarbonizationRecipes.smelting().addSmelting("ingotHCSteel", new ItemStack(ingots,1,3), 5, (100*difficultyMod), 2);
 		
 		//Activated Charcoal
 		FurnaceRecipes.smelting().addSmelting((new ItemStack(dust,1,0)).itemID, 0, new ItemStack(dust,1,8), 0);
 	}
 	
-	private void generateConversions(boolean ic2, boolean te)
+	private void generateConversions(boolean ic, boolean te)
 	{
 		//1 charcoal -> 1 coal
 		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(dust,1,5), new Object[]{HHPure, "dustCharcoal"}));
@@ -343,56 +337,56 @@ public class carbonization {
 		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(dust,1,6), new Object[]{HHPure, "dustGraphite","dustGraphite","dustGraphite","dustGraphite","dustGraphite","dustGraphite"}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(dust,6,7), new Object[]{HHPure, "dustAnthracite"}));
 		
-		//TODO: fix when ic2 out
-		/*if(ic2)//ic2 so make the recipes for that too
+		if(ic)//ic2 so make the recipes for that too
 		{
 			try {
 				//mash
-				Ic2Recipes.addMaceratorRecipe(new ItemStack(fuel,1,0), new ItemStack(dust,1,1));
-				Ic2Recipes.addMaceratorRecipe(new ItemStack(fuel,1,1), new ItemStack(dust,1,2));
-				Ic2Recipes.addMaceratorRecipe(new ItemStack(fuel,1,2), new ItemStack(dust,1,3));
-				Ic2Recipes.addMaceratorRecipe(new ItemStack(fuel,1,3), new ItemStack(dust,1,4));
-				Ic2Recipes.addMaceratorRecipe(new ItemStack(fuel,1,4), new ItemStack(dust,1,6));
-				Ic2Recipes.addMaceratorRecipe(new ItemStack(fuel,1,5), new ItemStack(dust,1,7));
+				
+				ic2.api.recipe.Recipes.macerator.addRecipe(new ItemStack(fuel,1,0), new ItemStack(dust,1,1));
+				ic2.api.recipe.Recipes.macerator.addRecipe(new ItemStack(fuel,1,1), new ItemStack(dust,1,2));
+				ic2.api.recipe.Recipes.macerator.addRecipe(new ItemStack(fuel,1,2), new ItemStack(dust,1,3));
+				ic2.api.recipe.Recipes.macerator.addRecipe(new ItemStack(fuel,1,3), new ItemStack(dust,1,4));
+				ic2.api.recipe.Recipes.macerator.addRecipe(new ItemStack(fuel,1,4), new ItemStack(dust,1,6));
+				ic2.api.recipe.Recipes.macerator.addRecipe(new ItemStack(fuel,1,5), new ItemStack(dust,1,7));
 				
 				//cleanse
-				//Ic2Recipes.addExtractorRecipe(new ItemStack(dust,1,5), new ItemStack(dust,1,0));
-				Ic2Recipes.addExtractorRecipe(new ItemStack(dust,1,5), new ItemStack(dust,1,0));
+				ic2.api.recipe.Recipes.extractor.addRecipe(new ItemStack(dust,1,5), new ItemStack(dust,1,0));
+				ic2.api.recipe.Recipes.extractor.addRecipe(new ItemStack(dust,1,5), new ItemStack(dust,1,0));
 				
-				//Ic2Recipes.addExtractorRecipe(new ItemStack(dust,1,2), new ItemStack(dust,1,1));
-				Ic2Recipes.addExtractorRecipe(new ItemStack(dust,1,1), new ItemStack(dust,1,2));
+				ic2.api.recipe.Recipes.extractor.addRecipe(new ItemStack(dust,1,2), new ItemStack(dust,1,1));
+				ic2.api.recipe.Recipes.extractor.addRecipe(new ItemStack(dust,1,1), new ItemStack(dust,1,2));
 				
-				//Ic2Recipes.addExtractorRecipe(new ItemStack(dust,4,3), new ItemStack(dust,5,2));
-				Ic2Recipes.addExtractorRecipe(new ItemStack(dust,5,2), new ItemStack(dust,4,3));
+				ic2.api.recipe.Recipes.extractor.addRecipe(new ItemStack(dust,4,3), new ItemStack(dust,5,2));
+				ic2.api.recipe.Recipes.extractor.addRecipe(new ItemStack(dust,5,2), new ItemStack(dust,4,3));
 				
-				//Ic2Recipes.addExtractorRecipe(new ItemStack(dust,2,4), new ItemStack(dust,3,3));
-				Ic2Recipes.addExtractorRecipe(new ItemStack(dust,3,3), new ItemStack(dust,2,4));
+				ic2.api.recipe.Recipes.extractor.addRecipe(new ItemStack(dust,2,4), new ItemStack(dust,3,3));
+				ic2.api.recipe.Recipes.extractor.addRecipe(new ItemStack(dust,3,3), new ItemStack(dust,2,4));
 				
-				//Ic2Recipes.addExtractorRecipe(new ItemStack(dust,2,5), new ItemStack(dust,3,4));
-				Ic2Recipes.addExtractorRecipe(new ItemStack(dust,3,4), new ItemStack(dust,2,5));
+				ic2.api.recipe.Recipes.extractor.addRecipe(new ItemStack(dust,2,5), new ItemStack(dust,3,4));
+				ic2.api.recipe.Recipes.extractor.addRecipe(new ItemStack(dust,3,4), new ItemStack(dust,2,5));
 				
-				//Ic2Recipes.addExtractorRecipe(new ItemStack(dust,5,6), new ItemStack(dust,6,5));
-				Ic2Recipes.addExtractorRecipe(new ItemStack(dust,6,5), new ItemStack(dust,5,6));
+				ic2.api.recipe.Recipes.extractor.addRecipe(new ItemStack(dust,5,6), new ItemStack(dust,6,5));
+				ic2.api.recipe.Recipes.extractor.addRecipe(new ItemStack(dust,6,5), new ItemStack(dust,5,6));
 				
-				Ic2Recipes.addExtractorRecipe(new ItemStack(dust,1,6), new ItemStack(dust,6,7));
-				//Ic2Recipes.addExtractorRecipe(new ItemStack(dust,6,7), new ItemStack(dust,1,6));
+				ic2.api.recipe.Recipes.extractor.addRecipe(new ItemStack(dust,1,6), new ItemStack(dust,6,7));
+				ic2.api.recipe.Recipes.extractor.addRecipe(new ItemStack(dust,6,7), new ItemStack(dust,1,6));
 				
 				
 				//mush
-				Ic2Recipes.addCompressorRecipe(new ItemStack(dust,1,0), new ItemStack(Item.coal, 1,1));
-				Ic2Recipes.addCompressorRecipe(new ItemStack(dust,1,1), new ItemStack(fuel,1,0));
-				Ic2Recipes.addCompressorRecipe(new ItemStack(dust,1,2), new ItemStack(fuel,1,1));
-				Ic2Recipes.addCompressorRecipe(new ItemStack(dust,1,3), new ItemStack(fuel,1,2));
-				Ic2Recipes.addCompressorRecipe(new ItemStack(dust,1,4), new ItemStack(fuel,1,3));
-				Ic2Recipes.addCompressorRecipe(new ItemStack(dust,1,5), new ItemStack(Item.coal, 1,0));
-				Ic2Recipes.addCompressorRecipe(new ItemStack(dust,1,6), new ItemStack(fuel,1,4));
-				Ic2Recipes.addCompressorRecipe(new ItemStack(dust,1,7), new ItemStack(fuel,1,5));
+				ic2.api.recipe.Recipes.compressor.addRecipe(new ItemStack(dust,1,0), new ItemStack(Item.coal, 1,1));
+				ic2.api.recipe.Recipes.compressor.addRecipe(new ItemStack(dust,1,1), new ItemStack(fuel,1,0));
+				ic2.api.recipe.Recipes.compressor.addRecipe(new ItemStack(dust,1,2), new ItemStack(fuel,1,1));
+				ic2.api.recipe.Recipes.compressor.addRecipe(new ItemStack(dust,1,3), new ItemStack(fuel,1,2));
+				ic2.api.recipe.Recipes.compressor.addRecipe(new ItemStack(dust,1,4), new ItemStack(fuel,1,3));
+				ic2.api.recipe.Recipes.compressor.addRecipe(new ItemStack(dust,1,5), new ItemStack(Item.coal, 1,0));
+				ic2.api.recipe.Recipes.compressor.addRecipe(new ItemStack(dust,1,6), new ItemStack(fuel,1,4));
+				ic2.api.recipe.Recipes.compressor.addRecipe(new ItemStack(dust,1,7), new ItemStack(fuel,1,5));
 			}
 			catch(Exception e)
 			{
 				System.out.println("Oh dear, something broke with IC2.  Prod Mal so he can fix it.");
 			}
-		}*/
+		}
 		
 		if(te)//thermal expansion recipes
 		{
@@ -413,7 +407,7 @@ public class carbonization {
 		}
 	}
 	
-	private void generateTools()
+	private void generateTools(boolean ic)
 	{
 		//Handheld tools
 		GameRegistry.addShapelessRecipe(new ItemStack(carbonization.hhpulv), new Object[] {new ItemStack(Item.flint), new ItemStack(Item.bowlEmpty)});
@@ -424,16 +418,30 @@ public class carbonization {
 		GameRegistry.addRecipe(new ItemStack(misc,1,0), new Object[]{"S","G", 'S', Item.stick, 'G', new ItemStack(fuel,1,5)});
 		GameRegistry.addRecipe(new ItemStack(misc,1,0), new Object[]{"S","C", 'S', Item.stick, 'C', new ItemStack(Item.coal,1,1)});
 		GameRegistry.addShapelessRecipe(new ItemStack(Item.writableBook,1), new Object[]{Item.book, new ItemStack(misc,1,0)});
-		GameRegistry.addShapelessRecipe(new ItemStack(misc,1,1), new Object[]{new ItemStack(Item.potion,1,0), new ItemStack(dust, 1, 8)});
-		GameRegistry.addShapelessRecipe(new ItemStack(misc,1,2), new Object[]{new ItemStack(Item.potion,1,0), new ItemStack(dust, 1, 5)});
+		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(misc,1,1), new Object[]{new ItemStack(Item.potion,1,0), "dustACharcoal"}));
+		if(!ic)//prevent a known conflict by changing the recipe if IC2 is installed
+			CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(misc,1,2), new Object[]{new ItemStack(Item.potion,1,0), "dustCoal"}));
 		GameRegistry.addRecipe(new ItemStack(Block.torchWood, 2), new Object[]{"C","S",'C', new ItemStack(fuel,1,2), 'S', Item.stick});
 		GameRegistry.addRecipe(new ItemStack(Block.torchWood, 4), new Object[]{"C","S",'C', new ItemStack(fuel,1,3), 'S', Item.stick});
 		GameRegistry.addRecipe(new ItemStack(Block.torchWood, 8), new Object[]{"C","S",'C', new ItemStack(fuel,1,4), 'S', Item.stick});
+		
+		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(misc, 1, 3), new Object[]{HHPure, "dustGraphite", "dustGraphite", 
+			"dustGraphite", "dustGraphite", "dustGraphite", "dustGraphite", "dustGraphite", "dustGraphite"}));
+		GameRegistry.addShapelessRecipe(new ItemStack(Item.diamond), new Object[]{HHComp, new ItemStack(misc, 1, 3), new ItemStack(misc, 1, 3), 
+			new ItemStack(misc, 1, 3), new ItemStack(misc, 1, 3), new ItemStack(misc, 1, 3), new ItemStack(misc, 1, 3), new ItemStack(misc, 1, 3), new ItemStack(misc, 1, 3)});
+		
+		if(ic)//IC2, so add in compressor recipes for the carbon chunk and alternate "cleansing" potion
+		{
+			ic2.api.recipe.Recipes.compressor.addRecipe(new ItemStack(dust, 8, 7), new ItemStack(misc, 1, 3));
+			ic2.api.recipe.Recipes.compressor.addRecipe(new ItemStack(misc, 8, 3), new ItemStack(Item.diamond));
+			
+			CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(misc, 1, 2), new Object[]{"WC", 'W', new ItemStack(Item.potion, 1, 0), 'C', "dustCoal"}));
+		}
 	}
 	
-	private void generateMachines(boolean ic2)
+	private void generateMachines(boolean ic)
 	{
-		if(!ic2)
+		if(!ic)
 			CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(furnaceBlock,1,0), 
 					new Object[]{" I ", "I I", "IFI", 'I' ,Item.ingotIron, 'F', Block.furnaceIdle}));
 		else

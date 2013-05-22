@@ -18,7 +18,7 @@ public class TestBlock extends BlockContainer {
 
 	public TestBlock(int par1, Material par2Material) {
 		super(par1, par2Material);
-		this.setUnlocalizedName("testblock");
+		this.setUnlocalizedName("carbonization:testblock");
 		this.setCreativeTab(CreativeTabs.tabBlock);
 	}
 

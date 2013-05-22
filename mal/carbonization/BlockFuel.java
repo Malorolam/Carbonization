@@ -63,10 +63,11 @@ public class BlockFuel extends Block {
 		}
 	}
 	
-	public Icon getIconFromDamage(int value)
+	@Override
+	public Icon getIcon(int side, int metadata)
 	{
 		//System.out.println("Someone is asking for my damage! " + value);
-		return iconArray[value];
+		return iconArray[metadata];
 	}
 	
     /**

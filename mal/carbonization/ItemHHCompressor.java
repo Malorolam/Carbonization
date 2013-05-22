@@ -34,9 +34,9 @@ public class ItemHHCompressor extends Item
 	}
 	
 	@Override
-	public void updateIcons(IconRegister ir)
+	public void registerIcons(IconRegister ir)
 	{
-		this.iconIndex = ir.registerIcon("carbonization:hhCompressorTexture");
+		this.itemIcon = ir.registerIcon("carbonization:hhCompressorTexture");
 	}
 	
 	@Override

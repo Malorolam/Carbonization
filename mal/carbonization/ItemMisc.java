@@ -16,7 +16,7 @@ import net.minecraft.world.World;
 
 public class ItemMisc extends Item{
 
-	private Icon[] iconArray = new Icon[3];
+	private Icon[] iconArray = new Icon[4];
 	
 	public ItemMisc(int par1) {
 		super(par1);
@@ -46,6 +46,12 @@ public class ItemMisc extends Item{
 			list.add(setTooltipData("and purge toxins for your health.", ColorReference.LIGHTGREEN));
 			list.add(setTooltipData("Made from 100% coal.", ColorReference.DARKCYAN));
 			break;
+		case 3://carbon chunk
+			list.add(setTooltipData("A partially compressed chunk of", ColorReference.LIGHTGREEN));
+			list.add(setTooltipData("pure carbon.", ColorReference.LIGHTGREEN));
+			list.add(setTooltipData("Perhaps I should compress it further", ColorReference.ORANGE));
+			list.add(setTooltipData("in case it becomes useful?", ColorReference.ORANGE));
+			break;
 		default:
 			list.add(setTooltipData("This isn't even an item!",ColorReference.DARKRED));
 			list.add(setTooltipData("Tell Mal about it so he can fix it.", ColorReference.LIGHTRED));
@@ -71,6 +77,8 @@ public class ItemMisc extends Item{
 			return "CleansingPotion";
 		case 2:
 			return "pCleansingPotion";
+		case 3:
+			return "carbonChunk";
 		default:
 			return "ItemMisc";
 		}
@@ -82,11 +90,12 @@ public class ItemMisc extends Item{
 	}
 	
 	@Override
-	public void updateIcons(IconRegister ir)
+	public void registerIcons(IconRegister ir)
 	{
 		iconArray[0] = ir.registerIcon("carbonization:pencilTexture");
 		iconArray[1] = ir.registerIcon("carbonization:cleansingPotionTexture");
 		iconArray[2] = ir.registerIcon("carbonization:cleansingPotionTexture");
+		iconArray[3] = ir.registerIcon("carbonization:carbonChunkTexture");
 	}
 	
 	public Icon getIconFromDamage(int value)
@@ -122,6 +131,9 @@ public class ItemMisc extends Item{
 		case 2:
 			r="pcurepotion";
 			break;
+		case 3:
+			r="carbonchunk";
+			break;
 		default:
 			r="blaarg";
 			break;
@@ -139,6 +151,7 @@ public class ItemMisc extends Item{
         par3List.add(new ItemStack(par1, 1, 0));
         par3List.add(new ItemStack(par1, 1, 1));
         par3List.add(new ItemStack(par1, 1, 2));
+        par3List.add(new ItemStack(par1, 1, 3));
     }
 	
     public ItemStack onEaten(ItemStack par1ItemStack, World par2World, EntityPlayer par3EntityPlayer)

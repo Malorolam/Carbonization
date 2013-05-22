@@ -107,7 +107,7 @@ public class ItemDust extends Item {
 	}
 	
 	@Override
-	public void updateIcons(IconRegister ir)
+	public void registerIcons(IconRegister ir)
 	{
 		iconArray[0] = ir.registerIcon("carbonization:charcoalDustTexture");
 		iconArray[1] = ir.registerIcon("carbonization:peatClumpTexture");

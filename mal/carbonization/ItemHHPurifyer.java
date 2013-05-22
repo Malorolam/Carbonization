@@ -34,9 +34,9 @@ public class ItemHHPurifyer extends Item {
 	}
 	
 	@Override
-	public void updateIcons(IconRegister ir)
+	public void registerIcons(IconRegister ir)
 	{
-		this.iconIndex = ir.registerIcon("carbonization:hhPurifyerTexture");
+		this.itemIcon = ir.registerIcon("carbonization:hhPurifyerTexture");
 	}
 	
 	@Override

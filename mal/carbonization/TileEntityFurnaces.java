@@ -552,7 +552,7 @@ public class TileEntityFurnaces extends TileEntity implements IInventory, net.mi
 
             if (var2 instanceof ItemTool && ((ItemTool) var2).getToolMaterialName().equals("WOOD")) return 200;
             if (var2 instanceof ItemSword && ((ItemSword) var2).getToolMaterialName().equals("WOOD")) return 200;
-            if (var2 instanceof ItemHoe && ((ItemHoe) var2).func_77842_f().equals("WOOD")) return 200;
+            if (var2 instanceof ItemHoe && ((ItemHoe) var2).getMaterialName().equals("WOOD")) return 200;
             if (var1 == Item.stick.itemID) return 100;
             if (var1 == Item.coal.itemID) return 1600;
             if (var1 == Item.bucketLava.itemID) return 20000;
@@ -643,18 +643,21 @@ public class TileEntityFurnaces extends TileEntity implements IInventory, net.mi
 	}
 
 	@Override
-	public int[] getSizeInventorySide(int par1) {
-		return par1 == 0 ? field_102011_e : (par1 == 1 ? field_102010_d : field_102009_f);
+	public int[] getAccessibleSlotsFromSide(int var1) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
-	public boolean func_102007_a(int i, ItemStack itemstack, int j) {
-		return this.isStackValidForSlot(j, itemstack);
+	public boolean canInsertItem(int i, ItemStack itemstack, int j) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	@Override
-	public boolean func_102008_b(int i, ItemStack itemstack, int j) {
-		return j != 0 || i != 1 || itemstack.itemID == Item.bucketEmpty.itemID;
+	public boolean canExtractItem(int i, ItemStack itemstack, int j) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }
 /*******************************************************************************
