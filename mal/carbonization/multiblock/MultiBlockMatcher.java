@@ -121,7 +121,7 @@ public class MultiBlockMatcher {
 						}
 						else
 						{
-							System.out.println("Compare process ended at index ("+i+", "+j+", "+k+") with failed match.");
+							//System.out.println("Compare process ended at index ("+i+", "+j+", "+k+") with failed match.");
 							return false;
 						}
 					}

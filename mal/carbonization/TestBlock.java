@@ -28,6 +28,7 @@ public class TestBlock extends BlockContainer {
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer par5EntityPlayer, int par6, float par7, float par8, float par9)
     {
+    	//System.out.println("I've been activated!");
     	if(world.isRemote)
     		return true;
     	else
@@ -35,13 +36,13 @@ public class TestBlock extends BlockContainer {
     		if(par5EntityPlayer.isSneaking())
     			return false;
     		
-    		TileEntityTest var10 = (TileEntityTest)world.getBlockTileEntity(x, y, z);
+    		TileEntityMultiblockInit var10 = (TileEntityMultiblockInit)world.getBlockTileEntity(x, y, z);
 
             if (var10 == null || par5EntityPlayer.isSneaking())
             {
             	return false;
             }
-    		var10.activate(x, y, z, world);
+    		var10.activate(x, y, z, world, par5EntityPlayer);
     		
     		
     		
@@ -51,7 +52,7 @@ public class TestBlock extends BlockContainer {
 
 	@Override
 	public TileEntity createNewTileEntity(World world) {
-		return new TileEntityTest();
+		return new TileEntityMultiblockInit("furnace");
 	}
 }
 /*******************************************************************************

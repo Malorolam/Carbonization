@@ -121,8 +121,8 @@ public class carbonization {
 		Item.itemsList[furnaceID] = new ItemBlockFurnaces(furnaceID-256,furnaceBlock);
 		//Item.itemsList[structureID] = new ItemBlockStructure(structureID-256);
 		//TODO: remember to disable on releases
-		testBlock = new TestBlock(structureID+1,Material.rock);
-		GameRegistry.registerBlock(testBlock, ItemTestBlock.class, "testBlock");
+		//testBlock = new TestBlock(structureID+1,Material.rock);
+		//GameRegistry.registerBlock(testBlock, ItemTestBlock.class, "testBlock");
 		
 		hhpulv.setContainerItem(hhpulv);
 		hhcomp.setContainerItem(hhcomp);
@@ -133,6 +133,8 @@ public class carbonization {
 		GameRegistry.registerWorldGenerator(new WorldgeneratorCarbonization());
 		NetworkRegistry.instance().registerGuiHandler(this, new GuiHandler());
 		GameRegistry.registerTileEntity(TileEntityFurnaces.class, "TileEntityFurnaces");
+		GameRegistry.registerTileEntity(TileEntityTest.class, "TileEntityTest");
+		GameRegistry.registerTileEntity(TileEntityMultiblockInit.class, "TileEntityMultiblockInit");
 		
 		GameRegistry.registerBlock(fuelBlock, ItemBlockFuels.class, "fuelBlock");
 		GameRegistry.registerBlock(structureBlock, ItemBlockStructure.class, "structureBlock");
@@ -191,6 +193,9 @@ public class carbonization {
 		LanguageRegistry.addName(new ItemStack(structureBlock,1,1), "Pig Iron Structure");
 		LanguageRegistry.addName(new ItemStack(structureBlock,1,2), "Mild Steel Structure");
 		LanguageRegistry.addName(new ItemStack(structureBlock,1,3), "Steel Structure");
+		LanguageRegistry.addName(new ItemStack(structureBlock,1,4), "Carbon Structure");
+		LanguageRegistry.addName(new ItemStack(structureBlock,1,5), "Reinforced Carbon Structure");
+		LanguageRegistry.addName(new ItemStack(structureBlock,1,6), "Ice Structure");
 		
 		//Localizations
 		LanguageRegistry.instance().addStringLocalization("tile.fuelBlock.peat.name", "Peat Deposit");
@@ -460,12 +465,19 @@ public class carbonization {
 		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(structureBlock,5,1), new Object[]{"x x", " x ", "x x", 'x', "ingotPigIron"}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(structureBlock,5,2), new Object[]{"x x", " x ", "x x", 'x', "ingotLCSteel"}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(structureBlock,5,3), new Object[]{"x x", " x ", "x x", 'x', "ingotSteel"}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(structureBlock,5,4), new Object[]{"x x", " x ", "x x", 'x', new ItemStack(misc, 1, 3)}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(structureBlock,5,5), new Object[]{"x x", " y ", "x x", 'x', new ItemStack(misc, 1, 3), 'y', Item.ingotIron}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(structureBlock,1,6), new Object[]{"x x", " x ", "x x", 'x', Item.snowball}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(structureBlock,5,6), new Object[]{"x x", " x ", "x x", 'x', Block.ice}));
 		
 		//take them apart
 		CraftingManager.getInstance().addShapelessRecipe(new ItemStack(ingots,1,0), new Object[]{new ItemStack(structureBlock,1,0)});
 		CraftingManager.getInstance().addShapelessRecipe(new ItemStack(ingots,1,1), new Object[]{new ItemStack(structureBlock,1,1)});
 		CraftingManager.getInstance().addShapelessRecipe(new ItemStack(ingots,1,2), new Object[]{new ItemStack(structureBlock,1,2)});
 		CraftingManager.getInstance().addShapelessRecipe(new ItemStack(ingots,1,3), new Object[]{new ItemStack(structureBlock,1,3)});
+		CraftingManager.getInstance().addShapelessRecipe(new ItemStack(fuel,1,5), new Object[]{new ItemStack(structureBlock,1,4)});
+		CraftingManager.getInstance().addShapelessRecipe(new ItemStack(fuel,1,5), new Object[]{new ItemStack(structureBlock,1,5)});
+		CraftingManager.getInstance().addShapelessRecipe(new ItemStack(Block.ice), new Object[]{new ItemStack(structureBlock,1,6)});
 	}
 }
 /*******************************************************************************

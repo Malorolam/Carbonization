@@ -14,6 +14,10 @@ public class GuiHandler implements IGuiHandler{
 		TileEntity tileEntity = world.getBlockTileEntity(x,y,z);
 		if (tileEntity instanceof TileEntityFurnaces)
 			return new ContainerFurnaces(player.inventory, (TileEntityFurnaces) tileEntity);
+        if(tileEntity instanceof TileEntityMultiblockInit){
+        	System.out.println("got to make the gui");
+        	return new ContainerTest(player.inventory, (TileEntityMultiblockInit)tileEntity);
+        }
 		return null;
 	}
 
@@ -24,6 +28,10 @@ public class GuiHandler implements IGuiHandler{
             TileEntity tileEntity = world.getBlockTileEntity(x, y, z);
             if(tileEntity instanceof TileEntityFurnaces){
                     return new GuiFurnaces(player.inventory, (TileEntityFurnaces) tileEntity);
+            }
+            if(tileEntity instanceof TileEntityMultiblockInit){
+            	System.out.println("got to make the gui");
+            	return new GuiTest((TileEntityMultiblockInit)tileEntity, player);
             }
             return null;
 

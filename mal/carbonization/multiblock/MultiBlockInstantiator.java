@@ -12,6 +12,40 @@ public class MultiBlockInstantiator {
 	}
 	
 	/*
+	 * Figure out the dimensions by finding the interior space and using known information from that
+	 */
+	public static int[] matchDimensions(int startX, int startY, int startZ, World world)
+	{
+		int[] value = new int[3];
+		boolean succ = false;
+		
+		//Figure out which axis lead to the interior
+		int sideAxis;
+		if(world.getBlockId(startX+1, startY, startZ)==0 && world.getBlockId(startX-1, startY, startZ)==0)//x axis alignment
+			sideAxis = 0;
+		else if(world.getBlockId(startX, startY+1, startZ)==0 && world.getBlockId(startX, startY-1, startZ)==0)//y axis alignment
+			sideAxis = 1;
+		else if(world.getBlockId(startX, startY, startZ+1)==0 && world.getBlockId(startX, startY, startZ-1)==0)//z axis alignment
+			sideAxis = 2;
+		else//not a valid block arrangement
+			return null;
+		
+		if(sideAxis==0)
+		{
+			//extend along x axis until we hit something not air or we reach the limit
+			for(int i=1; i<9; i++)
+			{
+				if(world.getBlockId(startX+i, startY, startZ)!= 0)
+				{
+					value[0] = i;
+					succ = true;
+					break;
+				}
+			}
+		}
+		return null;
+	}
+	/*
 	 * Continuously compare our pattern to what is in the world until there is a match and we return the offset
 	 */
 	public static int[] matchPattern(MultiBlockMatcher mbMatch, int startX, int startY, int startZ, World world, Multiblock parentBlock)
@@ -120,7 +154,7 @@ public class MultiBlockInstantiator {
 					}
 				}
 		}
-		if(sideAxis == -1)//the dreaded full axis calculations, since there is no information we have to examine every possible position
+		/*if(sideAxis == -1)//the dreaded full axis calculations, since there is no information we have to examine every possible position
 		{
 			for(int i = 1-pattern.length; i<pattern.length; i++)
 				for(int j=1-pattern[0].length; j<pattern[0].length; j++)
@@ -136,9 +170,10 @@ public class MultiBlockInstantiator {
 						}
 					}
 					
-		}
+		}*/
 		return null;
 	}
+	
 	/*
 	 * Build a multiblock from a successful pattern
 	 */

@@ -17,7 +17,7 @@ import net.minecraft.world.World;
 
 public class BlockStructure extends Block {
 
-private Icon[] iconArray = new Icon[4];
+private Icon[] iconArray = new Icon[7];
 	
 	public BlockStructure(int par1, int par2, Material par3Material) {
 		super(par1, par3Material);
@@ -35,6 +35,9 @@ private Icon[] iconArray = new Icon[4];
 		iconArray[1] = ir.registerIcon("carbonization:pigIronStructureTexture");
 		iconArray[2] = ir.registerIcon("carbonization:mildSteelStructureTexture");
 		iconArray[3] = ir.registerIcon("carbonization:steelStructureTexture");
+		iconArray[4] = ir.registerIcon("carbonization:carbonStructureTexture");
+		iconArray[5] = ir.registerIcon("carbonization:refCarbonStructureTexture");
+		iconArray[6] = ir.registerIcon("carbonization:iceStructureTexture");
 	}
 	
 	@Override
@@ -83,6 +86,44 @@ private Icon[] iconArray = new Icon[4];
         return 1;
     }
     
+    /**
+     * Location sensitive version of getExplosionRestance
+     *
+     * @param par1Entity The entity that caused the explosion
+     * @param world The current world
+     * @param x X Position
+     * @param y Y Position
+     * @param z Z Position
+     * @param explosionX Explosion source X Position
+     * @param explosionY Explosion source X Position
+     * @param explosionZ Explosion source X Position
+     * @return The amount of the explosion absorbed.
+     */
+    @Override
+    public float getExplosionResistance(Entity par1Entity, World world, int x, int y, int z, double explosionX, double explosionY, double explosionZ)
+    {
+        int metadata = world.getBlockMetadata(x, y, z);
+        switch(metadata)
+        {
+        case 0://refined iron
+        	return 10f;
+        case 1://pig iron
+        	return 8f;
+        case 2://HC steel
+        	return 10f;
+        case 3://MC steel
+        	return 15f;
+        case 4://carbon
+        	return 5f;
+        case 5://reinforced carbon
+        	return 15f;
+        case 6://ice
+        	return 5f;
+        default:
+        	return 1f;
+        }
+    }
+    
     @SideOnly(Side.CLIENT)
     public void getSubBlocks(int par1, CreativeTabs par2CreativeTabs, List par3List)
     {
@@ -90,6 +131,9 @@ private Icon[] iconArray = new Icon[4];
     	par3List.add(new ItemStack(par1, 1, 1));
     	par3List.add(new ItemStack(par1, 1, 2));
     	par3List.add(new ItemStack(par1, 1, 3));
+    	par3List.add(new ItemStack(par1, 1, 4));
+    	par3List.add(new ItemStack(par1, 1, 5));
+    	par3List.add(new ItemStack(par1, 1, 6));
     }
 
 }

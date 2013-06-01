@@ -37,6 +37,22 @@ public class ItemBlockStructure extends ItemBlock {
 			list.add(setTooltipData("Made from a medium-carbon steel", ColorReference.LIGHTGREEN));
 			list.add(setTooltipData("Tier 4 Material", ColorReference.DARKCYAN));
 			break;
+		case 4://carbon
+			list.add(setTooltipData("Made from carbon fibre", ColorReference.LIGHTGREEN));
+			list.add(setTooltipData("Tier 4 Material", ColorReference.DARKCYAN));
+			break;
+		case 5://reinforced carbon
+			list.add(setTooltipData("Made from carbon fibre, ", ColorReference.LIGHTGREEN));
+			list.add(setTooltipData("reinforced with iron", ColorReference.LIGHTGREEN));
+			list.add(setTooltipData("Tier 5 Material", ColorReference.DARKCYAN));
+			break;
+		case 6://ice
+			list.add(setTooltipData("Made from ice", ColorReference.LIGHTGREEN));
+			list.add(setTooltipData("Dwarven engineering allows ", ColorReference.ORANGE));
+			list.add(setTooltipData("for unmelting ice, even in ", ColorReference.ORANGE));
+			list.add(setTooltipData("the hottest of temperatures.", ColorReference.ORANGE));
+			list.add(setTooltipData("Tier 0 Material", ColorReference.DARKCYAN));
+			break;
 		default:
 			list.add(setTooltipData("This isn't even an item!",ColorReference.DARKRED));
 			list.add(setTooltipData("Tell Mal about it so he can fix it.", ColorReference.LIGHTRED));
@@ -64,6 +80,12 @@ public class ItemBlockStructure extends ItemBlock {
 			return this.getUnlocalizedName()+"mildSteel";
 		case 3:
 			return this.getUnlocalizedName()+"steel";
+		case 4:
+			return this.getUnlocalizedName()+"carbon";
+		case 5:
+			return this.getUnlocalizedName()+"refCarbon";
+		case 6:
+			return this.getUnlocalizedName()+"ice";
 		default:
 			return this.getUnlocalizedName()+"BlockStructure";
 		}
@@ -90,6 +112,15 @@ public class ItemBlockStructure extends ItemBlock {
 			break;
 		case 3:
 			name = "steel";
+			break;
+		case 4:
+			name = "carbon";
+			break;
+		case 5:
+			name = "reinforcedCarbon";
+			break;
+		case 6:
+			name = "ice";
 			break;
 		default: name = "blarg";
 		}
