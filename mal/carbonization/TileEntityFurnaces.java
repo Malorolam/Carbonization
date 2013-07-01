@@ -268,6 +268,8 @@ public class TileEntityFurnaces extends TileEntity implements IInventory, net.mi
         nbt.setTag("Items", var2);
         nbt.setByte("facing", facing);
         nbt.setInteger("Tier", tier);
+        
+        System.out.println("wrote to NBT");
     }
 
     /**

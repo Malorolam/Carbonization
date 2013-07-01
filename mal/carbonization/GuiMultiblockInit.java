@@ -1,5 +1,6 @@
 package mal.carbonization;
 
+import java.awt.event.KeyEvent;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.net.URI;
@@ -26,7 +27,7 @@ import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.StatCollector;
 
 @SideOnly(Side.CLIENT)
-public class GuiTest extends GuiScreen
+public class GuiMultiblockInit extends GuiScreen
 {
     private TileEntityMultiblockInit test;
     
@@ -34,8 +35,9 @@ public class GuiTest extends GuiScreen
     private GuiTextField ybox;
     private GuiTextField zbox;
     private EntityPlayer player;
+    private GuiButton closeBtn;
 
-    public GuiTest(TileEntityMultiblockInit par2TileEntityTest, EntityPlayer player)
+    public GuiMultiblockInit(TileEntityMultiblockInit par2TileEntityTest, EntityPlayer player)
     {
         this.test = par2TileEntityTest;
         this.player = player;
@@ -50,17 +52,17 @@ public class GuiTest extends GuiScreen
         this.buttonList.clear();
         byte b0 = -16;
         this.buttonList.add(new GuiButton(1, this.width / 2 - 116, this.height / 2 + 62 + b0, 114, 20, "Make it so."));
-        this.buttonList.add(new GuiButton(2, this.width / 2 + 2, this.height / 2 + 62 + b0, 114, 20, "Close"));
+        this.buttonList.add(this.closeBtn = new GuiButton(2, this.width / 2 + 2, this.height / 2 + 62 + b0, 114, 20, "Close"));
         
-        this.xbox = new GuiTextField(this.fontRenderer, (this.width - 248) / 2 + 60, (this.height - 166) / 2 + 50, 60 , 20);
+        this.xbox = new GuiTextField(this.fontRenderer, (this.width - 248) / 2 + 50, (this.height - 166) / 2 + 35, 60 , 20);
         this.xbox.setMaxStringLength(2);
         this.xbox.setFocused(true);
         this.xbox.setText(String.valueOf(this.test.xdiff));
-        this.ybox = new GuiTextField(this.fontRenderer, (this.width - 248) / 2 + 60, (this.height - 166) / 2 + 80, 60, 20);
+        this.ybox = new GuiTextField(this.fontRenderer, (this.width - 248) / 2 + 50, (this.height - 166) / 2 + 65, 60, 20);
         this.ybox.setMaxStringLength(2);
         this.ybox.setFocused(false);
         this.ybox.setText(String.valueOf(this.test.ydiff));
-        this.zbox = new GuiTextField(this.fontRenderer, (this.width - 248) / 2 + 60, (this.height - 166) / 2 + 110, 60, 20);
+        this.zbox = new GuiTextField(this.fontRenderer, (this.width - 248) / 2 + 50, (this.height - 166) / 2 + 95, 60, 20);
         this.zbox.setMaxStringLength(2);
         this.zbox.setFocused(false);
         this.zbox.setText(String.valueOf(this.test.zdiff));
@@ -117,6 +119,34 @@ public class GuiTest extends GuiScreen
      */
     protected void keyTyped(char par1, int par2)
     {
+    	if(par1==KeyEvent.VK_TAB)
+    	{
+    		if(xbox.isFocused())
+    		{
+    			xbox.setFocused(false);
+    			ybox.setFocused(true);
+    		}
+    		else if(ybox.isFocused())
+        	{
+    			ybox.setFocused(false);
+    			zbox.setFocused(true);
+    		}
+    		else if(zbox.isFocused())
+        	{
+    			zbox.setFocused(false);
+    			xbox.setFocused(true);
+    		}
+    		else
+    		{
+    			xbox.setFocused(true);
+    			ybox.setFocused(false);
+    			zbox.setFocused(false);
+    		}
+    	}
+    	
+    	if(par1==KeyEvent.VK_ESCAPE)
+    		this.actionPerformed(this.closeBtn);
+    	
     	if(xbox.isFocused())
     		xbox.textboxKeyTyped(par1, par2);
     	if(ybox.isFocused())
@@ -154,7 +184,7 @@ public class GuiTest extends GuiScreen
         this.mc.renderEngine.bindTexture("/mods/carbonization/textures/gui/multiblock.png");
         int i = (this.width - 248) / 2;
         int j = (this.height - 166) / 2;
-        this.drawTexturedModalRect(i, j, 0, 0, 248, 166);
+        this.drawTexturedModalRect(i, j, 0, 0, 248, 266);
     }
 
     /**
@@ -165,14 +195,14 @@ public class GuiTest extends GuiScreen
         this.drawDefaultBackground();
         int k = (this.width - 248) / 2 + 10;
         int l = (this.height - 166) / 2 + 8;
-        this.fontRenderer.drawString("The Official Carbonization Test Block:", k, l, 2039583);
+        this.fontRenderer.drawString("Multiblock Initilization:", k, l, 2039583);
         l += 12;
         GameSettings gamesettings = this.mc.gameSettings;
-        String s = "Currently testing Multiblock size calculations";
+        String s = "Still doesn't work right.";
         this.fontRenderer.drawString(s, k, l, 5197647);
-        this.fontRenderer.drawString("X Size:", k, l+30, 5197647);
-        this.fontRenderer.drawString("Y Size:", k, l+60, 5197647);
-        this.fontRenderer.drawString("Z Size:", k, l+90, 5197647);
+        this.fontRenderer.drawString("X Size:", k, l+20, 2039583);
+        this.fontRenderer.drawString("Y Size:", k, l+50, 2039583);
+        this.fontRenderer.drawString("Z Size:", k, l+80, 2039583);
         this.xbox.drawTextBox();
         this.ybox.drawTextBox();
         this.zbox.drawTextBox();

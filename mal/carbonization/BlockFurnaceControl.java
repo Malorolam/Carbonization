@@ -1,22 +1,30 @@
 package mal.carbonization;
 
+import java.util.Random;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import mal.carbonization.multiblock.MultiBlockInstantiator;
 import mal.carbonization.multiblock.MultiBlockMatcher;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Icon;
 import net.minecraft.world.World;
 
 /*
  * A test block for debugging internal mechanisms
  * Currently set up for multiblock patterns
  */
-public class TestBlock extends BlockContainer {
+public class BlockFurnaceControl extends BlockContainer {
 
-	public TestBlock(int par1, Material par2Material) {
+	private Icon[] icons = new Icon[2];
+	
+	public BlockFurnaceControl(int par1, Material par2Material) {
 		super(par1, par2Material);
 		this.setUnlocalizedName("carbonization:testblock");
 		this.setCreativeTab(CreativeTabs.tabBlock);
@@ -26,6 +34,36 @@ public class TestBlock extends BlockContainer {
 	public boolean hasTileEntity(int metadata)
 	{
 		return true;
+	}
+	
+	@Override
+    @SideOnly(Side.CLIENT)
+    public void registerIcons(IconRegister ir)
+    {
+		icons[0] = ir.registerIcon("carbonization:multiblockFurnaceControlSideTexture");
+		icons[1] = ir.registerIcon("carbonization:multiblockFurnaceControlTopTexture");
+    }
+	
+	@Override
+	public Icon getIcon(int side, int metadata)
+	{
+		if(side == 0 || side == 1)//top or bottom
+			return icons[1];
+		else
+			return icons[0];
+	}
+	
+	@Override
+	public int idDropped(int par1, Random par2Random, int par3)
+	{
+		try 
+		{
+			return carbonization.multiblockFurnaceControl.blockID;
+		}
+		catch (Exception e)
+		{
+			return 0;
+		}
 	}
 
 	/**

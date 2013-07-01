@@ -5,46 +5,12 @@ import net.minecraft.world.World;
 //Used to calculate and create the multiblock
 //Totally doesn't work right...
 public class MultiBlockInstantiator {
-
 	
 	public MultiBlockInstantiator()
 	{
 	}
 	
-	/*
-	 * Figure out the dimensions by finding the interior space and using known information from that
-	 */
-	public static int[] matchDimensions(int startX, int startY, int startZ, World world)
-	{
-		int[] value = new int[3];
-		boolean succ = false;
-		
-		//Figure out which axis lead to the interior
-		int sideAxis;
-		if(world.getBlockId(startX+1, startY, startZ)==0 && world.getBlockId(startX-1, startY, startZ)==0)//x axis alignment
-			sideAxis = 0;
-		else if(world.getBlockId(startX, startY+1, startZ)==0 && world.getBlockId(startX, startY-1, startZ)==0)//y axis alignment
-			sideAxis = 1;
-		else if(world.getBlockId(startX, startY, startZ+1)==0 && world.getBlockId(startX, startY, startZ-1)==0)//z axis alignment
-			sideAxis = 2;
-		else//not a valid block arrangement
-			return null;
-		
-		if(sideAxis==0)
-		{
-			//extend along x axis until we hit something not air or we reach the limit
-			for(int i=1; i<9; i++)
-			{
-				if(world.getBlockId(startX+i, startY, startZ)!= 0)
-				{
-					value[0] = i;
-					succ = true;
-					break;
-				}
-			}
-		}
-		return null;
-	}
+	
 	/*
 	 * Continuously compare our pattern to what is in the world until there is a match and we return the offset
 	 */
@@ -192,11 +158,28 @@ public class MultiBlockInstantiator {
 	}
 	
 	/*
-	 * Build a multibBlockMatcher following the blocks in a volume
+	 * Determine the two efficiency values of a multiblock
+	 */
+	public static int[] addValue(int value, boolean type, int[] data)
+	{
+		if(type)//side and top
+		{
+			data[0] += value;
+		}
+		else
+		{
+			data[1] += value;
+		}
+		return data;
+	}
+	
+	/*
+	 * Build a multiBlockMatcher following the blocks in a volume
 	 */
 	public static boolean createWorldMultiBlock(MultiBlockMatcher mbMatch, int startX, int startY, int startZ, int xSize, int ySize, int zSize, World world)
 	{
 		System.out.println("Starting Values: " + startX +", "+ startY+", "+ startZ +", " + xSize + ", " + ySize + ", " + zSize);
+		
 		for(int i=0;i<mbMatch.getPattern().length;i++)
 			for(int j=0; j<mbMatch.getPattern()[0].length;j++)
 				for(int k=0; k<mbMatch.getPattern()[0][0].length;k++)

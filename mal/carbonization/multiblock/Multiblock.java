@@ -1,22 +1,32 @@
 package mal.carbonization.multiblock;
 
+import mal.carbonization.carbonization;
 import net.minecraft.block.Block;
-//Stores a block and it's location
+//Stores a block and it's location, as well as it's tier if it's one of the valid multiblock blocks
 public class Multiblock {
 
 	public int blockID;
 	public byte blockMetadata;
+	public int tier=-1;
 	
 	public Multiblock(int blockID, byte metadata)
 	{
 		this.blockID = blockID;
 		this.blockMetadata = metadata;
+		if(blockID==carbonization.structureBlock.blockID)
+		{
+			this.tier=carbonization.structureBlock.getTier(blockMetadata);
+		}
 	}
 	
 	public Multiblock(int blockID, int metadata)
 	{
 		this.blockID = blockID;
 		this.blockMetadata = (byte)metadata;
+		if(blockID==carbonization.structureBlock.blockID)
+		{
+			this.tier=carbonization.structureBlock.getTier(blockMetadata);
+		}
 	}
 	
 	public boolean compare(Multiblock multiblock, boolean useMetadata)

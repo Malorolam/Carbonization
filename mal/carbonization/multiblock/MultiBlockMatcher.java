@@ -1,5 +1,7 @@
 package mal.carbonization.multiblock;
 
+import mal.carbonization.carbonization;
+
 /*
  * Will build a pattern of blocks
  */
@@ -8,6 +10,9 @@ public class MultiBlockMatcher {
 	private int xdiff;
 	private int ydiff;
 	private int zdiff;
+	
+	//efficiency of the side/top[0] and base [1]
+	private int[] efficiency = new int[2];
 	
 	/**
 	 * patterns are related to a starting position x,y,z at 0,0,0 on the pattern
@@ -22,6 +27,9 @@ public class MultiBlockMatcher {
 		this.ydiff=ydiff;
 		this.zdiff=zdiff;
 		
+		efficiency[0]=-1;
+		efficiency[1]=-1;
+		
 		pattern = new Multiblock[xdiff][ydiff][zdiff];
 		//Initialize the pattern with "air"
 		buildSolid(0,0,0,xdiff-1,ydiff-1,zdiff-1,0,(byte)0);
@@ -33,6 +41,36 @@ public class MultiBlockMatcher {
 	public Multiblock[][][] getPattern()
 	{
 		return pattern;
+	}
+	
+	public int[] getEfficiency()
+	{
+		if(efficiency[0]!=-1 && efficiency[1]!=-1)
+			return efficiency;
+		else
+			return calculateEfficiency();
+	}
+	
+	public int[] calculateEfficiency()
+	{
+		efficiency[0]=0;
+		efficiency[1]=0;
+		
+		for(int i=0;i<xdiff;i++)
+		{
+			for (int j=0;j<ydiff;j++)
+			{
+				for (int k=0;k<zdiff;k++)
+				{
+					if(pattern[i][j][k].tier != -1)
+						if(j==0)
+							efficiency[1]+=pattern[i][j][k].tier;
+						else
+							efficiency[0]+=pattern[i][j][k].tier;
+				}
+			}
+		}
+		return efficiency;
 	}
 	
 	/*
@@ -110,7 +148,7 @@ public class MultiBlockMatcher {
 			for(int j = 0; j<pattern[0].length; j++)
 				for(int k = 0; k<pattern[0][0].length; k++)
 				{
-					if(!pattern[i][j][k].compare(test_pattern[i][j][k],true))
+					if(!pattern[i][j][k].compare(test_pattern[i][j][k],false))
 					{
 						if(test_pattern[i][j][k].compare(exceptionBlock,true) && count<exceptionCount)
 						{
@@ -336,6 +374,7 @@ public class MultiBlockMatcher {
 		}
 		
 		pattern[i][j][k] = new Multiblock(blockID, metadata);
+		
 		return true;
 	}
 }

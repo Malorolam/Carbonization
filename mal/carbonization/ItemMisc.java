@@ -16,7 +16,7 @@ import net.minecraft.world.World;
 
 public class ItemMisc extends Item{
 
-	private Icon[] iconArray = new Icon[4];
+	private Icon[] iconArray = new Icon[6];
 	
 	public ItemMisc(int par1) {
 		super(par1);
@@ -52,6 +52,14 @@ public class ItemMisc extends Item{
 			list.add(setTooltipData("Perhaps I should compress it further", ColorReference.ORANGE));
 			list.add(setTooltipData("in case it becomes useful?", ColorReference.ORANGE));
 			break;
+		case 4://glass insulation
+			list.add(setTooltipData("Glass fibre suspended in clay filler.", ColorReference.LIGHTGREEN));
+			list.add(setTooltipData("Useful for insulating.", ColorReference.LIGHTGREEN));
+			break;
+		case 5://high density insulation
+			list.add(setTooltipData("Graphite fibre suspended in sand filler.", ColorReference.LIGHTGREEN));
+			list.add(setTooltipData("Useful for insulating at high temperatures.", ColorReference.LIGHTGREEN));
+			break;
 		default:
 			list.add(setTooltipData("This isn't even an item!",ColorReference.DARKRED));
 			list.add(setTooltipData("Tell Mal about it so he can fix it.", ColorReference.LIGHTRED));
@@ -79,6 +87,10 @@ public class ItemMisc extends Item{
 			return "pCleansingPotion";
 		case 3:
 			return "carbonChunk";
+		case 4:
+			return "glassInsulation";
+		case 5:
+			return "highDensityInsulation";
 		default:
 			return "ItemMisc";
 		}
@@ -96,6 +108,8 @@ public class ItemMisc extends Item{
 		iconArray[1] = ir.registerIcon("carbonization:cleansingPotionTexture");
 		iconArray[2] = ir.registerIcon("carbonization:cleansingPotionTexture");
 		iconArray[3] = ir.registerIcon("carbonization:carbonChunkTexture");
+		iconArray[4] = ir.registerIcon("carbonization:glassInsulationTexture");
+		iconArray[5] = ir.registerIcon("carbonization:highDensityInsulationTexture");
 	}
 	
 	public Icon getIconFromDamage(int value)
@@ -134,6 +148,12 @@ public class ItemMisc extends Item{
 		case 3:
 			r="carbonchunk";
 			break;
+		case 4:
+			r="glassinsulation";
+			break;
+		case 5:
+			r="highdensityinsulation";
+			break;
 		default:
 			r="blaarg";
 			break;
@@ -152,6 +172,8 @@ public class ItemMisc extends Item{
         par3List.add(new ItemStack(par1, 1, 1));
         par3List.add(new ItemStack(par1, 1, 2));
         par3List.add(new ItemStack(par1, 1, 3));
+        par3List.add(new ItemStack(par1, 1, 4));
+        par3List.add(new ItemStack(par1, 1, 5));
     }
 	
     public ItemStack onEaten(ItemStack par1ItemStack, World par2World, EntityPlayer par3EntityPlayer)

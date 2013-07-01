@@ -7,7 +7,7 @@ import java.io.IOException;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
 
-import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.Packet250CustomPayload;
@@ -20,19 +20,18 @@ public class PacketHandler implements IPacketHandler {
 
 	@Override
 	public void onPacketData(INetworkManager manager, Packet250CustomPayload packet, Player player) {
-		if(packet.channel.equals("CarbonizationChn"))
-		{
-			ByteArrayDataInput data = ByteStreams.newDataInput(packet.data);
-		
-			int x = data.readInt();
-			int y = data.readInt();
-			int z = data.readInt();
-			int metadata = data.readInt();
-			
-			if(player instanceof EntityClientPlayerMP)
+		try {
+			if(packet.channel.equals("CarbonizationChn"))
 			{
+				ByteArrayDataInput data = ByteStreams.newDataInput(packet.data);
+			
+				int x = data.readInt();
+				int y = data.readInt();
+				int z = data.readInt();
+				int metadata = data.readInt();
+				
 				System.out.println("We gots a packet!");
-				World world = ((EntityClientPlayerMP)player).worldObj;
+				World world = ((EntityPlayer) player).worldObj;
 				TileEntity te = world.getBlockTileEntity(x, y, z);
 				if(te instanceof TileEntityFurnaces)
 				{
@@ -59,25 +58,35 @@ public class PacketHandler implements IPacketHandler {
 					cte.furnaceCookTimeMultiplyer = multiplyer;
 					cte.handlePacketData(items);
 				}
-				
-				if(te instanceof TileEntityMultiblockInit)
+				else if(te instanceof TileEntityMultiblockInit)
 				{
 					System.out.println("MultiblockInit packet recieved!");
 					int xdiff = data.readInt();
 					int ydiff = data.readInt();
 					int zdiff = data.readInt();
 					boolean activated = data.readBoolean();
+					System.out.println("Writing Data: " + xdiff + ", " + ydiff + ", " + zdiff + "; " + activated);
 					
 					TileEntityMultiblockInit mte = (TileEntityMultiblockInit)te;
 					mte.blockMetadata = metadata;
 					mte.activated = activated;
-					mte.initilizeFunction(xdiff, ydiff, zdiff);
+					mte.xdiff = xdiff;
+					mte.ydiff = ydiff;
+					mte.zdiff = zdiff;
 					if(activated)
 					{
 						mte.processFunction();
 					}
 				}
+				else
+				{
+					System.out.println("I'm too sexy for my pants, too sexy for my pants, too sexy to dance.");
+				}
 			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
 		}
 	}
 	
@@ -132,9 +141,9 @@ public class PacketHandler implements IPacketHandler {
 			}
 		}
 		
-		if(te instanceof TileEntityMultiblockInit)
+		else if(te instanceof TileEntityMultiblockInit)
 		{
-			System.out.println("Writing Multiblockinit packet.");
+			//System.out.println("Writing Multiblockinit packet.");
 			int xdiff = ((TileEntityMultiblockInit)te).xdiff;
 			int ydiff = ((TileEntityMultiblockInit)te).ydiff;
 			int zdiff = ((TileEntityMultiblockInit)te).zdiff;
@@ -153,11 +162,53 @@ public class PacketHandler implements IPacketHandler {
 			}
 		}
 		
+		else
+		{
+			System.out.println("I'm too sexy for Milan, too sexy for Milan, New york, and Japan.");
+		}
+		
 		Packet250CustomPayload pak = new Packet250CustomPayload();
 		pak.channel = "CarbonizationChn";
 		pak.data = bos.toByteArray();
 		pak.length = bos.size();
 		pak.isChunkDataPacket = true;
+		//System.out.println("happy packet is happy.");
+		return pak;
+	}
+	
+	//make the packet for multiblock init
+	public static Packet makeMultiblockPacket(TileEntityMultiblockInit te, int xdiff, int ydiff, int zdiff, boolean activated)
+	{
+		ByteArrayOutputStream bos = new ByteArrayOutputStream(140);
+		DataOutputStream dos = new DataOutputStream(bos);
+		
+		int x = te.xCoord;
+		int y = te.yCoord;
+		int z = te.zCoord;
+		int metadata = te.blockMetadata;
+		
+		try
+		{
+			dos.writeInt(x);
+			dos.writeInt(y);
+			dos.writeInt(z);
+			dos.writeInt(metadata);
+			dos.writeInt(xdiff);
+			dos.writeInt(ydiff);
+			dos.writeInt(zdiff);
+			dos.writeBoolean(activated);
+		}
+		catch (IOException e)
+		{
+			System.out.println("HURRR DURRR");
+		}
+		
+		Packet250CustomPayload pak = new Packet250CustomPayload();
+		pak.channel = "CarbonizationChn";
+		pak.data = bos.toByteArray();
+		pak.length = bos.size();
+		pak.isChunkDataPacket = true;
+		System.out.println("happy packet is happy.");
 		return pak;
 	}
 

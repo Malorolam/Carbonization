@@ -13,14 +13,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.tileentity.TileEntityFurnace;
 
-public class ContainerTest extends Container
+public class ContainerMultiblockInit extends Container
 {
     private TileEntityMultiblockInit test;
     private int xdiff;
     private int ydiff;
     private int zdiff;
 
-    public ContainerTest(InventoryPlayer par1InventoryPlayer, TileEntityMultiblockInit partest)
+    public ContainerMultiblockInit(InventoryPlayer par1InventoryPlayer, TileEntityMultiblockInit partest)
     {
         this.test = partest;
     }

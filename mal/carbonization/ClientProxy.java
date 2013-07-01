@@ -24,10 +24,12 @@ public class ClientProxy extends CommonProxy {
 	public Object getClientGuiElement(int id, EntityPlayer player, World world, int x, int y, int z)
 	{
 		TileEntity te = world.getBlockTileEntity(x, y, z);
-		if(te != null && te instanceof TileEntityFurnaces)
+		if(te instanceof TileEntityFurnaces)
 		{
 			return new GuiFurnaces(player.inventory, (TileEntityFurnaces)te);
 		}
+		else if(te instanceof TileEntityMultiblockInit)
+			return new GuiTest((TileEntityMultiblockInit)te, player);
 		else
 			return null;
 	}

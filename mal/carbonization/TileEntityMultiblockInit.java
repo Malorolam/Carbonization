@@ -1,5 +1,7 @@
 package mal.carbonization;
 
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import mal.carbonization.multiblock.MultiBlockInstantiator;
@@ -23,9 +25,9 @@ public class TileEntityMultiblockInit extends TileEntity {
 	private MultiBlockMatcher match;
 	private MultiBlockMatcher mbEmpty;
 	//dimensions of the multiblock, set through GUI
-	int xdiff = 0;
-	int ydiff = 0;
-	int zdiff = 0;
+	int xdiff;
+	int ydiff;
+	int zdiff;
 	boolean activated=false;
 	//lowercase representation of what this multiblock is going to become
 	String type;
@@ -33,6 +35,14 @@ public class TileEntityMultiblockInit extends TileEntity {
 	public TileEntityMultiblockInit(String type)
 	{
 		this.type = type;
+		xdiff=3;
+		ydiff=3;
+		zdiff=3;
+	}
+	
+	public TileEntityMultiblockInit()
+	{
+		this("none");
 	}
 	
 	/**
@@ -47,6 +57,8 @@ public class TileEntityMultiblockInit extends TileEntity {
     	this.ydiff = nbt.getInteger("ydiff");
     	this.zdiff = nbt.getInteger("zdiff");
     	this.activated = nbt.getBoolean("activated");
+    	this.type = nbt.getString("type");
+    	System.out.println("Reading Data: " + xdiff + ", " + ydiff + ", " + zdiff + "; " + activated + ", " + type);
     }
     
     @Override
@@ -58,6 +70,8 @@ public class TileEntityMultiblockInit extends TileEntity {
     	nbt.setInteger("ydiff", ydiff);
     	nbt.setInteger("zdiff", zdiff);
     	nbt.setBoolean("activated", activated);
+    	nbt.setString("type", type);
+    	System.out.println("Writing Data: " + xdiff + ", " + ydiff + ", " + zdiff + "; " + activated + ", " + type);
     }
 	
     /*
@@ -68,13 +82,9 @@ public class TileEntityMultiblockInit extends TileEntity {
 		System.out.println("xd: " + xd + ", xdiff: " + xdiff);
 		System.out.println("yd: " + yd + ", ydiff: " + ydiff);
 		System.out.println("zd: " + zd + ", zdiff: " + zdiff);
-		
-		if(xd != xdiff || yd != ydiff ||zd != zdiff)
-		{
-			xdiff = xd;
-			ydiff = yd;
-			zdiff = zd;
-		}
+		xdiff = xd;
+		ydiff = yd;
+		zdiff = zd;
 	}
 	
 	/*
@@ -86,12 +96,14 @@ public class TileEntityMultiblockInit extends TileEntity {
         player.openGui(carbonization.instance, 1, world, x, y, z);
     }
 	
-	public void closeGui(boolean activated, EntityPlayer player)
+	public void closeGui(EntityPlayer player, int xd, int yd, int zd, boolean activated)
 	{
+		xdiff = xd;
+		ydiff = yd;
+		zdiff = zd;
 		this.activated = activated;
-
-        if(player instanceof EntityClientPlayerMP)
-        	((EntityClientPlayerMP) player).sendQueue.addToSendQueue(getDescriptionPacket());
+		//if(FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
+			PacketDispatcher.sendPacketToServer(getDescriptionPacket());
 	}
 	
 	@Override
@@ -119,11 +131,19 @@ public class TileEntityMultiblockInit extends TileEntity {
 		else
 			System.out.println("Null");
 	}
-
-	public boolean isUseableByPlayer(EntityPlayer par1EntityPlayer) {
-		// TODO Auto-generated method stub
-		return true;
-	}
+	
+    public boolean isUseableByPlayer(EntityPlayer entityplayer)
+    {
+        if (worldObj == null)
+        {
+            return true;
+        }
+        if (worldObj.getBlockTileEntity(xCoord, yCoord, zCoord) != this)
+        {
+            return false;
+        }
+        return entityplayer.getDistanceSq((double) xCoord + 0.5D, (double) yCoord + 0.5D, (double) zCoord + 0.5D) <= 64D;
+    }
 }
 /*******************************************************************************
 * Copyright (c) 2013 Malorolam.

@@ -15,8 +15,8 @@ public class GuiHandler implements IGuiHandler{
 		if (tileEntity instanceof TileEntityFurnaces)
 			return new ContainerFurnaces(player.inventory, (TileEntityFurnaces) tileEntity);
         if(tileEntity instanceof TileEntityMultiblockInit){
-        	System.out.println("got to make the gui");
-        	return new ContainerTest(player.inventory, (TileEntityMultiblockInit)tileEntity);
+        	//System.out.println("got to make the gui server side");
+        	return new ContainerMultiblockInit(player.inventory, (TileEntityMultiblockInit)tileEntity);
         }
 		return null;
 	}
@@ -30,8 +30,8 @@ public class GuiHandler implements IGuiHandler{
                     return new GuiFurnaces(player.inventory, (TileEntityFurnaces) tileEntity);
             }
             if(tileEntity instanceof TileEntityMultiblockInit){
-            	System.out.println("got to make the gui");
-            	return new GuiTest((TileEntityMultiblockInit)tileEntity, player);
+            	//System.out.println("got to make the gui client side");
+            	return new GuiMultiblockInit((TileEntityMultiblockInit)tileEntity, player);
             }
             return null;
 
