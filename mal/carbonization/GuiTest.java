@@ -16,6 +16,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.gui.inventory.GuiFurnace;
+import net.minecraft.client.resources.ResourceLocation;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -151,7 +152,7 @@ public class GuiTest extends GuiScreen
     {
         super.drawDefaultBackground();
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        this.mc.renderEngine.bindTexture("/mods/carbonization/textures/gui/multiblock.png");
+        this.mc.renderEngine.func_110577_a(new ResourceLocation("/assets/carbonization/textures/gui/multiblock.png"));
         int i = (this.width - 248) / 2;
         int j = (this.height - 166) / 2;
         this.drawTexturedModalRect(i, j, 0, 0, 248, 166);

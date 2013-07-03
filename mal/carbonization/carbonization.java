@@ -34,7 +34,7 @@ import thermalexpansion.api.crafting.CraftingHelpers;
 import thermalexpansion.api.crafting.CraftingManagers;
 import ic2.api.recipe.*;
 
-@Mod(modid="carbonization", name="Carbonization", version="0.6.5")
+@Mod(modid="carbonization", name="Carbonization", version="0.6.9")
 @NetworkMod(clientSideRequired=true, serverSideRequired=false, channels={"CarbonizationChn"}, packetHandler = PacketHandler.class)
 public class carbonization {
 
@@ -78,7 +78,7 @@ public class carbonization {
 	@SidedProxy(clientSide = "mal.carbonization.ClientProxy", serverSide = "mal.carbonization.CommonProxy")
 	public static CommonProxy prox;
 	
-	@PreInit
+	@Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
             Configuration config = new Configuration(event.getSuggestedConfigurationFile());
 
@@ -104,129 +104,135 @@ public class carbonization {
     		}
     		
     		config.save();
+    		
+    		
+    		//blarg
+    		fuel = new ItemFuel(fuelID);
+    		dust = new ItemDust(dustID);
+    		misc = new ItemMisc(miscID);
+    		ingots = new ItemIngots(ingotID);
+    		hhpulv = new ItemHHPulverizer(itemID);
+    		HHPulv  = new ItemStack(hhpulv, 1, OreDictionary.WILDCARD_VALUE);
+    		hhpure = new ItemHHPurifyer(itemID3);
+    		HHPure = new ItemStack(hhpure, 1, OreDictionary.WILDCARD_VALUE);
+    		hhcomp = new ItemHHCompressor(itemID2);
+    		HHComp = new ItemStack(hhcomp,1,OreDictionary.WILDCARD_VALUE);
+    		fuelBlock = new BlockFuel(blockID,0,Material.rock).setStepSound(Block.soundStoneFootstep).setHardness(3F).setResistance(1.0F);
+    		structureBlock = new BlockStructure(structureID,0,Material.iron);
+    		furnaceBlock = new BlockFurnaces(furnaceID,false);
+    		furnaceBlockActive = new BlockFurnaces(furnaceID2, true);
+    		multiblockFurnaceControl = new BlockFurnaceControl(multiblockfurnaceID, Material.iron);
+    		//Item.itemsList[blockID] = new ItemBlockFuels(blockID-256);
+    		Item.itemsList[furnaceID] = new ItemBlockFurnaces(furnaceID-256,furnaceBlock);
+    		//Item.itemsList[structureID] = new ItemBlockStructure(structureID-256);
+    		
+    		//TODO: remember to disable on releases
+    		testBlock = new TestBlock(structureID+2,Material.rock);
+    		GameRegistry.registerBlock(testBlock, ItemTestBlock.class, "testBlock");
+    		
+    		hhpulv.setContainerItem(hhpulv);
+    		hhcomp.setContainerItem(hhcomp);
+    		hhpure.setContainerItem(hhpure);
+    		
+    		//Basic stuff
+    		GameRegistry.registerFuelHandler(new FuelHandler());
+    		GameRegistry.registerWorldGenerator(new WorldgeneratorCarbonization());
+    		NetworkRegistry.instance().registerGuiHandler(this, new GuiHandler());
+    		GameRegistry.registerTileEntity(TileEntityFurnaces.class, "TileEntityFurnaces");
+    		GameRegistry.registerTileEntity(TileEntityTest.class, "TileEntityTest");
+    		GameRegistry.registerTileEntity(TileEntityMultiblockInit.class, "TileEntityMultiblockInit");
+    		
+    		GameRegistry.registerBlock(fuelBlock, ItemBlockFuels.class, "fuelBlock");
+    		GameRegistry.registerBlock(structureBlock, ItemBlockStructure.class, "structureBlock");
+    		GameRegistry.registerBlock(multiblockFurnaceControl, ItemBlockMultiblockFurnaceControl.class, "multiblockfurnacecontrol");
+    		
+    		//Names
+    		//Fuels
+    		LanguageRegistry.addName(new ItemStack(fuel,1,0), "Peat");
+    		LanguageRegistry.addName(new ItemStack(fuel,1,1), "Lignite");
+    		LanguageRegistry.addName(new ItemStack(fuel,1,2), "Sub-Bituminous Coal");
+    		LanguageRegistry.addName(new ItemStack(fuel,1,3), "Bituminous Coal");
+    		LanguageRegistry.addName(new ItemStack(fuel,1,4), "Anthracite");
+    		LanguageRegistry.addName(new ItemStack(fuel,1,5), "Graphite");
+    		
+    		//Dusts
+    		LanguageRegistry.addName(new ItemStack(dust,1,0), "Charcoal Dust");
+    		LanguageRegistry.addName(new ItemStack(dust,1,1), "Peat Clumps");
+    		LanguageRegistry.addName(new ItemStack(dust,1,2), "Lignite Clumps");
+    		LanguageRegistry.addName(new ItemStack(dust,1,3), "Sub-Bituminous Coal Dust");
+    		LanguageRegistry.addName(new ItemStack(dust,1,4), "Bituminous Coal Dust");
+    		LanguageRegistry.addName(new ItemStack(dust,1,5), "Coal Dust");
+    		LanguageRegistry.addName(new ItemStack(dust,1,6), "Anthracite Dust");
+    		LanguageRegistry.addName(new ItemStack(dust,1,7), "Graphite Dust");
+    		LanguageRegistry.addName(new ItemStack(dust,1,8), "Activated Charcoal");
+    				
+    		//Deposits
+    		LanguageRegistry.addName(new ItemStack(fuelBlock,1,0), "Peat Deposit");
+    		LanguageRegistry.addName(new ItemStack(fuelBlock,1,1), "Lignite Deposit");
+    		LanguageRegistry.addName(new ItemStack(fuelBlock,1,2), "Sub-Bituminous Coal Deposit");
+    		LanguageRegistry.addName(new ItemStack(fuelBlock,1,3), "Bituminous Coal Deposit");
+    		LanguageRegistry.addName(new ItemStack(fuelBlock,1,4), "Anthracite Deposit");
+    		LanguageRegistry.addName(new ItemStack(fuelBlock,1,5), "Graphite Cluster");
+    		
+    		//Ingots
+    		LanguageRegistry.addName(new ItemStack(ingots,1,0), "Refined Iron");
+    		LanguageRegistry.addName(new ItemStack(ingots,1,1), "Pig Iron");
+    		LanguageRegistry.addName(new ItemStack(ingots,1,2), "Mild Steel");
+    		LanguageRegistry.addName(new ItemStack(ingots,1,3), "Steel");
+    		
+    		//Tools
+    		LanguageRegistry.addName(HHPulv, "Handheld Pulverizer");
+    		LanguageRegistry.addName(HHComp, "Handheld Compressor");
+    		LanguageRegistry.addName(HHPure, "Handheld Purifyer");
+    		
+    		LanguageRegistry.addName(new ItemStack(misc, 1, 0), "Pencil");
+    		LanguageRegistry.addName(new ItemStack(misc, 1, 1), "Cleansing Potion");
+    		LanguageRegistry.addName(new ItemStack(misc, 1, 2), "\"Cleansing\" Potion");
+    		LanguageRegistry.addName(new ItemStack(misc, 1, 3), "Carbon Chunk");
+    		LanguageRegistry.addName(new ItemStack(misc, 1, 4), "Glass Fibre Insulation");
+    		LanguageRegistry.addName(new ItemStack(misc, 1, 5), "High Density Insulation");
+    		
+    		//Machines
+    		LanguageRegistry.addName(new ItemStack(furnaceBlock,1,0), "Iron Furnace");
+    		LanguageRegistry.addName(new ItemStack(furnaceBlock,1,1), "Insulated Iron Furnace");
+    		LanguageRegistry.addName(new ItemStack(furnaceBlock,1,2), "Insulated Steel Furnace");
+    		//Multiblock controls
+    		LanguageRegistry.addName(new ItemStack(multiblockFurnaceControl), "Furnace Control System");
+    		
+    		//Structure
+    		LanguageRegistry.addName(new ItemStack(structureBlock,1,0), "Ice Structure");
+    		LanguageRegistry.addName(new ItemStack(structureBlock,1,1), "Refined Iron Structure");
+    		LanguageRegistry.addName(new ItemStack(structureBlock,1,2), "Pig Iron Structure");
+    		LanguageRegistry.addName(new ItemStack(structureBlock,1,3), "Mild Steel Structure");
+    		LanguageRegistry.addName(new ItemStack(structureBlock,1,4), "Steel Structure");
+    		LanguageRegistry.addName(new ItemStack(structureBlock,1,5), "Carbon Structure");
+    		LanguageRegistry.addName(new ItemStack(structureBlock,1,6), "Reinforced Carbon Structure");
+    		LanguageRegistry.addName(new ItemStack(structureBlock,1,7), "Insulated Steel Structure");
+    		LanguageRegistry.addName(new ItemStack(structureBlock,1,8), "Insulated Carbon Structure");
+    		LanguageRegistry.addName(new ItemStack(structureBlock,1,9), "High Density Insulated Carbon Structure");
+    		LanguageRegistry.addName(new ItemStack(structureBlock,1,10), "Insulated Reinforced Carbon Structure");
+    		LanguageRegistry.addName(new ItemStack(structureBlock,1,11), "High Density Insulated Steel Structure");
+    		LanguageRegistry.addName(new ItemStack(structureBlock,1,12), "High Density Insulated Reinforced Carbon Structure");
+    		
+    		//Localizations
+    		LanguageRegistry.instance().addStringLocalization("tile.fuelBlock.peat.name", "Peat Deposit");
+    		LanguageRegistry.instance().addStringLocalization("tile.fuelBlock.lignite.name", "Lignite Deposit");
+    		LanguageRegistry.instance().addStringLocalization("tile.fuelBlock.sBituminous.name", "Sub-Bituminous Coal Deposit");
+    		LanguageRegistry.instance().addStringLocalization("tile.fuelBlock.bituminous.name", "Bituminous Coal Deposit");
+    		LanguageRegistry.instance().addStringLocalization("tile.fuelBlock.anthracite.name", "Anthracite Deposit");
+    		LanguageRegistry.instance().addStringLocalization("tile.fuelBlock.graphite.name", "Graphite Cluster");
+    		
+    		LanguageRegistry.instance().addStringLocalization("tile.furnaceBlock.ironfurnace.name", "Iron Furnace");
+    		LanguageRegistry.instance().addStringLocalization("tile.furnaceBlock.refinedironfurnace.name", "Insulated Iron Furnace");
+    		LanguageRegistry.instance().addStringLocalization("tile.furnaceBlock.steelfurnace.name", "Insulated Steel Furnace");
+    		
+    		prox.registerRenderThings();
 	}
 	
-	@Init
+	@Mod.EventHandler
 	public void load(FMLInitializationEvent event)
 	{	
-		fuel = new ItemFuel(fuelID);
-		dust = new ItemDust(dustID);
-		misc = new ItemMisc(miscID);
-		ingots = new ItemIngots(ingotID);
-		hhpulv = new ItemHHPulverizer(itemID);
-		HHPulv  = new ItemStack(hhpulv, 1, OreDictionary.WILDCARD_VALUE);
-		hhpure = new ItemHHPurifyer(itemID3);
-		HHPure = new ItemStack(hhpure, 1, OreDictionary.WILDCARD_VALUE);
-		hhcomp = new ItemHHCompressor(itemID2);
-		HHComp = new ItemStack(hhcomp,1,OreDictionary.WILDCARD_VALUE);
-		fuelBlock = new BlockFuel(blockID,0,Material.rock).setStepSound(Block.soundStoneFootstep).setHardness(3F).setResistance(1.0F);
-		structureBlock = new BlockStructure(structureID,0,Material.iron);
-		furnaceBlock = new BlockFurnaces(furnaceID,false);
-		furnaceBlockActive = new BlockFurnaces(furnaceID2, true);
-		multiblockFurnaceControl = new BlockFurnaceControl(multiblockfurnaceID, Material.iron);
-		//Item.itemsList[blockID] = new ItemBlockFuels(blockID-256);
-		Item.itemsList[furnaceID] = new ItemBlockFurnaces(furnaceID-256,furnaceBlock);
-		//Item.itemsList[structureID] = new ItemBlockStructure(structureID-256);
 		
-		//TODO: remember to disable on releases
-		testBlock = new TestBlock(structureID+2,Material.rock);
-		GameRegistry.registerBlock(testBlock, ItemTestBlock.class, "testBlock");
-		
-		hhpulv.setContainerItem(hhpulv);
-		hhcomp.setContainerItem(hhcomp);
-		hhpure.setContainerItem(hhpure);
-		
-		//Basic stuff
-		GameRegistry.registerFuelHandler(new FuelHandler());
-		GameRegistry.registerWorldGenerator(new WorldgeneratorCarbonization());
-		NetworkRegistry.instance().registerGuiHandler(this, new GuiHandler());
-		GameRegistry.registerTileEntity(TileEntityFurnaces.class, "TileEntityFurnaces");
-		GameRegistry.registerTileEntity(TileEntityTest.class, "TileEntityTest");
-		GameRegistry.registerTileEntity(TileEntityMultiblockInit.class, "TileEntityMultiblockInit");
-		
-		GameRegistry.registerBlock(fuelBlock, ItemBlockFuels.class, "fuelBlock");
-		GameRegistry.registerBlock(structureBlock, ItemBlockStructure.class, "structureBlock");
-		GameRegistry.registerBlock(multiblockFurnaceControl, ItemBlockMultiblockFurnaceControl.class, "multiblockfurnacecontrol");
-		
-		//Names
-		//Fuels
-		LanguageRegistry.addName(new ItemStack(fuel,1,0), "Peat");
-		LanguageRegistry.addName(new ItemStack(fuel,1,1), "Lignite");
-		LanguageRegistry.addName(new ItemStack(fuel,1,2), "Sub-Bituminous Coal");
-		LanguageRegistry.addName(new ItemStack(fuel,1,3), "Bituminous Coal");
-		LanguageRegistry.addName(new ItemStack(fuel,1,4), "Anthracite");
-		LanguageRegistry.addName(new ItemStack(fuel,1,5), "Graphite");
-		
-		//Dusts
-		LanguageRegistry.addName(new ItemStack(dust,1,0), "Charcoal Dust");
-		LanguageRegistry.addName(new ItemStack(dust,1,1), "Peat Clumps");
-		LanguageRegistry.addName(new ItemStack(dust,1,2), "Lignite Clumps");
-		LanguageRegistry.addName(new ItemStack(dust,1,3), "Sub-Bituminous Coal Dust");
-		LanguageRegistry.addName(new ItemStack(dust,1,4), "Bituminous Coal Dust");
-		LanguageRegistry.addName(new ItemStack(dust,1,5), "Coal Dust");
-		LanguageRegistry.addName(new ItemStack(dust,1,6), "Anthracite Dust");
-		LanguageRegistry.addName(new ItemStack(dust,1,7), "Graphite Dust");
-		LanguageRegistry.addName(new ItemStack(dust,1,8), "Activated Charcoal");
-				
-		//Deposits
-		LanguageRegistry.addName(new ItemStack(fuelBlock,1,0), "Peat Deposit");
-		LanguageRegistry.addName(new ItemStack(fuelBlock,1,1), "Lignite Deposit");
-		LanguageRegistry.addName(new ItemStack(fuelBlock,1,2), "Sub-Bituminous Coal Deposit");
-		LanguageRegistry.addName(new ItemStack(fuelBlock,1,3), "Bituminous Coal Deposit");
-		LanguageRegistry.addName(new ItemStack(fuelBlock,1,4), "Anthracite Deposit");
-		LanguageRegistry.addName(new ItemStack(fuelBlock,1,5), "Graphite Cluster");
-		
-		//Ingots
-		LanguageRegistry.addName(new ItemStack(ingots,1,0), "Refined Iron");
-		LanguageRegistry.addName(new ItemStack(ingots,1,1), "Pig Iron");
-		LanguageRegistry.addName(new ItemStack(ingots,1,2), "Mild Steel");
-		LanguageRegistry.addName(new ItemStack(ingots,1,3), "Steel");
-		
-		//Tools
-		LanguageRegistry.addName(HHPulv, "Handheld Pulverizer");
-		LanguageRegistry.addName(HHComp, "Handheld Compressor");
-		LanguageRegistry.addName(HHPure, "Handheld Purifyer");
-		
-		LanguageRegistry.addName(new ItemStack(misc, 1, 0), "Pencil");
-		LanguageRegistry.addName(new ItemStack(misc, 1, 1), "Cleansing Potion");
-		LanguageRegistry.addName(new ItemStack(misc, 1, 2), "\"Cleansing\" Potion");
-		LanguageRegistry.addName(new ItemStack(misc, 1, 3), "Carbon Chunk");
-		LanguageRegistry.addName(new ItemStack(misc, 1, 4), "Glass Fibre Insulation");
-		LanguageRegistry.addName(new ItemStack(misc, 1, 5), "High Density Insulation");
-		
-		//Machines
-		LanguageRegistry.addName(new ItemStack(furnaceBlock,1,0), "Iron Furnace");
-		LanguageRegistry.addName(new ItemStack(furnaceBlock,1,1), "Insulated Iron Furnace");
-		LanguageRegistry.addName(new ItemStack(furnaceBlock,1,2), "Insulated Steel Furnace");
-		//Multiblock controls
-		LanguageRegistry.addName(new ItemStack(multiblockFurnaceControl), "Furnace Control System");
-		
-		//Structure
-		LanguageRegistry.addName(new ItemStack(structureBlock,1,0), "Ice Structure");
-		LanguageRegistry.addName(new ItemStack(structureBlock,1,1), "Refined Iron Structure");
-		LanguageRegistry.addName(new ItemStack(structureBlock,1,2), "Pig Iron Structure");
-		LanguageRegistry.addName(new ItemStack(structureBlock,1,3), "Mild Steel Structure");
-		LanguageRegistry.addName(new ItemStack(structureBlock,1,4), "Steel Structure");
-		LanguageRegistry.addName(new ItemStack(structureBlock,1,5), "Carbon Structure");
-		LanguageRegistry.addName(new ItemStack(structureBlock,1,6), "Reinforced Carbon Structure");
-		LanguageRegistry.addName(new ItemStack(structureBlock,1,7), "Insulated Steel Structure");
-		LanguageRegistry.addName(new ItemStack(structureBlock,1,8), "Insulated Carbon Structure");
-		LanguageRegistry.addName(new ItemStack(structureBlock,1,9), "High Density Insulated Carbon Structure");
-		LanguageRegistry.addName(new ItemStack(structureBlock,1,10), "Insulated Reinforced Carbon Structure");
-		LanguageRegistry.addName(new ItemStack(structureBlock,1,11), "High Density Insulated Steel Structure");
-		LanguageRegistry.addName(new ItemStack(structureBlock,1,12), "High Density Insulated Reinforced Carbon Structure");
-		
-		//Localizations
-		LanguageRegistry.instance().addStringLocalization("tile.fuelBlock.peat.name", "Peat Deposit");
-		LanguageRegistry.instance().addStringLocalization("tile.fuelBlock.lignite.name", "Lignite Deposit");
-		LanguageRegistry.instance().addStringLocalization("tile.fuelBlock.sBituminous.name", "Sub-Bituminous Coal Deposit");
-		LanguageRegistry.instance().addStringLocalization("tile.fuelBlock.bituminous.name", "Bituminous Coal Deposit");
-		LanguageRegistry.instance().addStringLocalization("tile.fuelBlock.anthracite.name", "Anthracite Deposit");
-		LanguageRegistry.instance().addStringLocalization("tile.fuelBlock.graphite.name", "Graphite Cluster");
-		
-		LanguageRegistry.instance().addStringLocalization("tile.furnaceBlock.ironfurnace.name", "Iron Furnace");
-		LanguageRegistry.instance().addStringLocalization("tile.furnaceBlock.refinedironfurnace.name", "Insulated Iron Furnace");
-		LanguageRegistry.instance().addStringLocalization("tile.furnaceBlock.steelfurnace.name", "Insulated Steel Furnace");
 		
 		
 		//Ore dictionary
@@ -257,11 +263,9 @@ public class carbonization {
 		MinecraftForge.setBlockHarvestLevel(fuelBlock, 3, "pickaxe", 1);
 		MinecraftForge.setBlockHarvestLevel(fuelBlock, 4, "pickaxe", 1);
 		MinecraftForge.setBlockHarvestLevel(fuelBlock, 5, "pickaxe", 1);
-		
-		prox.registerRenderThings();
 	}
 	
-	@PostInit
+	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event)
 	{
 		boolean te=false;
