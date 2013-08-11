@@ -1,8 +1,39 @@
 package mal.carbonization;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.util.logging.Level;
 
 import ic2.api.item.*;
+import mal.carbonization.blocks.BlockFuel;
+import mal.carbonization.blocks.BlockFurnaceControl;
+import mal.carbonization.blocks.BlockFurnaces;
+import mal.carbonization.blocks.BlockMultiblockFurnaceControl;
+import mal.carbonization.blocks.BlockMultiblockStructure;
+import mal.carbonization.blocks.BlockMultiblockStructureFurnace;
+import mal.carbonization.blocks.BlockStructure;
+import mal.carbonization.blocks.BlockStructureFurnace;
+import mal.carbonization.blocks.TestBlock;
+import mal.carbonization.items.ItemBlockFuels;
+import mal.carbonization.items.ItemBlockFurnaces;
+import mal.carbonization.items.ItemBlockMultiblockFurnaceControl;
+import mal.carbonization.items.ItemBlockStructure;
+import mal.carbonization.items.ItemBlockStructureFurnace;
+import mal.carbonization.items.ItemDust;
+import mal.carbonization.items.ItemFuel;
+import mal.carbonization.items.ItemHHCompressor;
+import mal.carbonization.items.ItemHHPulverizer;
+import mal.carbonization.items.ItemHHPurifyer;
+import mal.carbonization.items.ItemIngots;
+import mal.carbonization.items.ItemMisc;
+import mal.carbonization.items.ItemTestBlock;
+import mal.carbonization.network.PacketHandler;
+import mal.carbonization.tileentity.TileEntityFurnaces;
+import mal.carbonization.tileentity.TileEntityMultiblockDummy;
+import mal.carbonization.tileentity.TileEntityMultiblockFurnace;
+import mal.carbonization.tileentity.TileEntityMultiblockInit;
+import mal.carbonization.tileentity.TileEntityTest;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.item.Item;
@@ -34,10 +65,11 @@ import thermalexpansion.api.crafting.CraftingHelpers;
 import thermalexpansion.api.crafting.CraftingManagers;
 import ic2.api.recipe.*;
 
-@Mod(modid="carbonization", name="Carbonization", version="0.6.9")
-@NetworkMod(clientSideRequired=true, serverSideRequired=false, channels={"CarbonizationChn"}, packetHandler = PacketHandler.class)
+@Mod(modid="carbonization", name="Carbonization", version="0.7.4", dependencies = "required-after:Forge@[9.10,);required-after:FML@[6.2.43,)")
+@NetworkMod(clientSideRequired=true, channels={"CarbonizationChn"}, packetHandler = PacketHandler.class)
 public class carbonization {
 
+	public static int ORESLAGRATIO = 300;//number of millibuckets needed for an item
 	public static ItemFuel fuel;
 	public static ItemDust dust;
 	public static ItemMisc misc;
@@ -49,8 +81,12 @@ public class carbonization {
 	public static BlockFurnaces furnaceBlock;
 	public static BlockFurnaces furnaceBlockActive;
 	public static BlockStructure structureBlock;
-	public static BlockFurnaceControl multiblockFurnaceControl;
-	public static TestBlock testBlock;
+	public static BlockStructureFurnace structureFurnaceBlock;
+	public static BlockFurnaceControl FurnaceControl;
+	public static BlockMultiblockStructure structureMultiblock;
+	public static BlockMultiblockStructureFurnace structureFurnaceMultiblock;
+	public static BlockMultiblockFurnaceControl multiblockFurnaceControl;
+	//public static TestBlock testBlock;
 	
 	int fuelID=9540;
 	int dustID = 9541;
@@ -61,9 +97,13 @@ public class carbonization {
 	int ingotID = 9546;
 	int blockID=1560;
 	int structureID=1563;
+	int structureFurnaceID = 1564;
 	int furnaceID = 1561;
 	int furnaceID2 = 1562;
-	int multiblockfurnaceID = 1564;
+	int multiblockfurnaceID = 1565;
+	int multiblockstructureID = 1566;
+	int multiblockstructurefurnaceID = 1567;
+	int multiblockfurnacecontrolID = 1568;
 	
 	//Difficulty modifier, the higher the number, the more time the metals take to bake
 	private int difficultyMod = 10;
@@ -95,7 +135,12 @@ public class carbonization {
     		furnaceID = config.getBlock("Furnace ID", 1561).getInt();
     		furnaceID2 = config.getBlock("Active Furnace ID", 1562).getInt();
     		structureID = config.getBlock("Structure Block ID", 1563).getInt();
-    		multiblockfurnaceID = config.getBlock("Multiblock Furnace ID", 1564).getInt();
+    		structureFurnaceID = config.getBlock("Structure Furnace ID", 1564).getInt();
+    		multiblockfurnaceID = config.getBlock("Multiblock Furnace ID", 1565).getInt();
+    		multiblockstructureID = config.getBlock("Multiblock Structure ID", 1566).getInt();
+    		multiblockstructurefurnaceID = config.getBlock("Multiblock Structure Furnace ID", 1567).getInt();
+    		multiblockfurnacecontrolID = config.getBlock("Multiblock Furnace Control ID", 1568).getInt();
+    		
     		difficultyMod = config.get("Modifiers", "Metal Cook Time", 10).getInt();
     		if (difficultyMod<=0)
     		{
@@ -119,16 +164,20 @@ public class carbonization {
     		HHComp = new ItemStack(hhcomp,1,OreDictionary.WILDCARD_VALUE);
     		fuelBlock = new BlockFuel(blockID,0,Material.rock).setStepSound(Block.soundStoneFootstep).setHardness(3F).setResistance(1.0F);
     		structureBlock = new BlockStructure(structureID,0,Material.iron);
+    		structureFurnaceBlock = new BlockStructureFurnace(structureFurnaceID, Material.iron);
+    		structureMultiblock = new BlockMultiblockStructure(multiblockstructureID,Material.iron);
+    		structureFurnaceMultiblock = new BlockMultiblockStructureFurnace(multiblockstructurefurnaceID, Material.iron);
     		furnaceBlock = new BlockFurnaces(furnaceID,false);
     		furnaceBlockActive = new BlockFurnaces(furnaceID2, true);
-    		multiblockFurnaceControl = new BlockFurnaceControl(multiblockfurnaceID, Material.iron);
+    		FurnaceControl = new BlockFurnaceControl(multiblockfurnaceID, Material.iron);
+    		multiblockFurnaceControl = new BlockMultiblockFurnaceControl(multiblockfurnacecontrolID, Material.iron);
     		//Item.itemsList[blockID] = new ItemBlockFuels(blockID-256);
     		Item.itemsList[furnaceID] = new ItemBlockFurnaces(furnaceID-256,furnaceBlock);
     		//Item.itemsList[structureID] = new ItemBlockStructure(structureID-256);
     		
     		//TODO: remember to disable on releases
-    		testBlock = new TestBlock(structureID+2,Material.rock);
-    		GameRegistry.registerBlock(testBlock, ItemTestBlock.class, "testBlock");
+    		//testBlock = new TestBlock(structureID+200,Material.rock);
+    		//GameRegistry.registerBlock(testBlock, ItemTestBlock.class, "testBlock");
     		
     		hhpulv.setContainerItem(hhpulv);
     		hhcomp.setContainerItem(hhcomp);
@@ -137,14 +186,20 @@ public class carbonization {
     		//Basic stuff
     		GameRegistry.registerFuelHandler(new FuelHandler());
     		GameRegistry.registerWorldGenerator(new WorldgeneratorCarbonization());
-    		NetworkRegistry.instance().registerGuiHandler(this, new GuiHandler());
+    		NetworkRegistry.instance().registerGuiHandler(instance, prox);
     		GameRegistry.registerTileEntity(TileEntityFurnaces.class, "TileEntityFurnaces");
     		GameRegistry.registerTileEntity(TileEntityTest.class, "TileEntityTest");
     		GameRegistry.registerTileEntity(TileEntityMultiblockInit.class, "TileEntityMultiblockInit");
+    		GameRegistry.registerTileEntity(TileEntityMultiblockDummy.class, "TileEntityMultiblockDummy");
+    		GameRegistry.registerTileEntity(TileEntityMultiblockFurnace.class, "TileEntityMultiblockFurnace");
     		
     		GameRegistry.registerBlock(fuelBlock, ItemBlockFuels.class, "fuelBlock");
     		GameRegistry.registerBlock(structureBlock, ItemBlockStructure.class, "structureBlock");
-    		GameRegistry.registerBlock(multiblockFurnaceControl, ItemBlockMultiblockFurnaceControl.class, "multiblockfurnacecontrol");
+    		//GameRegistry.registerBlock(structureMultiblock, ItemBlockStructure.class, "structureMultiblock");
+    		GameRegistry.registerBlock(structureFurnaceBlock, ItemBlockStructureFurnace.class, "structureFurnaceBlock");
+    		//GameRegistry.registerBlock(structureFurnaceMultiblock, ItemBlockStructureFurnace.class, "structureFurnaceMultiBlock");
+    		GameRegistry.registerBlock(FurnaceControl, ItemBlockMultiblockFurnaceControl.class, "furnacecontrol");
+    		GameRegistry.registerBlock(multiblockFurnaceControl, ItemBlockMultiblockFurnaceControl.class, "furnacemultiblockcontrol");
     		
     		//Names
     		//Fuels
@@ -191,13 +246,14 @@ public class carbonization {
     		LanguageRegistry.addName(new ItemStack(misc, 1, 3), "Carbon Chunk");
     		LanguageRegistry.addName(new ItemStack(misc, 1, 4), "Glass Fibre Insulation");
     		LanguageRegistry.addName(new ItemStack(misc, 1, 5), "High Density Insulation");
+    		LanguageRegistry.addName(new ItemStack(misc, 1, 6), "Ash");
     		
     		//Machines
     		LanguageRegistry.addName(new ItemStack(furnaceBlock,1,0), "Iron Furnace");
     		LanguageRegistry.addName(new ItemStack(furnaceBlock,1,1), "Insulated Iron Furnace");
     		LanguageRegistry.addName(new ItemStack(furnaceBlock,1,2), "Insulated Steel Furnace");
     		//Multiblock controls
-    		LanguageRegistry.addName(new ItemStack(multiblockFurnaceControl), "Furnace Control System");
+    		LanguageRegistry.addName(new ItemStack(FurnaceControl), "Furnace Control System");
     		
     		//Structure
     		LanguageRegistry.addName(new ItemStack(structureBlock,1,0), "Ice Structure");
@@ -209,10 +265,25 @@ public class carbonization {
     		LanguageRegistry.addName(new ItemStack(structureBlock,1,6), "Reinforced Carbon Structure");
     		LanguageRegistry.addName(new ItemStack(structureBlock,1,7), "Insulated Steel Structure");
     		LanguageRegistry.addName(new ItemStack(structureBlock,1,8), "Insulated Carbon Structure");
-    		LanguageRegistry.addName(new ItemStack(structureBlock,1,9), "High Density Insulated Carbon Structure");
+    		LanguageRegistry.addName(new ItemStack(structureBlock,1,9), "HMD Insulated Carbon Structure");
     		LanguageRegistry.addName(new ItemStack(structureBlock,1,10), "Insulated Reinforced Carbon Structure");
-    		LanguageRegistry.addName(new ItemStack(structureBlock,1,11), "High Density Insulated Steel Structure");
-    		LanguageRegistry.addName(new ItemStack(structureBlock,1,12), "High Density Insulated Reinforced Carbon Structure");
+    		LanguageRegistry.addName(new ItemStack(structureBlock,1,11), "HMD Ins. Steel Structure");
+    		LanguageRegistry.addName(new ItemStack(structureBlock,1,12), "HMD Ins. Reinforced Carbon Structure");
+    		
+    		//Structure Furnaces
+    		LanguageRegistry.addName(new ItemStack(structureFurnaceBlock,1,0), "Ice Furnace Structure");
+    		LanguageRegistry.addName(new ItemStack(structureFurnaceBlock,1,1), "Refined Iron Furnace Structure");
+    		LanguageRegistry.addName(new ItemStack(structureFurnaceBlock,1,2), "Pig Iron Furnace Structure");
+    		LanguageRegistry.addName(new ItemStack(structureFurnaceBlock,1,3), "Mild Steel Furnace Structure");
+    		LanguageRegistry.addName(new ItemStack(structureFurnaceBlock,1,4), "Steel Furnace Structure");
+    		LanguageRegistry.addName(new ItemStack(structureFurnaceBlock,1,5), "Carbon Furnace Structure");
+    		LanguageRegistry.addName(new ItemStack(structureFurnaceBlock,1,6), "Reinforced Carbon Furnace Structure");
+    		LanguageRegistry.addName(new ItemStack(structureFurnaceBlock,1,7), "Insulated Steel Furnace Structure");
+    		LanguageRegistry.addName(new ItemStack(structureFurnaceBlock,1,8), "Insulated Carbon Furnace Structure");
+    		LanguageRegistry.addName(new ItemStack(structureFurnaceBlock,1,9), "HMD Ins. Carbon Furnace Structure");
+    		LanguageRegistry.addName(new ItemStack(structureFurnaceBlock,1,10), "Ins. Reinf Carbon Furnace Structure");
+    		LanguageRegistry.addName(new ItemStack(structureFurnaceBlock,1,11), "HMD Ins. Steel Furnace Structure");
+    		LanguageRegistry.addName(new ItemStack(structureFurnaceBlock,1,12), "HMD Ins. Reinf Carbon Furnace Structure");
     		
     		//Localizations
     		LanguageRegistry.instance().addStringLocalization("tile.fuelBlock.peat.name", "Peat Deposit");
@@ -288,6 +359,8 @@ public class carbonization {
 		generateConversions(ic, te);
 		generateMachines(ic);
 		generateStructure();
+		generateFurnaceStructure();
+		generateMultiblockFurnaceRecipes();
 	}
 	
 	private void generateMash()
@@ -412,7 +485,7 @@ public class carbonization {
 			}
 			catch(Exception e)
 			{
-				System.out.println("Oh dear, something broke with IC2.  Prod Mal so he can fix it.");
+				FMLLog.log(Level.INFO, "Oh dear, something broke with IC2.  Prod Mal so he can fix it.");
 			}
 		}
 		
@@ -430,7 +503,7 @@ public class carbonization {
 			}
 			catch(Exception e)
 			{
-				System.out.println("Oh dear, something broke with Thermal Expansion.  Prod Mal so he can fix it.");
+				FMLLog.log(Level.INFO, "Oh dear, something broke with Thermal Expansion.  Prod Mal so he can fix it.");
 			}
 		}
 	}
@@ -460,6 +533,7 @@ public class carbonization {
 		
 		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(misc,1,4), new Object[]{Item.clay, Block.gravel, Block.gravel, Block.thinGlass}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(misc,1,5), new Object[]{Block.sand, Block.sand, "dustGraphite", "dustGraphite"}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(dust,1,0), new Object[]{new ItemStack(misc, 1, 6), new ItemStack(misc, 1, 6), new ItemStack(misc, 1, 6), new ItemStack(misc, 1, 6)}));
 		
 		if(ic)//IC2, so add in compressor recipes for the carbon chunk and alternate "cleansing" potion
 		{
@@ -488,7 +562,7 @@ public class carbonization {
 		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(furnaceBlock,1,2), 
 				new Object[]{"SSS", "SFS", "SSS", 'S' ,"ingotSteel", 'F', new ItemStack(furnaceBlock,1,1)}));
 		
-		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(multiblockFurnaceControl, 1), new Object[]
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(FurnaceControl, 1), new Object[]
 				{"SSS", "SFS", "SSS", 'S', new ItemStack(structureBlock,1,OreDictionary.WILDCARD_VALUE), 'F', new ItemStack(furnaceBlock,1,1)}));
 	}
 
@@ -524,6 +598,128 @@ public class carbonization {
 		CraftingManager.getInstance().addShapelessRecipe(new ItemStack(misc,1,3), new Object[]{new ItemStack(structureBlock,1,10)});
 		CraftingManager.getInstance().addShapelessRecipe(new ItemStack(ingots,1,3), new Object[]{new ItemStack(structureBlock,1,11)});
 		CraftingManager.getInstance().addShapelessRecipe(new ItemStack(misc,1,3), new Object[]{new ItemStack(structureBlock,1,12)});
+	}
+	
+	private void generateFurnaceStructure()
+	{
+		//make the furnace structure blocks
+		for(int i = 0; i<13; i++)
+		{
+			CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(structureFurnaceBlock,4,i), new Object[]{" x ", "xyx", " x ", 'x', new ItemStack(structureBlock,1,i), 
+				'y', (i<2)?(Block.furnaceIdle):((i<6)?(new ItemStack(furnaceBlock,1,0)):((i<11)?(new ItemStack(furnaceBlock,1,1)):(new ItemStack(furnaceBlock,1,2))))}));
+			//take them apart
+			CraftingManager.getInstance().addShapelessRecipe(new ItemStack(structureBlock,1,i), new Object[]{new ItemStack(structureFurnaceBlock,1,i)});
+		}	
+	}
+	
+	private void generateMultiblockFurnaceRecipes()
+	{
+		//Add in the ore slag relationships
+		CarbonizationRecipes.smelting().addOreSlag("ashSlag", new ItemStack(misc, 2, 6));
+		CarbonizationRecipes.smelting().addOreSlag("stoneSlag", new ItemStack(Block.stone));
+		CarbonizationRecipes.smelting().addOreSlag("glassSlag", new ItemStack(Block.glass));
+		CarbonizationRecipes.smelting().addOreSlag("ironSlag", new ItemStack(Item.ingotIron));
+		CarbonizationRecipes.smelting().addOreSlag("goldSlag", new ItemStack(Item.ingotGold));
+		CarbonizationRecipes.smelting().addOreSlag("brickSlag", new ItemStack(Item.brick));
+		CarbonizationRecipes.smelting().addOreSlag("brickBlockSlag", new ItemStack(Block.brick));
+		CarbonizationRecipes.smelting().addOreSlag("copperSlag", "ingotCopper");
+		CarbonizationRecipes.smelting().addOreSlag("tinSlag", "ingotTin");
+		CarbonizationRecipes.smelting().addOreSlag("silverSlag", "ingotSilver");
+		CarbonizationRecipes.smelting().addOreSlag("leadSlag", "ingotLead");
+		CarbonizationRecipes.smelting().addOreSlag("nickelSlag", "ingotNickel");
+		
+		//Add in the recipes, normal metals and blocks
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Block.cobblestone), 200, 1, "stoneSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Block.sand), 200, 1, "glassSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting("oreIron", 400, 1, "ironSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting("oreGold", 400, 1, "goldSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.clay), 200, 1, "brickSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Block.blockClay), 400, 1, "brickBlockSlag");
+		
+		//Add in common mod ores through OreDictionary
+		CarbonizationRecipes.smelting().addMultiblockSmelting("oreCopper", 400, 1, "copperSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting("oreTin", 400, 1, "tinSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting("oreSilver", 400, 1, "silverSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting("oreLead", 400, 1, "leadSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting("oreNicked", 400, 1, "nickelSlag");
+		
+		//food and wood items
+		//TODO: Find a way to do this easier
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.appleRed), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.arrow), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.axeWood), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.bakedPotato), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.beefCooked), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.beefRaw), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.boat), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.bow), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.bowlEmpty), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.book), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.bowlSoup), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.bread), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.cake), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.carrot), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.carrotOnAStick), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.chickenCooked), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.chickenRaw), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.cookie), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.doorWood), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.egg), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.enchantedBook), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.feather), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.fishCooked), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.fishRaw), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.fishingRod), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.hoeWood), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.helmetLeather), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.itemFrame), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.leather), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.legsLeather), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.melon), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.melonSeeds), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.painting), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.paper), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.pickaxeWood), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.poisonousPotato), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.porkCooked), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.porkRaw), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.potato), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.pumpkinPie), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.pumpkinSeeds), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.plateLeather), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.reed), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.rottenFlesh), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.saddle), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.seeds), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.shovelWood), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.sign), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.silk), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.stick), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.swordWood), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.wheat), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.writableBook), 50, 1, "ashSlag");
+		CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Item.writtenBook), 50, 1, "ashSlag");
+		
+		for(int i = 0; i<Block.blocksList.length; i++)
+		{
+			if(Block.blocksList[i] != null)
+			{
+				Material m = Block.blocksList[i].blockMaterial; 
+				if(m == Material.cloth || m==Material.pumpkin || m==Material.wood || m==Material.cactus)
+				{
+					if(Block.blocksList[i].damageDropped(1) == 1)//simple check for damage values not 0
+						for(int j = 0; j<16; j++)
+						{
+							if(new ItemStack(Block.blocksList[i], 1, j) != null)
+							{
+								CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Block.blocksList[i], 1, j), 100, 1, "ashSlag");
+							}
+						}
+					CarbonizationRecipes.smelting().addMultiblockSmelting(new ItemStack(Block.blocksList[i]), 100, 1, "ashSlag");
+				}
+			}
+		}
+
 	}
 }
 /*******************************************************************************

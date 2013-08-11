@@ -1,0 +1,7 @@
+1 gravel = 100mb slag
+1 cobble = 50mb slag
+1 dirt = 75mb slag
+1 low-tier metal(copper/tin/etc.) = 1000mb slag
+1 mid-tier metal(iron/lead/silver) = 2000mb slag
+1 high-tier metal(gold/ferrous) = 4000mb slag
+1 carbon dust = 125mb slag (8000mb for a diamond's worth)

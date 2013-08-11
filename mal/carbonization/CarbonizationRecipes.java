@@ -4,6 +4,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.logging.Level;
+
+import cpw.mods.fml.common.FMLLog;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
@@ -26,7 +30,9 @@ public class CarbonizationRecipes
     private HashMap<List<Integer>, Integer> metaMinTier = new HashMap<List<Integer>, Integer>();
     
     /** Multiblock smelting maps*/
-    private HashMap<List<Integer>, ItemStack> metaMultiblockSmeltingList = new HashMap<List<Integer>, ItemStack>();
+    private HashMap<String, ItemStack> oreSlagRegistry = new HashMap<String, ItemStack>();
+    private Map multiblockSmeltingList = new HashMap();
+    
     private HashMap<List<Integer>, Integer> metaMultiblockFuelTime = new HashMap<List<Integer>, Integer>();
     private HashMap<List<Integer>, Integer> metaMultiblockCookTime = new HashMap<List<Integer>, Integer>();
     private HashMap<List<Integer>, String> metaMultiblockOreSlagType = new HashMap<List<Integer>, String>();
@@ -49,14 +55,22 @@ public class CarbonizationRecipes
     {
         return this.smeltingList;
     }
+    
+    public Map getMultiblockSmeltingList()
+    {
+    	return multiblockSmeltingList;
+    }
 
     /**
      * Add a multiblock smelting recipe to allow for alternate cook times and fuel needs
      * as well as ore slag return
+     * 
+     * oreSlagType must be in an accepted string or registered with the recipe handler, ideally in the form
+     * <descriptor>Slag
      * params:
      * input, output, cookTime, fuelTime, oreSlagType
      */
-    public void addMultiblockSmelting(Object input, ItemStack output, int cookTime, int fuelTime, String oreSlagType)
+    public void addMultiblockSmelting(Object input, int cookTime, int fuelTime, String oreSlagType)
     {
     	int itemID;
     	int metadata;
@@ -64,7 +78,7 @@ public class CarbonizationRecipes
     	{
     		itemID = ((ItemStack) input).itemID;
     		metadata = ((ItemStack) input).getItemDamage();
-            metaMultiblockSmeltingList.put(Arrays.asList(itemID, metadata), output);
+            //metaMultiblockSmeltingList.put(Arrays.asList(itemID, metadata), output);
             metaMultiblockFuelTime.put(Arrays.asList(itemID, metadata), fuelTime);
             metaMultiblockCookTime.put(Arrays.asList(itemID, metadata), cookTime);
             metaMultiblockOreSlagType.put(Arrays.asList(itemID, metadata), oreSlagType);
@@ -75,7 +89,7 @@ public class CarbonizationRecipes
     		{
     			itemID = OreDictionary.getOres((String)input).get(i).itemID;
     			metadata = OreDictionary.getOres((String)input).get(i).getItemDamage();
-    	        metaMultiblockSmeltingList.put(Arrays.asList(itemID, metadata), output);
+    	        //metaMultiblockSmeltingList.put(Arrays.asList(itemID, metadata), output);
     	        metaMultiblockFuelTime.put(Arrays.asList(itemID, metadata), fuelTime);
     	        metaMultiblockCookTime.put(Arrays.asList(itemID, metadata), cookTime);
                 metaMultiblockOreSlagType.put(Arrays.asList(itemID, metadata), oreSlagType);
@@ -83,7 +97,7 @@ public class CarbonizationRecipes
     	}
     	else
     	{
-    		System.err.println("ERROR LEVEL: DAFUQ...  Tell Mal to fix his recipe handler...");
+    		FMLLog.log(Level.SEVERE, "ERROR LEVEL: DAFUQ...  Tell Mal to fix his recipe handler...");
     	}
 
     }
@@ -123,9 +137,46 @@ public class CarbonizationRecipes
     	}
     	else
     	{
-    		System.err.println("ERROR LEVEL: DAFUQ...  Tell Mal to fix his recipe handler...");
+    		FMLLog.log(Level.SEVERE, "ERROR LEVEL: DAFUQ...  Tell Mal to fix his recipe handler...");
     	}
 
+    }
+    
+    /**
+     * Adds a relation of an oreslag and an output
+     * This should be logical, not something like chickenSlag->diamonds
+     * Amount needed for the output is determined by the furnace, not the recipe
+     * 
+     * @param oreSlagType
+     * @param output
+     */
+    public void addOreSlag(String oreSlagType, Object output)
+    {
+    	if(output instanceof String)//I'm lazy and want to use ore dictionary stuff
+    	{
+    		//Just use the first result from the list
+    		if(OreDictionary.getOreID((String)output) != -1)
+    		{
+    			if(OreDictionary.getOres((String)output) == null)
+    				FMLLog.log(Level.INFO, "OreDictionary Slag Registration of Type: " + oreSlagType + " Failed: OreDictionary entry " 
+    						+ (String)output + " invalid.  Contact Mal or the mod author who added the recipe so they can fix it.");
+    			else if(OreDictionary.getOres((String)output).size()<1)
+    				FMLLog.log(Level.INFO, "OreDictionary Slag Registration of Type: " + oreSlagType + " Failed: OreDictionary entry " 
+    						+ (String)output + " invalid.  Contact Mal or the mod author who added the recipe so they can fix it.");
+    			else
+    				this.oreSlagRegistry.put(oreSlagType, OreDictionary.getOres((String)output).get(0));
+    		}
+    			
+    	}
+    	else if(output instanceof ItemStack)
+    	{
+    		this.oreSlagRegistry.put(oreSlagType, (ItemStack)output);
+    	}
+    	else
+    	{
+    		FMLLog.log(Level.INFO, "Ore Slag Registration Failed: Output not in String or ItemStack format.  Contact Mal or the mod author" +
+    				" so they can fix it.");
+    	}
     }
 
     /**
@@ -147,13 +198,6 @@ public class CarbonizationRecipes
         return (ItemStack)smeltingList.get(Integer.valueOf(item.itemID));
     }
     
-    public ItemStack getMultiblockSmeltingResult(ItemStack item)
-    {
-    	if (item == null)
-    		return null;
-    	ItemStack ret = (ItemStack)metaMultiblockSmeltingList.get(Arrays.asList(item.itemID, item.getItemDamage()));
-    	return ret;
-    }
 
     /**
      * Grabs the amount of base experience for this item to give when pulled from the furnace slot.
@@ -245,10 +289,44 @@ public class CarbonizationRecipes
     		ret = metaMultiblockOreSlagType.get(Arrays.asList(item.itemID, item.getItemDamage()));
     	return ret;
     }
+    
+    public ItemStack getOreSlagOutput(String oreSlagType)
+    {
+    	ItemStack ret = null;
+    	if(oreSlagRegistry.containsKey(oreSlagType))
+    		ret = oreSlagRegistry.get(oreSlagType);
+    	return ret;
+    }
 
     public Map<List<Integer>, ItemStack> getMetaSmeltingList()
     {
         return metaSmeltingList;
+    }
+    
+    public Map<List<Integer>, String> getMultiblockMetaSmelthingList()
+    {
+    	return this.multiblockSmeltingList;
+    }
+    
+    public Map<String, ItemStack> getOreSlagMap()
+    {
+    	return this.oreSlagRegistry;
+    }
+    
+    public Map<List<Integer>, ItemStack> generateMultiblockMap()
+    {
+    	HashMap<List<Integer>, ItemStack> list = new HashMap<List<Integer>, ItemStack>();
+    	
+    	for(Entry<List<Integer>, String> entry : this.metaMultiblockOreSlagType.entrySet())
+    	{
+    		String s = entry.getValue();
+    		if(this.oreSlagRegistry.containsKey(s))
+    		{
+    			list.put(entry.getKey(), this.oreSlagRegistry.get(s));
+    		}
+    	}
+    	
+    	return list;
     }
 }
 /*******************************************************************************

@@ -1,13 +1,17 @@
 package mal.carbonization;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import cpw.mods.fml.common.IFuelHandler;
 
 public class FuelHandler implements IFuelHandler {
 
 	@Override
-	public int getBurnTime(ItemStack fuel) {
+	public int getBurnTime(ItemStack fuel) 
+	{
 		if(fuel.itemID == carbonization.fuel.itemID)
 		{
 			switch (fuel.getItemDamage())
@@ -27,7 +31,31 @@ public class FuelHandler implements IFuelHandler {
 			}
 		}
 		else
-			return 0;
+		{
+			int i = fuel.getItem().itemID;
+			Item item = fuel.getItem();
+
+			if (fuel.getItem() instanceof ItemBlock && Block.blocksList[i] != null)
+			{
+				Block block = Block.blocksList[i];
+
+				if (block == Block.woodSingleSlab)
+				{
+					return 150;
+				}
+				
+				if (block.blockMaterial == Material.wood)
+				{
+					return 300;
+				}
+
+				if (block == Block.field_111034_cE)
+				{
+					return 16000;
+				}
+			}
+        }
+		return 0;
 	}
 
 }

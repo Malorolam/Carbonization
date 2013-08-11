@@ -1,6 +1,14 @@
 package mal.carbonization;
 
 import cpw.mods.fml.client.FMLClientHandler;
+import mal.carbonization.gui.GuiFurnaces;
+import mal.carbonization.gui.GuiMultiblockFurnace;
+import mal.carbonization.gui.GuiMultiblockInit;
+import mal.carbonization.gui.GuiTest;
+import mal.carbonization.tileentity.TileEntityFurnaces;
+import mal.carbonization.tileentity.TileEntityMultiblockFurnace;
+import mal.carbonization.tileentity.TileEntityMultiblockInit;
+import mal.carbonization.tileentity.TileEntityTest;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
@@ -23,15 +31,21 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public Object getClientGuiElement(int id, EntityPlayer player, World world, int x, int y, int z)
 	{
-		TileEntity te = world.getBlockTileEntity(x, y, z);
-		if(te instanceof TileEntityFurnaces)
-		{
-			return new GuiFurnaces(player.inventory, (TileEntityFurnaces)te);
-		}
-		else if(te instanceof TileEntityMultiblockInit)
-			return new GuiTest((TileEntityMultiblockInit)te, player);
-		else
-			return null;
+		TileEntity tileEntity = world.getBlockTileEntity(x, y, z);
+        if(tileEntity instanceof TileEntityFurnaces){
+                return new GuiFurnaces(player.inventory, (TileEntityFurnaces) tileEntity);
+        }
+        if(tileEntity instanceof TileEntityMultiblockInit){
+        	//System.out.println("got to make the gui client side");
+        	return new GuiMultiblockInit((TileEntityMultiblockInit)tileEntity, player);
+        }
+        if(tileEntity instanceof TileEntityMultiblockFurnace){
+        	//System.out.println("got to make the gui client side");
+        	return new GuiMultiblockFurnace((TileEntityMultiblockFurnace)tileEntity, player.inventory);
+        }
+        if(tileEntity instanceof TileEntityTest)
+        	return new GuiTest((TileEntityTest)tileEntity, player);
+        return null;
 	}
 }
 /*******************************************************************************

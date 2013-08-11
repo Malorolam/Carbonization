@@ -1,5 +1,6 @@
 package mal.carbonization.multiblock;
 
+import net.minecraft.block.Block;
 import mal.carbonization.carbonization;
 
 /*
@@ -12,7 +13,7 @@ public class MultiBlockMatcher {
 	private int zdiff;
 	
 	//efficiency of the side/top[0] and base [1]
-	private int[] efficiency = new int[2];
+	private float[] efficiency = new float[2];
 	
 	/**
 	 * patterns are related to a starting position x,y,z at 0,0,0 on the pattern
@@ -43,15 +44,15 @@ public class MultiBlockMatcher {
 		return pattern;
 	}
 	
-	public int[] getEfficiency()
+	public float[] getEfficiency(Multiblock[][][] ipattern)
 	{
 		if(efficiency[0]!=-1 && efficiency[1]!=-1)
 			return efficiency;
 		else
-			return calculateEfficiency();
+			return calculateEfficiency(ipattern);
 	}
 	
-	public int[] calculateEfficiency()
+	public float[] calculateEfficiency(Multiblock[][][] ipattern)
 	{
 		efficiency[0]=0;
 		efficiency[1]=0;
@@ -62,15 +63,25 @@ public class MultiBlockMatcher {
 			{
 				for (int k=0;k<zdiff;k++)
 				{
-					if(pattern[i][j][k].tier != -1)
+					if(ipattern[i][j][k].tier != -1)
 						if(j==0)
-							efficiency[1]+=pattern[i][j][k].tier;
+							efficiency[1]+=ipattern[i][j][k].tier;
 						else
-							efficiency[0]+=pattern[i][j][k].tier;
+							efficiency[0]+=ipattern[i][j][k].tier;
 				}
 			}
 		}
+		efficiency[0] = efficiency[0]/getSize(false);
+		efficiency[1] = efficiency[1]/getSize(true);
 		return efficiency;
+	}
+	
+	private int getSize(boolean base)
+	{
+		if(base)//base area
+			return pattern.length*pattern[0][0].length;
+		else
+			return (2*pattern.length*(pattern[0].length-2)+2*(pattern[0][0].length-2)*(pattern[0].length-2)+pattern.length*pattern[0][0].length);
 	}
 	
 	/*
@@ -82,7 +93,7 @@ public class MultiBlockMatcher {
 		//easy bits first, see if they are the same dimensions
 		if(pattern.length != test_pattern.length || pattern[0].length != test_pattern[0].length || pattern[0][0].length != test_pattern[0][0].length)
 		{
-			System.out.println("Compare process failed: Patterns not the same size.");
+			System.err.println("Compare process failed: Patterns not the same size.");
 			return false;
 		}
 		
@@ -96,11 +107,11 @@ public class MultiBlockMatcher {
 							exclude = true;
 					if(pattern[i][j][k].compare(test_pattern[i][j][k],true) && !exclude)
 					{
-						System.out.println("Compare process ended at index ("+i+", "+j+", "+k+") with failed match.");
+						System.err.println("Compare process ended at index ("+i+", "+j+", "+k+") with failed match.");
 						return false;
 					}
 				}
-		System.out.println("Compare process completed with success.");
+		//System.out.println("Compare process completed with success.");
 		return true;
 	}
 	
@@ -125,19 +136,19 @@ public class MultiBlockMatcher {
 	/*
 	 * Compare the input pattern, allowing for a block to be substituted a set number of times instead of the pattern
 	 */
-	public boolean comparePatternWithSubstitutions(Multiblock[][][] test_pattern, Multiblock exceptionBlock, int exceptionCount)
+	public boolean comparePatternWithSubstitutions(Multiblock[][][] test_pattern, Multiblock exceptionBlock, int exceptionCount, boolean forceAir)
 	{
 		//Make sure that there is an exception block in the first place
 		if(exceptionBlock == null || exceptionCount==0)
 		{
-			System.out.println("No exceptions allowed, using basic comparison instead.");
+			//System.out.println("No exceptions allowed, using basic comparison instead.");
 			return comparePattern(test_pattern);
 		}
 		
 		//easy bits first, see if they are the same dimensions
 		if(pattern.length != test_pattern.length || pattern[0].length != test_pattern[0].length || pattern[0][0].length != test_pattern[0][0].length)
 		{
-			System.out.println("Compare process failed: Patterns not the same size.");
+			System.err.println("Compare process failed: Patterns not the same size.");
 			return false;
 		}
 		
@@ -148,13 +159,18 @@ public class MultiBlockMatcher {
 			for(int j = 0; j<pattern[0].length; j++)
 				for(int k = 0; k<pattern[0][0].length; k++)
 				{
-					if(!pattern[i][j][k].compare(test_pattern[i][j][k],false))
+					//air can be anything, lets us "live" in a furnace :3
+					if(!forceAir && pattern[i][j][k].blockID == 0)
+					{
+						
+					}
+					else if(!pattern[i][j][k].compare(test_pattern[i][j][k],false))
 					{
 						if(test_pattern[i][j][k].compare(exceptionBlock,true) && count<exceptionCount)
 						{
 							count++;
-							System.out.println("Compare process bypassed substituted block ID: " + exceptionBlock.blockID + ", metadata: " + exceptionBlock.blockMetadata
-									+ "; instances bypassed: "+count+"/"+exceptionCount+".");
+							//System.out.println("Compare process bypassed substituted block ID: " + exceptionBlock.blockID + ", metadata: " + exceptionBlock.blockMetadata
+							//		+ "; instances bypassed: "+count+"/"+exceptionCount+".");
 								
 						}
 						else
@@ -164,7 +180,7 @@ public class MultiBlockMatcher {
 						}
 					}
 				}
-		System.out.println("Compare process completed with success.");
+		//System.out.println("Compare process completed with success.");
 		return true;
 	}
 	
