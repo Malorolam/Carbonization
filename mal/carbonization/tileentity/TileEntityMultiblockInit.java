@@ -150,20 +150,22 @@ public class TileEntityMultiblockInit extends TileEntity {
 		match.buildBasedHollowSolid(0, 0, 0, xdiff-1, ydiff-1, zdiff-1, carbonization.structureBlock.blockID, (byte)0, carbonization.structureFurnaceBlock.blockID, (byte)0, 1);
 
 		int[] value;
-		if(offset[1] < 0)
-			value = MultiBlockInstantiator.matchPattern(match, xCoord, yCoord, zCoord, worldObj, new Multiblock(worldObj.getBlockId(xCoord, yCoord, zCoord), worldObj.getBlockMetadata(xCoord, yCoord, zCoord)), true);
+		if(offset[1] == -1000)
+			value = MultiBlockInstantiator.matchPattern(match, xCoord, yCoord, zCoord, worldObj, new Multiblock(worldObj.getBlockId(xCoord, yCoord, zCoord), worldObj.getBlockMetadata(xCoord, yCoord, zCoord)), carbonization.FAKEAIR);
 		else//an actual offset
-			value = MultiBlockInstantiator.matchPatternWithOffset(match, xCoord, yCoord, zCoord, worldObj, new Multiblock(worldObj.getBlockId(xCoord, yCoord, zCoord), worldObj.getBlockMetadata(xCoord, yCoord, zCoord)), offset, true);
+			value = MultiBlockInstantiator.matchPatternWithOffset(match, xCoord, yCoord, zCoord, worldObj, new Multiblock(worldObj.getBlockId(xCoord, yCoord, zCoord), worldObj.getBlockMetadata(xCoord, yCoord, zCoord)), offset, carbonization.FAKEAIR);
 		
 		System.out.println("Offset: " + offset[0] +", "+ offset[1] +", "+ offset[2]);
 		
 		if(value != null)
 		{
-			System.out.println("Value: " + value[0] +", "+ value[1] +", "+ value[2]);
+			//System.out.println("Value: " + value[0] +", "+ value[1] +", "+ value[2]);
 			MultiBlockInstantiator.createMultiBlock(match, xCoord, yCoord, zCoord, worldObj, value);
 		}
 		else
+		{
 			System.out.println("Value is Null");
+		}
 	}
 	
     public boolean isUseableByPlayer(EntityPlayer entityplayer)

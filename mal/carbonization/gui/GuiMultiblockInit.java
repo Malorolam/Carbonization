@@ -108,7 +108,7 @@ public class GuiMultiblockInit extends GuiScreen
                 		
                 	}
                 	if(ydiff >6)
-                		ydiff = 9;
+                		ydiff = 6;
                 	if(ydiff <3)
                 		ydiff = 3;
 	            	

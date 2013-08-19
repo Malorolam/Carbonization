@@ -1,6 +1,7 @@
 package mal.carbonization.multiblock;
 
 import net.minecraft.block.Block;
+import net.minecraft.world.World;
 import mal.carbonization.carbonization;
 
 /*
@@ -136,7 +137,7 @@ public class MultiBlockMatcher {
 	/*
 	 * Compare the input pattern, allowing for a block to be substituted a set number of times instead of the pattern
 	 */
-	public boolean comparePatternWithSubstitutions(Multiblock[][][] test_pattern, Multiblock exceptionBlock, int exceptionCount, boolean forceAir)
+	public boolean comparePatternWithSubstitutions(Multiblock[][][] test_pattern, Multiblock exceptionBlock, int exceptionCount, boolean forceAir, int xstart, int ystart, int zstart, World world)
 	{
 		//Make sure that there is an exception block in the first place
 		if(exceptionBlock == null || exceptionCount==0)
@@ -163,6 +164,10 @@ public class MultiBlockMatcher {
 					if(!forceAir && pattern[i][j][k].blockID == 0)
 					{
 						
+					}
+					else if(!forceAir && Block.blocksList[test_pattern[i][j][k].blockID] != null && Block.blocksList[test_pattern[i][j][k].blockID].isAirBlock(world, xstart, ystart, zstart))
+					{
+						System.out.println("Bypassed fake air block.");
 					}
 					else if(!pattern[i][j][k].compare(test_pattern[i][j][k],false))
 					{

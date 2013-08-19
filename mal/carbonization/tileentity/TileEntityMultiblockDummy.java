@@ -37,7 +37,7 @@ public class TileEntityMultiblockDummy extends TileEntity implements ITileEntity
 	
 	public void activate(World world, int x, int y, int z, EntityPlayer par5EntityPlayer)
 	{
-		System.out.println("!!REMOTE ACCESS!!");
+		//System.out.println("!!REMOTE ACCESS!!");
 		if(masterEntity != null)
 			if(this.isUseableByPlayer(par5EntityPlayer))
 				masterEntity.activate(world, masterEntity.getX(), masterEntity.getY(), masterEntity.getZ(), par5EntityPlayer);
@@ -76,41 +76,46 @@ public class TileEntityMultiblockDummy extends TileEntity implements ITileEntity
 	{
 		super.updateEntity();
 		
-		if(worldObj != null && loaded)
+		if(worldObj != null && !loaded)
 		{
 			TileEntity te = worldObj.getBlockTileEntity(mx, my, mz);
 			if(te instanceof ITileEntityMultiblock)
-				this.masterEntity = (ITileEntityMultiblock) te;
-			loaded = false;
-		}
-		
-		/*if(masterEntity==null && !loaded)
-		{
-			if(my == -100)//something is really broken, so revert
-				MultiBlockInstantiator.revertSingleMultiblock(worldObj, xCoord, yCoord, zCoord);
-			
-			System.out.println("Master Entity Null: Attempting Recovery");
-			TileEntity te = worldObj.getBlockTileEntity(mx, my, mz);
-			if(te instanceof TileEntityMultiblockFurnace)
-				this.masterEntity = (TileEntityMultiblockFurnace) te;
-			else//couldn't find the correct entity at the location, so revert to the standard block
 			{
-				if(mastercheckFail == 0)//we haven't failed before
-				{
-					System.out.println("Recovery Failed: Delaying 100 ticks...");
-					mastercheckFail = 1;
-				}
-				else if(mastercheckFail <100)
-				{
-					mastercheckFail++;
-				}
-				else
-				{
-					System.out.println("Recovery Failed: Reverting Block");
-					MultiBlockInstantiator.revertSingleMultiblock(worldObj, xCoord, yCoord, zCoord);
-				}
+				this.masterEntity = (ITileEntityMultiblock) te;
+				loaded = true;
 			}
-		}*/
+		
+			/*if(masterEntity==null && loaded)
+			{
+				if(my == -100)//something is really broken, so revert
+					MultiBlockInstantiator.revertSingleMultiblock(worldObj, xCoord, yCoord, zCoord);
+				
+				System.out.println("Master Entity Null: Attempting Recovery");
+				te = worldObj.getBlockTileEntity(mx, my, mz);
+				if((mastercheckFail == 0 || mastercheckFail == 100) && te instanceof TileEntityMultiblockFurnace)
+				{
+					this.masterEntity = (TileEntityMultiblockFurnace) te;
+					loaded = false;
+				}
+				else//couldn't find the correct entity at the location, so revert to the standard block
+				{
+					if(mastercheckFail == 0)//we haven't failed before
+					{
+						System.out.println("Recovery Failed: Delaying 100 ticks...");
+						mastercheckFail = 1;
+					}
+					else if(mastercheckFail <100)
+					{
+						mastercheckFail++;
+					}
+					else
+					{
+						System.out.println("Recovery Failed: Reverting Block");
+						MultiBlockInstantiator.revertSingleMultiblock(worldObj, xCoord, yCoord, zCoord);
+					}
+				}
+			}*/
+		}
 	}
 	
 	@Override
@@ -151,61 +156,81 @@ public class TileEntityMultiblockDummy extends TileEntity implements ITileEntity
 		mx = nbt.getInteger("masterEntityx");
 		my = nbt.getInteger("masterEntityy");
 		mz = nbt.getInteger("masterEntityz");
-		loaded = true;
 	}
 
 	@Override
 	public int[] getAccessibleSlotsFromSide(int var1) {
+		if(masterEntity == null)
+			return null;
 		return masterEntity.getAccessibleSlotsFromSide(var1);
 	}
 
 	@Override
 	public boolean canInsertItem(int i, ItemStack itemstack, int j) {
+		if(masterEntity == null)
+			return false;
 		return masterEntity.canInsertItem(i, itemstack, j);
 	}
 
 	@Override
 	public boolean canExtractItem(int i, ItemStack itemstack, int j) {
+		if(masterEntity == null)
+			return false;
 		return masterEntity.canExtractItem(i, itemstack, j);
 	}
 
 	@Override
 	public int getSizeInventory() {
+		if(masterEntity == null)
+			return 0;
 		return masterEntity.getSizeInventory();
 	}
 
 	@Override
 	public ItemStack getStackInSlot(int i) {
+		if(masterEntity == null)
+			return null;
 		return masterEntity.getStackInSlot(i);
 	}
 
 	@Override
 	public ItemStack decrStackSize(int i, int j) {
+		if(masterEntity == null)
+			return null;
 		return masterEntity.decrStackSize(i, j);
 	}
 
 	@Override
 	public ItemStack getStackInSlotOnClosing(int i) {
+		if(masterEntity == null)
+			return null;
 		return masterEntity.getStackInSlotOnClosing(i);
 	}
 
 	@Override
 	public void setInventorySlotContents(int i, ItemStack itemstack) {
-		masterEntity.setInventorySlotContents(i, itemstack);
+		if(masterEntity != null)
+			masterEntity.setInventorySlotContents(i, itemstack);
 	}
 
 	@Override
 	public String getInvName() {
+		if(masterEntity == null)
+			return "";
 		return masterEntity.getInvName();
 	}
 
 	@Override
 	public boolean isInvNameLocalized() {
+		if(masterEntity == null)
+			return false;
 		return masterEntity.isInvNameLocalized();
 	}
 
 	@Override
 	public int getInventoryStackLimit() {
+		if(masterEntity == null)
+			return 0;
 		return masterEntity.getInventoryStackLimit();
 	}
 
@@ -219,16 +244,20 @@ public class TileEntityMultiblockDummy extends TileEntity implements ITileEntity
 
 	@Override
 	public void openChest() {
-		masterEntity.openChest();
+		if(masterEntity != null)
+			masterEntity.openChest();
 	}
 
 	@Override
 	public void closeChest() {
-		masterEntity.closeChest();
+		if(masterEntity != null)
+			masterEntity.closeChest();
 	}
 
 	@Override
 	public boolean isItemValidForSlot(int i, ItemStack itemstack) {
+		if(masterEntity == null)
+			return false;
 		return masterEntity.isItemValidForSlot(i, itemstack);
 	}
 

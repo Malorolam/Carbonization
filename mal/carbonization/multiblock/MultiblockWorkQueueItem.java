@@ -40,7 +40,7 @@ public class MultiblockWorkQueueItem {
 		nbt.setString("type", oreSlagType);
 		nbt.setInteger("slagYield", slagYield);
 		input.writeToNBT(nbt);
-		System.out.println("Saved Item: "+ input.toString() + " (" + cookTime + "/" + maxCookTime + ")");
+		//System.out.println("Saved Item: "+ input.toString() + " (" + cookTime + "/" + maxCookTime + ")");
 	}
 	
 	public void retreiveNBT(NBTTagCompound nbt)
@@ -51,7 +51,7 @@ public class MultiblockWorkQueueItem {
 		this.oreSlagType = nbt.getString("type");
 		this.slagYield = nbt.getInteger("slagYield");
 		input.readFromNBT(nbt);
-		System.out.println("Recovered Item: "+ input.toString() + " (" + cookTime + "/" + maxCookTime + ")");
+		//System.out.println("Recovered Item: "+ input.toString() + " (" + cookTime + "/" + maxCookTime + ")");
 	}
 	
 	public boolean tickItem()

@@ -30,7 +30,7 @@ public class GuiMultiblockFurnace extends GuiContainer{
 	{
 		super.onGuiClosed();
 		
-		PacketDispatcher.sendPacketToServer(furnaceInventory.getDescriptionPacket());
+		//PacketDispatcher.sendPacketToServer(furnaceInventory.getDescriptionPacket());
 	}
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float f, int i, int j) {
@@ -56,7 +56,7 @@ public class GuiMultiblockFurnace extends GuiContainer{
 	@Override
 	protected void drawGuiContainerForegroundLayer(int par1, int par2)
 	{
-		this.fontRenderer.drawString(furnaceInventory.getNumQueueJobs() + "/" + furnaceInventory.oreCapacity, (this.width-this.xSize)/2-65, 6, 4210752);
+		this.fontRenderer.drawString(furnaceInventory.getNumQueueJobs() + "/" + furnaceInventory.oreCapacity, 62, 6, 4210752);
 	}
 	
 	@Override

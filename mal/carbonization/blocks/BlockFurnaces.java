@@ -56,7 +56,7 @@ public class BlockFurnaces extends BlockContainer
     {
         super(par1, Material.ground);
         this.setUnlocalizedName("IronFurnace");
-        this.setHardness(3.0f);
+        this.setHardness(1.5f);
         this.setResistance(20f);
         this.isActive = par2;
         this.setCreativeTab(CreativeTabs.tabDecorations);

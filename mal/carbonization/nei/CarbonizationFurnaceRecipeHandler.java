@@ -13,6 +13,7 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.tileentity.TileEntityFurnace;
+import net.minecraft.util.ResourceLocation;
 import codechicken.nei.ItemList;
 import codechicken.nei.NEIClientUtils;
 import codechicken.nei.NEIServerUtils;
@@ -93,8 +94,8 @@ public class CarbonizationFurnaceRecipeHandler extends TemplateRecipeHandler{
 	@Override
 	public void loadTransferRects()
 	{
-		transferRects.add(new RecipeTransferRect(new Rectangle(50, 23, 18, 18), "fuel"));
-		transferRects.add(new RecipeTransferRect(new Rectangle(74, 23, 24, 18), "carbonizationSmelting"));
+		transferRects.add(new RecipeTransferRect(new Rectangle(56, 36, 14, 14), "fuel"));
+		transferRects.add(new RecipeTransferRect(new Rectangle(79, 36, 24, 18), "carbonizationSmelting"));
 	}
 	
 	@Override
@@ -114,7 +115,7 @@ public class CarbonizationFurnaceRecipeHandler extends TemplateRecipeHandler{
 	@Override
 	public String getGuiTexture() {
 		// TODO Auto-generated method stub
-		return "carbonization:/textures/gui/furnace.png";
+		return new ResourceLocation("carbonization", "textures/gui/furnace.png").toString();
 	}
 	
 	@Override

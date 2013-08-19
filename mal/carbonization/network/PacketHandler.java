@@ -25,6 +25,8 @@ public class PacketHandler implements IPacketHandler {
 		try {
 			if(packet.channel.equals("CarbonizationChn"))
 			{
+				if(packet.data == null)
+					System.out.println("PACKET DATA NULL!");
 				ByteArrayDataInput data = ByteStreams.newDataInput(packet.data);
 			
 				int x = data.readInt();
@@ -136,7 +138,7 @@ public class PacketHandler implements IPacketHandler {
 				}
 				else
 				{
-					System.out.println("I'm too sexy for my pants, too sexy for my pants, too sexy to dance.");
+					System.out.println("Got a packet for TileEntity: " + (te==null?"null":te.getClass().toString()) + ".");
 				}
 			}
 		}
@@ -288,7 +290,7 @@ public class PacketHandler implements IPacketHandler {
 		}
 		else
 		{
-			System.out.println("I'm too sexy for Milan, too sexy for Milan, New york, and Japan.");
+			System.out.println("Trying to make packet for TileEntity: " + te.getClass().toString() + ".");
 		}
 		
 		Packet250CustomPayload pak = new Packet250CustomPayload();
@@ -296,6 +298,11 @@ public class PacketHandler implements IPacketHandler {
 		pak.data = bos.toByteArray();
 		pak.length = bos.size();
 		pak.isChunkDataPacket = true;
+		
+		if(pak.data == null)
+		{
+			System.out.println("ERROR ERROR DATA NULL!");
+		}
 		//System.out.println("happy packet is happy.");
 		return pak;
 	}

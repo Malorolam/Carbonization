@@ -5,8 +5,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
 
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
@@ -140,7 +142,7 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
 
             if (item != null)
             {
-            	System.out.println("input index: " + i);
+            	//System.out.println("input index: " + i);
                 var10 = this.furnaceRand.nextFloat() * 0.8F + 0.1F;
                 var11 = this.furnaceRand.nextFloat() * 0.8F + 0.1F;
                 var12 = this.furnaceRand.nextFloat() * 0.8F + 0.1F;
@@ -169,7 +171,7 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
 
             if (item != null)
             {
-            	System.out.println("output index: " + j);
+            	//System.out.println("output index: " + j);
                 var10 = this.furnaceRand.nextFloat() * 0.8F + 0.1F;
                 var11 = this.furnaceRand.nextFloat() * 0.8F + 0.1F;
                 var12 = this.furnaceRand.nextFloat() * 0.8F + 0.1F;
@@ -543,7 +545,7 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
 		slagCapacity = oreCapacity*1000;
 		maxFuelCapacity = (int)(componentTiers[1]+1)*xsize*zsize*500;
 		
-		slagDistribution = (int) Math.floor(300+(componentTiers[0]+componentTiers[1])*20);
+		slagDistribution = (int) Math.floor(300+(componentTiers[0]+componentTiers[1])*22.5);
 		double lv = Math.sqrt(xsize*ysize*zsize);
 		fuelTimeModifier = (float) (6.61/Math.pow(componentTiers[1]+1,1.2)*Math.log10(lv));
 		
@@ -613,7 +615,7 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
 			{
 				this.onInventoryChanged();
 			}
-			PacketDispatcher.sendPacketToAllPlayers(getDescriptionPacket());
+			PacketDispatcher.sendPacketToAllAround(xCoord, yCoord, zCoord, 64, worldObj.provider.dimensionId, getDescriptionPacket());
 		}
 		
 		//System.out.println("Jobs in Queue: " + this.numQueueJobs + ": " + worldObj.isRemote);
@@ -892,7 +894,7 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
     			if(inputStacks[i].stackSize == 0)
     			{
     				inputStacks[i] = null;
-    		    	System.out.println("Cleared 0 value input at " + i);
+    		    	//System.out.println("Cleared 0 value input at " + i);
     				inc = true;
     			}
     	}
@@ -903,7 +905,7 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
     			if(outputStacks[i].stackSize == 0)
     			{
     				outputStacks[i] = null;
-    		    	System.out.println("Cleared 0 value output at " + i);
+    		    	//System.out.println("Cleared 0 value output at " + i);
     				inc = true;
     			}
     	}
@@ -939,8 +941,8 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
 	    			int cookTime = (int) Math.floor(CarbonizationRecipes.smelting().getMultiblockCookTime(input)*this.cookTimeModifier);
 	    			String oreSlagType = CarbonizationRecipes.smelting().getMultiblockOreSlagType(input);
 	    			queue.add(new MultiblockWorkQueueItem(input, fuelTick, cookTime, cookTime, oreSlagType, this.slagDistribution));
-	    			System.out.println("cookTime: " + cookTime + "; fuelTick: " + fuelTick + "; slagDistribution: " + slagDistribution);
-	    			this.numQueueJobs++;
+	    			//System.out.println("cookTime: " + cookTime + "; fuelTick: " + fuelTick + "; slagDistribution: " + slagDistribution);
+	    			this.numQueueJobs = queue.size();
 	    			action++;
 	    		}
     		}
@@ -990,7 +992,7 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
   	//the current fuel is passed in to ensure that the job can be ticked
   	public List<ItemStack> tickJobs()
   	{
-  		if(queue == null || numQueueJobs == 0)
+  		if(queue == null)
   			return tickSlag();
   		
   		List<MultiblockWorkQueueItem> doneItems = new ArrayList();
@@ -1021,7 +1023,9 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
   			
   			for(MultiblockWorkQueueItem item:doneItems)
   			{
-  				removeJob(item);
+  				boolean b = removeJob(item);
+  				if(!b)
+  					FMLLog.log(Level.SEVERE, "Queue Job mismanaged.");
   			}
   		}
 

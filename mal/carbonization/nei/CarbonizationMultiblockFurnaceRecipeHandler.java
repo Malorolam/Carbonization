@@ -14,6 +14,7 @@ import net.minecraft.block.Block;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityFurnace;
+import net.minecraft.util.ResourceLocation;
 import codechicken.nei.ItemList;
 import codechicken.nei.NEIClientUtils;
 import codechicken.nei.NEIServerUtils;
@@ -92,7 +93,7 @@ public class CarbonizationMultiblockFurnaceRecipeHandler extends TemplateRecipeH
 	@Override
 	public String getGuiTexture() {
 		// TODO Auto-generated method stub
-		return "carbonization:/textures/gui/multiblockNEI.png";
+		return new ResourceLocation("carbonization", "textures/gui/multiblockNEI.png").toString();
 	}
 	
 	@Override
@@ -124,7 +125,7 @@ public class CarbonizationMultiblockFurnaceRecipeHandler extends TemplateRecipeH
 	@Override
 	public void loadCraftingRecipes(ItemStack result)
 	{
-        HashMap<Integer, ItemStack> recipes = (HashMap<Integer, ItemStack>) CarbonizationRecipes.smelting().getSmeltingList();
+        HashMap<Integer, ItemStack> recipes = (HashMap<Integer, ItemStack>) CarbonizationRecipes.smelting().getMultiblockSmeltingList();
         HashMap<List<Integer>, ItemStack> metarecipes = (HashMap<List<Integer>, ItemStack>) CarbonizationRecipes.smelting().generateMultiblockMap();
         
         for(Entry<Integer, ItemStack> recipe : recipes.entrySet())
@@ -151,7 +152,7 @@ public class CarbonizationMultiblockFurnaceRecipeHandler extends TemplateRecipeH
 	{
 		if(inputID.equals("fuel") && getClass() == CarbonizationMultiblockFurnaceRecipeHandler.class)
 		{
-			loadCraftingRecipes("carbonizationMultiblock");
+			loadCraftingRecipes("carbonizationMultiblockRecipes");
 		}
 		else
 		{
@@ -162,8 +163,8 @@ public class CarbonizationMultiblockFurnaceRecipeHandler extends TemplateRecipeH
 	@Override
 	public void loadUsageRecipes(ItemStack ingredient)
 	{
-		HashMap<Integer, ItemStack> recipes = (HashMap<Integer, ItemStack>) CarbonizationRecipes.smelting().getSmeltingList();
-        HashMap<List<Integer>, ItemStack> metarecipes = (HashMap<List<Integer>, ItemStack>) CarbonizationRecipes.smelting().getMetaSmeltingList();
+		HashMap<Integer, ItemStack> recipes = (HashMap<Integer, ItemStack>) CarbonizationRecipes.smelting().getMultiblockSmeltingList();
+        HashMap<List<Integer>, ItemStack> metarecipes = (HashMap<List<Integer>, ItemStack>) CarbonizationRecipes.smelting().generateMultiblockMap();
         
         for(Entry<Integer, ItemStack> recipe : recipes.entrySet())
         {

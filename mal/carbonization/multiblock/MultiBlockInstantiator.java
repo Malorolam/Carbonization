@@ -28,14 +28,20 @@ public class MultiBlockInstantiator {
 	public static int[] matchPatternWithOffset(MultiBlockMatcher mbMatch, int startX, int startY, int startZ, World world, Multiblock parentBlock, int[] offset, boolean forceAir)
 	{
 		//make sure the offset is a valid one
-		if(offset.length != 3 || offset[0] == -1000 || offset[1] == -1000 || offset[2] == -1000)
+		if(offset == null || offset.length != 3)
+		{
+			System.out.println("Failed due to invalid offset");
 			return null;
+		}
+		
+		if(offset[0] == -1000 || offset[1] == -1000 || offset[2] == -1000)
+			return matchPattern(mbMatch, startX, startY, startZ, world, parentBlock, forceAir);
 		
 		Multiblock[][][] pattern = mbMatch.getPattern();
 		MultiBlockMatcher test_matcher = new MultiBlockMatcher(pattern.length, pattern[0].length, pattern[0][0].length);
 		
 		createWorldMultiBlock(test_matcher, startX-offset[0], startY-offset[1], startZ-offset[2], pattern.length, pattern[0].length, pattern[0][0].length, world);
-		if(mbMatch.comparePatternWithSubstitutions(test_matcher.getPattern(), parentBlock, 1, forceAir))
+		if(mbMatch.comparePatternWithSubstitutions(test_matcher.getPattern(), parentBlock, 1, forceAir, startX, startY, startZ, world))
 		{
 			return offset;//it matches, so return the offset we gave it
 		}
@@ -65,11 +71,11 @@ public class MultiBlockInstantiator {
 		
 		//Figure out if we have an easy calculation
 		int sideAxis;
-		if(world.getBlockId(startX+1, startY, startZ)==0 && world.getBlockId(startX-1, startY, startZ)==0)//x axis alignment
+		if(world.isAirBlock(startX+1, startY, startZ) && world.isAirBlock(startX-1, startY, startZ))//x axis alignment
 			sideAxis = 0;
-		else if(world.getBlockId(startX, startY+1, startZ)==0 && world.getBlockId(startX, startY-1, startZ)==0)//y axis alignment
+		else if(world.isAirBlock(startX, startY+1, startZ) && world.isAirBlock(startX, startY-1, startZ))//y axis alignment
 			sideAxis = 1;
-		else if(world.getBlockId(startX, startY, startZ+1)==0 && world.getBlockId(startX, startY, startZ-1)==0)//z axis alignment
+		else if(world.isAirBlock(startX, startY, startZ+1) && world.isAirBlock(startX, startY, startZ-1))//z axis alignment
 			sideAxis = 2;
 		else//we are sad and have to do lots of calculations now :[
 			sideAxis = -1;
@@ -86,7 +92,7 @@ public class MultiBlockInstantiator {
 				for(int k=0; k<mbMatch.getPattern()[0][0].length; k++)
 				{
 					createWorldMultiBlock(test_matcher, startX, startY-j, startZ-k, pattern.length, pattern[0].length, pattern[0][0].length, world);
-					if(mbMatch.comparePatternWithSubstitutions(test_matcher.getPattern(), parentBlock, 1, forceAir))
+					if(mbMatch.comparePatternWithSubstitutions(test_matcher.getPattern(), parentBlock, 1, forceAir, startX, startY, startZ, world))
 					{
 						offset[1] = j;
 						offset[2] = k;
@@ -94,7 +100,7 @@ public class MultiBlockInstantiator {
 					}
 					
 					createWorldMultiBlock(test_matcher, startX-pattern.length+1, startY-j, startZ-k, pattern.length, pattern[0].length, pattern[0][0].length, world);
-					if(mbMatch.comparePatternWithSubstitutions(test_matcher.getPattern(), parentBlock, 1, forceAir))
+					if(mbMatch.comparePatternWithSubstitutions(test_matcher.getPattern(), parentBlock, 1, forceAir, startX, startY, startZ, world))
 					{
 						offset[0] = pattern.length-1;
 						offset[1] = j;
@@ -111,7 +117,7 @@ public class MultiBlockInstantiator {
 				for(int k=0; k<mbMatch.getPattern()[0][0].length; k++)
 				{
 					createWorldMultiBlock(test_matcher, startX-i, startY, startZ-k, pattern.length, pattern[0].length, pattern[0][0].length, world);
-					if(mbMatch.comparePatternWithSubstitutions(test_matcher.getPattern(), parentBlock, 1, forceAir))
+					if(mbMatch.comparePatternWithSubstitutions(test_matcher.getPattern(), parentBlock, 1, forceAir, startX, startY, startZ, world))
 					{
 						offset[0] = i;
 						offset[1] = 0;
@@ -120,7 +126,7 @@ public class MultiBlockInstantiator {
 					}
 					
 					createWorldMultiBlock(test_matcher, startX-i, startY-pattern[0].length+1, startZ-k, pattern.length, pattern[0].length, pattern[0][0].length, world);
-					if(mbMatch.comparePatternWithSubstitutions(test_matcher.getPattern(), parentBlock, 1, forceAir))
+					if(mbMatch.comparePatternWithSubstitutions(test_matcher.getPattern(), parentBlock, 1, forceAir, startX, startY, startZ, world))
 					{
 						offset[0] = i;
 						offset[1] = pattern[0].length-1;
@@ -137,7 +143,7 @@ public class MultiBlockInstantiator {
 				for(int j=0; j<mbMatch.getPattern()[0].length; j++)
 				{
 					createWorldMultiBlock(test_matcher, startX-i, startY-j, startZ, pattern.length, pattern[0].length, pattern[0][0].length, world);
-					if(mbMatch.comparePatternWithSubstitutions(test_matcher.getPattern(), parentBlock, 1, forceAir))
+					if(mbMatch.comparePatternWithSubstitutions(test_matcher.getPattern(), parentBlock, 1, forceAir, startX, startY, startZ, world))
 					{
 						offset[0] = i;
 						offset[1] = j;
@@ -146,7 +152,7 @@ public class MultiBlockInstantiator {
 					}
 					
 					createWorldMultiBlock(test_matcher, startX-i, startY-j, startZ-pattern[0][0].length+1, pattern.length, pattern[0].length, pattern[0][0].length, world);
-					if(mbMatch.comparePatternWithSubstitutions(test_matcher.getPattern(), parentBlock, 1, forceAir))
+					if(mbMatch.comparePatternWithSubstitutions(test_matcher.getPattern(), parentBlock, 1, forceAir, startX, startY, startZ, world))
 					{
 						offset[0] = i;
 						offset[1] = j;
@@ -162,7 +168,7 @@ public class MultiBlockInstantiator {
 					for(int k=1-pattern[0][0].length; k<pattern[0][0].length; k++)
 					{
 						createWorldMultiBlock(test_matcher, startX-i, startY-j, startZ-k, pattern.length, pattern[0].length, pattern[0][0].length, world);
-						if(mbMatch.comparePatternWithSubstitutions(test_matcher.getPattern(), parentBlock, 1))
+						if(mbMatch.comparePatternWithSubstitutions(test_matcher.getPattern(), parentBlock, 1, forceAir, startX, startY, startZ, world))
 						{
 							offset[0] = i;
 							offset[1] = j;
@@ -247,7 +253,7 @@ public class MultiBlockInstantiator {
 	public static boolean revertMultiBlock(int[] offset, World worldObj, int x, int y, int z, int xsize, int ysize, int zsize, boolean masterOverride)
 	{
 		//go through the volume and reset everyone
-		if(Side.SERVER == FMLCommonHandler.instance().getEffectiveSide())
+		//if(Side.SERVER == FMLCommonHandler.instance().getEffectiveSide())
 		{
 				//System.out.println("Master Revert");
 				for(int i = 0; i<xsize;i++)
@@ -277,6 +283,7 @@ public class MultiBlockInstantiator {
 											worldObj.setBlock(xCoord, yCoord, zCoord, carbonization.structureFurnaceBlock.blockID, worldObj.getBlockMetadata(xCoord, yCoord, zCoord), 2);
 										else
 											worldObj.setBlock(xCoord, yCoord, zCoord, 0, 0, 2);
+									
 										//}
 									}//hopefully the automatic system cleans up the orphan tile entity >.>
 								}
@@ -304,6 +311,8 @@ public class MultiBlockInstantiator {
 						    			}
 									}
 								}
+								
+								worldObj.markTileEntityForDespawn(te);
 							}
 							else
 							{

@@ -36,6 +36,7 @@ public class CarbonizationRecipes
     private HashMap<List<Integer>, Integer> metaMultiblockFuelTime = new HashMap<List<Integer>, Integer>();
     private HashMap<List<Integer>, Integer> metaMultiblockCookTime = new HashMap<List<Integer>, Integer>();
     private HashMap<List<Integer>, String> metaMultiblockOreSlagType = new HashMap<List<Integer>, String>();
+    private HashMap<List<Integer>, Boolean> metaMultiblockForceSingle = new HashMap<List<Integer>, Boolean>();
     
 
     /**
@@ -66,11 +67,12 @@ public class CarbonizationRecipes
      * as well as ore slag return
      * 
      * oreSlagType must be in an accepted string or registered with the recipe handler, ideally in the form
+     * forceSingle will force a single output worth of slag, used for things like cobble->stone and sand->glass
      * <descriptor>Slag
      * params:
      * input, output, cookTime, fuelTime, oreSlagType
      */
-    public void addMultiblockSmelting(Object input, int cookTime, int fuelTime, String oreSlagType)
+    public void addMultiblockSmelting(Object input, int cookTime, int fuelTime, String oreSlagType, boolean forceSingle)
     {
     	int itemID;
     	int metadata;
@@ -82,6 +84,7 @@ public class CarbonizationRecipes
             metaMultiblockFuelTime.put(Arrays.asList(itemID, metadata), fuelTime);
             metaMultiblockCookTime.put(Arrays.asList(itemID, metadata), cookTime);
             metaMultiblockOreSlagType.put(Arrays.asList(itemID, metadata), oreSlagType);
+            metaMultiblockForceSingle.put(Arrays.asList(itemID, metadata), forceSingle);
     	}
     	else if(input instanceof String)
     	{
@@ -93,6 +96,7 @@ public class CarbonizationRecipes
     	        metaMultiblockFuelTime.put(Arrays.asList(itemID, metadata), fuelTime);
     	        metaMultiblockCookTime.put(Arrays.asList(itemID, metadata), cookTime);
                 metaMultiblockOreSlagType.put(Arrays.asList(itemID, metadata), oreSlagType);
+                metaMultiblockForceSingle.put(Arrays.asList(itemID, metadata), forceSingle);
     		}
     	}
     	else
@@ -100,6 +104,10 @@ public class CarbonizationRecipes
     		FMLLog.log(Level.SEVERE, "ERROR LEVEL: DAFUQ...  Tell Mal to fix his recipe handler...");
     	}
 
+    }
+    public void addMultiblockSmelting(Object input, int cookTime, int fuelTime, String oreSlagType)
+    {
+    	this.addMultiblockSmelting(input, cookTime, fuelTime, oreSlagType, false);
     }
     
     /**
@@ -252,6 +260,15 @@ public class CarbonizationRecipes
     	return (ret < 0 ? -1 : ret);
     }
     
+    public boolean getMultiblockForceSingle(ItemStack item)
+    {
+    	if(item == null || item.getItem() == null)
+    		return false;
+    	if(metaMultiblockForceSingle.containsKey(Arrays.asList(item.itemID, item.getItemDamage())))
+    		return metaMultiblockForceSingle.get(Arrays.asList(item.itemID, item.getItemDamage()));
+    	return false;
+    }
+    
     public int getMinTier(ItemStack item)
     {
     	if(item == null || item.getItem() == null)
@@ -303,7 +320,7 @@ public class CarbonizationRecipes
         return metaSmeltingList;
     }
     
-    public Map<List<Integer>, String> getMultiblockMetaSmelthingList()
+    public Map<List<Integer>, String> getMultiblockMetaSmeltingList()
     {
     	return this.multiblockSmeltingList;
     }

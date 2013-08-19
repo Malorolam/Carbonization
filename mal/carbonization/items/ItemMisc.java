@@ -17,7 +17,7 @@ import net.minecraft.world.World;
 
 public class ItemMisc extends Item{
 
-	private Icon[] iconArray = new Icon[7];
+	private Icon[] iconArray = new Icon[12];
 	
 	public ItemMisc(int par1) {
 		super(par1);
@@ -66,6 +66,21 @@ public class ItemMisc extends Item{
 			list.add(setTooltipData("items in an industrial furnace.", ColorReference.LIGHTGREEN));
 			list.add(setTooltipData("Good Job...", ColorReference.ORANGE));
 			break;
+		case 7://iron gear
+			list.add(setTooltipData("It's a few gears made of iron.", ColorReference.LIGHTGREEN));
+			break;
+		case 8://refined iron gear
+			list.add(setTooltipData("It's a few gears made of refined iron.", ColorReference.LIGHTGREEN));
+			break;
+		case 9://pig iron gear
+			list.add(setTooltipData("It's a few gears made of pig iron.", ColorReference.LIGHTGREEN));
+			break;
+		case 10://mild steel gear
+			list.add(setTooltipData("It's a few gears made of a high carbon steel.", ColorReference.LIGHTGREEN));
+			break;
+		case 11://steel gear
+			list.add(setTooltipData("It's a few gears made of medium carbon steel.", ColorReference.LIGHTGREEN));
+			break;
 		default:
 			list.add(setTooltipData("This isn't even an item!",ColorReference.DARKRED));
 			list.add(setTooltipData("Tell Mal about it so he can fix it.", ColorReference.LIGHTRED));
@@ -99,6 +114,16 @@ public class ItemMisc extends Item{
 			return "highDensityInsulation";
 		case 6:
 			return "ash";
+		case 7:
+			return "ironGear";
+		case 8:
+			return "refinedIronGear";
+		case 9:
+			return "pigIronGear";
+		case 10:
+			return "mildSteelGear";
+		case 11:
+			return "steelGear";
 		default:
 			return "ItemMisc";
 		}
@@ -119,6 +144,11 @@ public class ItemMisc extends Item{
 		iconArray[4] = ir.registerIcon("carbonization:glassInsulationTexture");
 		iconArray[5] = ir.registerIcon("carbonization:highDensityInsulationTexture");
 		iconArray[6] = ir.registerIcon("carbonization:ashTexture");
+		iconArray[7] = ir.registerIcon("carbonization:ironGearTexture");
+		iconArray[8] = ir.registerIcon("carbonization:refinedIronGearTexture");
+		iconArray[9] = ir.registerIcon("carbonization:pigIronGearTexture");
+		iconArray[10] = ir.registerIcon("carbonization:mildSteelGearTexture");
+		iconArray[11] = ir.registerIcon("carbonization:steelGearTexture");
 	}
 	
 	public Icon getIconFromDamage(int value)
@@ -166,6 +196,21 @@ public class ItemMisc extends Item{
 		case 6:
 			r="ash";
 			break;
+		case 7:
+			r="irongear";
+			break;
+		case 8:
+			r="refinedirongear";
+			break;
+		case 9:
+			r="pigirongear";
+			break;
+		case 10:
+			r="mildsteelgear";
+			break;
+		case 11:
+			r="steelgear";
+			break;
 		default:
 			r="blaarg";
 			break;
@@ -187,6 +232,11 @@ public class ItemMisc extends Item{
         par3List.add(new ItemStack(par1, 1, 4));
         par3List.add(new ItemStack(par1, 1, 5));
         par3List.add(new ItemStack(par1, 1, 6));
+        par3List.add(new ItemStack(par1, 1, 7));
+        par3List.add(new ItemStack(par1, 1, 8));
+        par3List.add(new ItemStack(par1, 1, 9));
+        par3List.add(new ItemStack(par1, 1, 10));
+        par3List.add(new ItemStack(par1, 1, 11));
     }
 	
     public ItemStack onEaten(ItemStack par1ItemStack, World par2World, EntityPlayer par3EntityPlayer)

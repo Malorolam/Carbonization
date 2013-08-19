@@ -61,12 +61,18 @@ public class BlockMultiblockFurnaceControl extends BlockContainer {
 	{
 		try 
 		{
-			return carbonization.multiblockFurnaceControl.blockID;
+			return carbonization.FurnaceControl.blockID;
 		}
 		catch (Exception e)
 		{
 			return 0;
 		}
+	}
+	
+	@Override
+	public int quantityDropped(Random par1Random)
+	{
+		return 1;
 	}
 	
     /**
