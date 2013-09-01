@@ -137,7 +137,7 @@ public class MultiBlockMatcher {
 	/*
 	 * Compare the input pattern, allowing for a block to be substituted a set number of times instead of the pattern
 	 */
-	public boolean comparePatternWithSubstitutions(Multiblock[][][] test_pattern, Multiblock exceptionBlock, int exceptionCount, boolean forceAir, int xstart, int ystart, int zstart, World world)
+	public boolean comparePatternWithSubstitutions(Multiblock[][][] test_pattern, Multiblock exceptionBlock, int exceptionCount, int xstart, int ystart, int zstart, World world)
 	{
 		//Make sure that there is an exception block in the first place
 		if(exceptionBlock == null || exceptionCount==0)
@@ -160,16 +160,7 @@ public class MultiBlockMatcher {
 			for(int j = 0; j<pattern[0].length; j++)
 				for(int k = 0; k<pattern[0][0].length; k++)
 				{
-					//air can be anything, lets us "live" in a furnace :3
-					if(!forceAir && pattern[i][j][k].blockID == 0)
-					{
-						
-					}
-					else if(!forceAir && Block.blocksList[test_pattern[i][j][k].blockID] != null && Block.blocksList[test_pattern[i][j][k].blockID].isAirBlock(world, xstart, ystart, zstart))
-					{
-						System.out.println("Bypassed fake air block.");
-					}
-					else if(!pattern[i][j][k].compare(test_pattern[i][j][k],false))
+					if(!pattern[i][j][k].compare(test_pattern[i][j][k],false))
 					{
 						if(test_pattern[i][j][k].compare(exceptionBlock,true) && count<exceptionCount)
 						{
@@ -180,10 +171,20 @@ public class MultiBlockMatcher {
 						}
 						else
 						{
-							//System.out.println("Compare process ended at index ("+i+", "+j+", "+k+") with failed match.");
-							return false;
+							if(pattern[i][j][k].blockID == 0)
+							{
+								if(Block.blocksList[test_pattern[i][j][k].blockID].isAirBlock(world, xstart+i, ystart+j, zstart+k))
+								{
+									
+								}
+								else
+									return false;
+							}
+							else
+								return false;
 						}
 					}
+
 				}
 		//System.out.println("Compare process completed with success.");
 		return true;

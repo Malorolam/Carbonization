@@ -73,14 +73,14 @@ public class TileEntityTest extends TileEntity {
 	
 	public void processFunction()
 	{
-		int[] value = MultiBlockInstantiator.matchPattern(match, xCoord, yCoord, zCoord, worldObj, new Multiblock(worldObj.getBlockId(xCoord, yCoord, zCoord), worldObj.getBlockMetadata(xCoord, yCoord, zCoord)), true);
+		//int[] value = MultiBlockInstantiator.matchPattern(match, xCoord, yCoord, zCoord, worldObj, new Multiblock(worldObj.getBlockId(xCoord, yCoord, zCoord), worldObj.getBlockMetadata(xCoord, yCoord, zCoord)), true);
 		
-		if(value != null)
+		//if(value != null)
 		{
 			//MultiBlockInstantiator.createMultiBlock(mbEmpty, xCoord-value[0], yCoord-value[1], zCoord-value[2], worldObj);
-			System.out.println(value[0]+", "+value[1]+", "+value[2]);
+			//System.out.println(value[0]+", "+value[1]+", "+value[2]);
 		}
-		else
+		//else
 			System.out.println("Null");
 	}
 

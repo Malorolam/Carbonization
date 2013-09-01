@@ -551,7 +551,7 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
 		fuelTimeModifier = (float) (1.4/Math.pow(componentTiers[1]+1,0.4)*Math.log10(lv));
 		
 		float d = (8000f-xsize*ysize*zsize)/8000f;
-		cookTimeModifier = (float) (1-0.075*componentTiers[0]*d);
+		cookTimeModifier = (float) (1-0.25*Math.log10(Math.pow(componentTiers[0]+1,3))*d);
 		
 		if(worldObj != null)//make sure the data is all loaded properly before we try to initilize everything
 		{	
@@ -561,7 +561,7 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
 				MultiBlockMatcher match = new MultiBlockMatcher(xsize, ysize, zsize);
 				match.buildBasedHollowSolid(0, 0, 0, xsize-1, ysize-1, zsize-1, carbonization.structureMultiblock.blockID, (byte)0, carbonization.structureFurnaceMultiblock.blockID, (byte)0, 1);
 	
-				int[] value = MultiBlockInstantiator.matchPatternWithOffset(match, xCoord, yCoord, zCoord, worldObj, new Multiblock(worldObj.getBlockId(xCoord, yCoord, zCoord), worldObj.getBlockMetadata(xCoord, yCoord, zCoord)), offset, false);
+				int[] value = MultiBlockInstantiator.matchPatternWithOffset(match, xCoord, yCoord, zCoord, worldObj, new Multiblock(worldObj.getBlockId(xCoord, yCoord, zCoord), worldObj.getBlockMetadata(xCoord, yCoord, zCoord)), offset);
 				if(value == null || value != offset)//the multiblock isn't properly set-up, so revert everything that can be reverted
 				{
 					System.out.println("Multiblock erronionus, reverting...");
@@ -941,7 +941,7 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
 	    			//put the item in the queue
 	    			ItemStack input = this.decrStackSize(i, 1);
 	    			float fuelTick = CarbonizationRecipes.smelting().getMultiblockFuelTime(input)*this.fuelTimeModifier;
-	    			int cookTime = (int) Math.floor(CarbonizationRecipes.smelting().getMultiblockCookTime(input)*this.cookTimeModifier);
+	    			int cookTime = (int) Math.ceil(CarbonizationRecipes.smelting().getMultiblockCookTime(input)*this.cookTimeModifier);
 	    			String oreSlagType = CarbonizationRecipes.smelting().getMultiblockOreSlagType(input);
 	    			boolean b = CarbonizationRecipes.smelting().getMultiblockForceSingle(input);
 	    			queue.add(new MultiblockWorkQueueItem(input, fuelTick, cookTime, cookTime, oreSlagType, b?carbonization.ORESLAGRATIO:this.slagDistribution));

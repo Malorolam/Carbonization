@@ -17,8 +17,8 @@ import net.minecraft.world.World;
 
 public class BlockStructureFurnace extends Block {
 
-	private Icon[] iconArrayTop = new Icon[13];
-	private Icon[] iconArraySide = new Icon[13];
+	private Icon[] iconArrayTop = new Icon[14];
+	private Icon[] iconArraySide = new Icon[14];
 	
 	public BlockStructureFurnace(int par1, Material par2Material) {
 		super(par1, par2Material);
@@ -44,6 +44,7 @@ public class BlockStructureFurnace extends Block {
 		iconArrayTop[10] = ir.registerIcon("carbonization:insRefCarbonStructureTexture");
 		iconArrayTop[11] = ir.registerIcon("carbonization:hdInsSteelStructureTexture");
 		iconArrayTop[12] = ir.registerIcon("carbonization:hdInsRefCarbonStructureTexture");
+		iconArrayTop[13] = ir.registerIcon("carbonization:endStructureTexture");
 		
 		iconArraySide[0] = ir.registerIcon("carbonization:iceStructureFurnaceTexture");
 		iconArraySide[1] = ir.registerIcon("carbonization:refinedIronStructureFurnaceTexture");
@@ -58,6 +59,7 @@ public class BlockStructureFurnace extends Block {
 		iconArraySide[10] = ir.registerIcon("carbonization:insRefCarbonStructureFurnaceTexture");
 		iconArraySide[11] = ir.registerIcon("carbonization:hdInsSteelStructureFurnaceTexture");
 		iconArraySide[12] = ir.registerIcon("carbonization:hdInsRefCarbonStructureFurnaceTexture");
+		iconArraySide[13] = ir.registerIcon("carbonization:endStructureFurnaceTexture");
 	}
 	
 	@Override
@@ -118,6 +120,8 @@ public class BlockStructureFurnace extends Block {
     		return 9;
     	case 12:
     		return 10;
+    	case 13:
+    		return 20;
     	default:
     		return 0;
     	}
@@ -194,6 +198,8 @@ public class BlockStructureFurnace extends Block {
         	return 18f;
         case 12://high density insulated reinforced carbon
         	return 20f;
+        case 13://end
+        	return 40f;
         default:
         	return 1f;
         }
@@ -215,5 +221,6 @@ public class BlockStructureFurnace extends Block {
     	par3List.add(new ItemStack(par1, 1, 10));
     	par3List.add(new ItemStack(par1, 1, 11));
     	par3List.add(new ItemStack(par1, 1, 12));
+    	par3List.add(new ItemStack(par1, 1, 13));
     }
 }

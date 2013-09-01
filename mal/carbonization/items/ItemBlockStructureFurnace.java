@@ -86,6 +86,11 @@ public class ItemBlockStructureFurnace extends ItemBlock {
 			list.add(setTooltipData("graphite insulation", ColorReference.LIGHTGREEN));
 			list.add(setTooltipData("Tier 10 Material", ColorReference.DARKCYAN));
 			break;
+		case 13://end
+			list.add(setTooltipData("Made from the essence of", ColorReference.PURPLE));
+			list.add(setTooltipData("withers and dragons.", ColorReference.PURPLE));
+			list.add(setTooltipData("Tier 20 Material", ColorReference.DARKCYAN));
+			break;
 		default:
 			list.add(setTooltipData("This isn't even an item!",ColorReference.DARKRED));
 			list.add(setTooltipData("Tell Mal about it so he can fix it.", ColorReference.LIGHTRED));
@@ -131,6 +136,8 @@ public class ItemBlockStructureFurnace extends ItemBlock {
 			return this.getUnlocalizedName()+"hdinsSteel";
 		case 12:
 			return this.getUnlocalizedName()+"hdinsrefCarbon";
+		case 13:
+			return this.getUnlocalizedName()+"end";
 
 		default:
 			return this.getUnlocalizedName()+"BlockStructure";
@@ -172,6 +179,8 @@ public class ItemBlockStructureFurnace extends ItemBlock {
 			return "hdinsSteel";
 		case 12:
 			return "hdinsrefCarbon";
+		case 13:
+			return "end";
 
 		default:
 			return this.getUnlocalizedName()+"BlockStructure";

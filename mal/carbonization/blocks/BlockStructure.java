@@ -18,7 +18,7 @@ import net.minecraft.world.World;
 
 public class BlockStructure extends Block {
 
-private Icon[] iconArray = new Icon[13];
+private Icon[] iconArray = new Icon[14];
 	
 	public BlockStructure(int par1, int par2, Material par3Material) {
 		super(par1, par3Material);
@@ -45,6 +45,7 @@ private Icon[] iconArray = new Icon[13];
 		iconArray[10] = ir.registerIcon("carbonization:insRefCarbonStructureTexture");
 		iconArray[11] = ir.registerIcon("carbonization:hdInsSteelStructureTexture");
 		iconArray[12] = ir.registerIcon("carbonization:hdInsRefCarbonStructureTexture");
+		iconArray[13] = ir.registerIcon("carbonization:endStructureTexture");
 	}
 	
 	@Override
@@ -100,6 +101,8 @@ private Icon[] iconArray = new Icon[13];
     		return 9;
     	case 12:
     		return 10;
+    	case 13:
+    		return 20;
     	default:
     		return 0;
     	}
@@ -176,6 +179,8 @@ private Icon[] iconArray = new Icon[13];
         	return 18f;
         case 12://high density insulated reinforced carbon
         	return 20f;
+        case 13://end
+        	return 40f;
         default:
         	return 1f;
         }
@@ -197,6 +202,7 @@ private Icon[] iconArray = new Icon[13];
     	par3List.add(new ItemStack(par1, 1, 10));
     	par3List.add(new ItemStack(par1, 1, 11));
     	par3List.add(new ItemStack(par1, 1, 12));
+    	par3List.add(new ItemStack(par1, 1, 13));
     }
 
 }
