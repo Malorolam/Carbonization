@@ -97,11 +97,13 @@ public class PacketHandler implements IPacketHandler {
 					comptT[0] = data.readFloat();
 					comptT[1] = data.readFloat();
 					
-					int fuelTime = data.readInt();
+					float fuelTime = data.readFloat();
 					int slagVolume = data.readInt();
 					
 					int grossCookTime = data.readInt();
 					int grossMaxCookTime = data.readInt();
+					
+					boolean passFuel = data.readBoolean();
 					
 					int itemSize = data.readInt();
 					
@@ -126,6 +128,7 @@ public class PacketHandler implements IPacketHandler {
 					fte.zsize = zsize;
 					fte.offset = offset;
 					fte.componentTiers = comptT;
+					fte.passFuel = passFuel;
 					fte.calculateData();
 					fte.recoverIntList(items);
 					fte.slagTank = slagVolume;
@@ -234,11 +237,14 @@ public class PacketHandler implements IPacketHandler {
 			float ctx = fte.componentTiers[0];
 			float cty = fte.componentTiers[1];
 			
-			int fuelStack = fte.getFuelStack();
+			float fuelStack = fte.getFuelStack();
 			int slagVolume = fte.slagTank;
 			
 			int grossCookTime = fte.getGrossCookTime();
 			int grossMaxCookTime = fte.getGrossMaxCookTime();
+			
+			boolean passFuel = fte.passFuel;
+			//System.out.println(passFuel);
 			
 			int[] items = fte.buildIntList();
 			int itemSize = items.length;
@@ -265,10 +271,11 @@ public class PacketHandler implements IPacketHandler {
 				dos.writeInt(oz);
 				dos.writeFloat(ctx);
 				dos.writeFloat(cty);
-				dos.writeInt(fuelStack);
+				dos.writeFloat(fuelStack);
 				dos.writeInt(slagVolume);
 				dos.writeInt(grossCookTime);
 				dos.writeInt(grossMaxCookTime);
+				dos.writeBoolean(passFuel);
 				dos.writeInt(itemSize);
 				
 				for(int i = 0; i < itemSize; i++)
@@ -306,43 +313,6 @@ public class PacketHandler implements IPacketHandler {
 		//System.out.println("happy packet is happy.");
 		return pak;
 	}
-	
-	//make the packet for multiblock init
-	public static Packet makeMultiblockPacket(TileEntityMultiblockInit te, int xdiff, int ydiff, int zdiff, boolean activated)
-	{
-		ByteArrayOutputStream bos = new ByteArrayOutputStream(140);
-		DataOutputStream dos = new DataOutputStream(bos);
-		
-		int x = te.xCoord;
-		int y = te.yCoord;
-		int z = te.zCoord;
-		int metadata = te.blockMetadata;
-		
-		try
-		{
-			dos.writeInt(x);
-			dos.writeInt(y);
-			dos.writeInt(z);
-			dos.writeInt(metadata);
-			dos.writeInt(xdiff);
-			dos.writeInt(ydiff);
-			dos.writeInt(zdiff);
-			dos.writeBoolean(activated);
-		}
-		catch (IOException e)
-		{
-			System.out.println("HURRR DURRR");
-		}
-		
-		Packet250CustomPayload pak = new Packet250CustomPayload();
-		pak.channel = "CarbonizationChn";
-		pak.data = bos.toByteArray();
-		pak.length = bos.size();
-		pak.isChunkDataPacket = true;
-		//System.out.println("happy packet is happy.");
-		return pak;
-	}
-
 }
 /*******************************************************************************
 * Copyright (c) 2013 Malorolam.

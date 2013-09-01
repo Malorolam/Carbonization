@@ -11,6 +11,7 @@ import mal.carbonization.ColorReference;
 import mal.carbonization.network.ContainerMultiblockFurnace;
 import mal.carbonization.tileentity.TileEntityMultiblockFurnace;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
@@ -19,10 +20,24 @@ import net.minecraft.util.ResourceLocation;
 public class GuiMultiblockFurnace extends GuiContainer{
 
 	private TileEntityMultiblockFurnace furnaceInventory;
+	private GuiButton passBtn;
+	private GuiButton holdBtn;
 	
 	public GuiMultiblockFurnace(TileEntityMultiblockFurnace par2TileEntityFurnace, InventoryPlayer par1InventoryPlayer) {
 		super(new ContainerMultiblockFurnace(par1InventoryPlayer, par2TileEntityFurnace));
 		furnaceInventory = par2TileEntityFurnace;
+	}
+	
+	public void initGui()
+	{
+		super.initGui();
+		this.buttonList.add(this.passBtn = new GuiButton(1, this.width / 2 - 83, this.height / 2 -13, 55, 12, "Pass Fuel"));
+		this.buttonList.add(this.holdBtn = new GuiButton(2, this.width / 2 - 23, this.height / 2 -13, 55, 12, "Hold Fuel"));
+		
+		if(furnaceInventory.passFuel)
+			passBtn.enabled = false;
+		else
+			holdBtn.enabled = false;
 	}
 
 	@Override
@@ -30,8 +45,31 @@ public class GuiMultiblockFurnace extends GuiContainer{
 	{
 		super.onGuiClosed();
 		
+		//furnaceInventory.closeGui();
 		//PacketDispatcher.sendPacketToServer(furnaceInventory.getDescriptionPacket());
 	}
+	
+	/**
+     * Fired when a control is clicked. This is the equivalent of ActionListener.actionPerformed(ActionEvent e).
+     */
+    protected void actionPerformed(GuiButton par1GuiButton)
+    {
+        switch (par1GuiButton.id)
+        {
+        case 1:
+        	passBtn.enabled = false;
+        	holdBtn.enabled = true;
+			furnaceInventory.passFuel = true;
+        	break;
+        case 2:
+        	holdBtn.enabled = false;
+        	passBtn.enabled = true;
+			furnaceInventory.passFuel = false;
+        	break;
+        }
+        furnaceInventory.closeGui();
+    }
+    
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float f, int i, int j) {
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);

@@ -19,7 +19,7 @@ public class ContainerMultiblockFurnace extends Container{
 	
 	private TileEntityMultiblockFurnace furnace;
     private int lastQueueNum = 0;
-    private int lastFuelTime = 0;
+    private float lastFuelTime = 0;
     private int lastSlagNum = 0;
 
     public ContainerMultiblockFurnace(InventoryPlayer par1InventoryPlayer, TileEntityMultiblockFurnace par2TileEntityFurnace)
@@ -60,7 +60,7 @@ public class ContainerMultiblockFurnace extends Container{
     public void addCraftingToCrafters(ICrafting par1ICrafting)
     {
         super.addCraftingToCrafters(par1ICrafting);
-        par1ICrafting.sendProgressBarUpdate(this, 0, this.furnace.getFuelStack());
+        par1ICrafting.sendProgressBarUpdate(this, 0, (int)this.furnace.getFuelStack());
         par1ICrafting.sendProgressBarUpdate(this, 1, this.furnace.getNumQueueJobs());
         par1ICrafting.sendProgressBarUpdate(this, 2, this.furnace.slagTank);
     }
@@ -78,7 +78,7 @@ public class ContainerMultiblockFurnace extends Container{
 
             if (this.lastFuelTime != this.furnace.getFuelStack())
             {
-                var2.sendProgressBarUpdate(this, 0, this.furnace.getFuelStack());
+                var2.sendProgressBarUpdate(this, 0, (int)this.furnace.getFuelStack());
             }
 
             if (this.lastQueueNum != this.furnace.getNumQueueJobs())

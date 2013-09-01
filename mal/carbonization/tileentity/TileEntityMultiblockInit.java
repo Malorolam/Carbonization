@@ -155,7 +155,7 @@ public class TileEntityMultiblockInit extends TileEntity {
 		else//an actual offset
 			value = MultiBlockInstantiator.matchPatternWithOffset(match, xCoord, yCoord, zCoord, worldObj, new Multiblock(worldObj.getBlockId(xCoord, yCoord, zCoord), worldObj.getBlockMetadata(xCoord, yCoord, zCoord)), offset, carbonization.FAKEAIR);
 		
-		System.out.println("Offset: " + offset[0] +", "+ offset[1] +", "+ offset[2]);
+		//System.out.println("Offset: " + offset[0] +", "+ offset[1] +", "+ offset[2]);
 		
 		if(value != null)
 		{

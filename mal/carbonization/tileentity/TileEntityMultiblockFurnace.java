@@ -64,10 +64,11 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
 	public float[] componentTiers = new float[2];//average efficiency of the side blocks [0] and base blocks[1] 
 	public ItemStack[] inputStacks = new ItemStack[9];
 	public ItemStack[] outputStacks = new ItemStack[9];
-	private int fuelStack;//the amount of fuel time available
+	private float fuelStack;//the amount of fuel time available
 	private int numQueueJobs;//number of jobs in the queue
 	private int grossCookTime=0;
 	private int grossMaxCookTime=0;
+	public boolean passFuel = false;//pass unneeded fuel through the inventory
 	
 	private List<MultiblockWorkQueueItem> queue = new ArrayList();
 	private HashMap<String, Integer> oreSlagInQueue = new HashMap<String, Integer>();
@@ -546,8 +547,8 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
 		maxFuelCapacity = (int)(componentTiers[1]+1)*xsize*zsize*500;
 		
 		slagDistribution = (int) Math.floor(300+(componentTiers[0]+componentTiers[1])*22.5);
-		double lv = Math.sqrt(xsize*ysize*zsize);
-		fuelTimeModifier = (float) (6.61/Math.pow(componentTiers[1]+1,1.2)*Math.log10(lv));
+		double lv = Math.pow(xsize*ysize*zsize, 0.3);
+		fuelTimeModifier = (float) (1.4/Math.pow(componentTiers[1]+1,0.4)*Math.log10(lv));
 		
 		float d = (8000f-xsize*ysize*zsize)/8000f;
 		cookTimeModifier = (float) (1-0.075*componentTiers[0]*d);
@@ -644,11 +645,12 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
 		offset = nbt.getIntArray("offset");
 		componentTiers[0] = nbt.getFloat("compTier0");
 		componentTiers[1] = nbt.getFloat("compTier1");
-		setFuelStack(nbt.getInteger("fuelStack"));
+		setFuelStack(nbt.getFloat("fuelStack"));
 		slagTank = nbt.getInteger("slagTank");
 		numQueueJobs = nbt.getInteger("numJobs");
 		grossCookTime = nbt.getInteger("grossCookTime");
 		grossMaxCookTime = nbt.getInteger("grossMaxCookTime");
+		passFuel = nbt.getBoolean("passFuel");
 		
 		NBTTagList input = nbt.getTagList("inputItems");
 		for (int i = 0; i < input.tagCount(); ++i)
@@ -710,11 +712,12 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
 		nbt.setIntArray("offset", offset);
 		nbt.setFloat("compTier0", componentTiers[0]);
 		nbt.setFloat("compTier1", componentTiers[1]);
-		nbt.setInteger("fuelStack", getFuelStack());
+		nbt.setFloat("fuelStack", getFuelStack());
 		nbt.setInteger("slagTank", slagTank);
 		nbt.setInteger("numJobs", numQueueJobs);
 		nbt.setInteger("grossCookTime", grossCookTime);
 		nbt.setInteger("grossMaxCookTime", grossMaxCookTime);
+		nbt.setBoolean("passFuel", passFuel);
 		
 		NBTTagList input = new NBTTagList();
 
@@ -806,7 +809,7 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
 	@SideOnly(Side.CLIENT)
 	public int getFuelCapacityScaled(int i)
 	{
-		return this.getFuelStack()*i/(this.maxFuelCapacity+1);
+		return (int) (this.getFuelStack()*i/(this.maxFuelCapacity+1));
 	}
 	
 	//add fuel
@@ -937,10 +940,11 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
     			{
 	    			//put the item in the queue
 	    			ItemStack input = this.decrStackSize(i, 1);
-	    			int fuelTick = (int) Math.ceil(CarbonizationRecipes.smelting().getMultiblockFuelTime(input)*this.fuelTimeModifier);
+	    			float fuelTick = CarbonizationRecipes.smelting().getMultiblockFuelTime(input)*this.fuelTimeModifier;
 	    			int cookTime = (int) Math.floor(CarbonizationRecipes.smelting().getMultiblockCookTime(input)*this.cookTimeModifier);
 	    			String oreSlagType = CarbonizationRecipes.smelting().getMultiblockOreSlagType(input);
-	    			queue.add(new MultiblockWorkQueueItem(input, fuelTick, cookTime, cookTime, oreSlagType, this.slagDistribution));
+	    			boolean b = CarbonizationRecipes.smelting().getMultiblockForceSingle(input);
+	    			queue.add(new MultiblockWorkQueueItem(input, fuelTick, cookTime, cookTime, oreSlagType, b?carbonization.ORESLAGRATIO:this.slagDistribution));
 	    			//System.out.println("cookTime: " + cookTime + "; fuelTick: " + fuelTick + "; slagDistribution: " + slagDistribution);
 	    			this.numQueueJobs = queue.size();
 	    			action++;
@@ -955,6 +959,11 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
     				else
     					inputStacks[i] = null;
     				action++;
+    			}
+    			else if(passFuel)
+    			{
+    				if(insertOutputItem(inputStacks[i].copy(), i))
+        				action++;
     			}
     		}
     		else//we don't know what to do, so just send the item to the output and let that deal with it
@@ -1422,6 +1431,14 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
 	   return PacketHandler.getPacket(this);
 	}
 	
+	public void closeGui()
+	{
+		if(FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
+		{
+			PacketDispatcher.sendPacketToServer(getDescriptionPacket());
+		}
+	}
+	
 	public int getX()
 	{
 		return xCoord;
@@ -1454,11 +1471,11 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
 	public void setGrossMaxCookTime(int grossMaxCookTime) {
 		this.grossMaxCookTime = grossMaxCookTime;
 	}
-	public int getFuelStack() {
+	public float getFuelStack() {
 		return fuelStack;
 	}
-	public void setFuelStack(int fuelStack) {
-		this.fuelStack = fuelStack;
+	public void setFuelStack(float f) {
+		this.fuelStack = f;
 	}
 	
 	public List getQueue()

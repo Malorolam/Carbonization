@@ -169,7 +169,7 @@ public class GuiMultiblockInit extends GuiScreen
                 		
                 	}
 
-                    this.test.closeGui(player, xdiff, ydiff, zdiff, true);
+                    this.test.closeGui(player, xdiff, ydiff, zdiff, false);
                     this.mc.displayGuiScreen((GuiScreen)null);
                     this.mc.setIngameFocus();
             	}
