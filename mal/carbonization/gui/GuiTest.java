@@ -139,7 +139,7 @@ public class GuiTest extends GuiScreen
     {
         super.drawDefaultBackground();
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        this.mc.func_110434_K().func_110577_a(new ResourceLocation("carbonization", "textures/gui/multiblockFurnace.png"));
+        this.mc.renderEngine.bindTexture(new ResourceLocation("carbonization", "textures/gui/multiblockFurnace.png"));
         int i = (this.width - 248) / 2;
         int j = (this.height - 166) / 2;
         this.drawTexturedModalRect(i, j, 0, 0, 248, 266);

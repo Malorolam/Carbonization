@@ -1,10 +1,13 @@
 package mal.carbonization;
 
 import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.client.registry.RenderingRegistry;
+import mal.carbonization.gui.GuiAutocraftingBench;
 import mal.carbonization.gui.GuiFurnaces;
 import mal.carbonization.gui.GuiMultiblockFurnace;
 import mal.carbonization.gui.GuiMultiblockInit;
 import mal.carbonization.gui.GuiTest;
+import mal.carbonization.tileentity.TileEntityAutocraftingBench;
 import mal.carbonization.tileentity.TileEntityFurnaces;
 import mal.carbonization.tileentity.TileEntityMultiblockFurnace;
 import mal.carbonization.tileentity.TileEntityMultiblockInit;
@@ -16,6 +19,16 @@ import net.minecraftforge.client.MinecraftForgeClient;
 
 public class ClientProxy extends CommonProxy {
 
+	public static int renderPass;
+	public static int structureBlockRenderType;
+	
+	public static void setCustomRenderers()
+	{
+		structureBlockRenderType = RenderingRegistry.getNextAvailableRenderId();
+		RenderingRegistry.registerBlockHandler(new StructureBlockRenderer());
+		
+		MinecraftForgeClient.registerItemRenderer(carbonization.itemStructureBlock.itemID, new StructureItemRenderer());
+	}
 	@Override
 	public void registerRenderThings()
 	{
@@ -42,6 +55,10 @@ public class ClientProxy extends CommonProxy {
         if(tileEntity instanceof TileEntityMultiblockFurnace){
         	//System.out.println("got to make the gui client side");
         	return new GuiMultiblockFurnace((TileEntityMultiblockFurnace)tileEntity, player.inventory);
+        }
+        if(tileEntity instanceof TileEntityAutocraftingBench) {
+        	//System.out.println("got to make the gui client side");
+        	return new GuiAutocraftingBench(player.inventory, (TileEntityAutocraftingBench)tileEntity);
         }
         if(tileEntity instanceof TileEntityTest)
         	return new GuiTest((TileEntityTest)tileEntity, player);

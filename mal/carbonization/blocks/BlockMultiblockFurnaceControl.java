@@ -7,7 +7,6 @@ import cpw.mods.fml.relauncher.SideOnly;
 import mal.carbonization.carbonization;
 import mal.carbonization.multiblock.MultiBlockInstantiator;
 import mal.carbonization.multiblock.MultiBlockMatcher;
-import mal.carbonization.tileentity.TileEntityMultiblockDummy;
 import mal.carbonization.tileentity.TileEntityMultiblockFurnace;
 import mal.carbonization.tileentity.TileEntityMultiblockInit;
 import net.minecraft.block.Block;

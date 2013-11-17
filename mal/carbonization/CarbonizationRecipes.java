@@ -1,5 +1,6 @@
 package mal.carbonization;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +38,9 @@ public class CarbonizationRecipes
     private HashMap<List<Integer>, Integer> metaMultiblockCookTime = new HashMap<List<Integer>, Integer>();
     private HashMap<List<Integer>, String> metaMultiblockOreSlagType = new HashMap<List<Integer>, String>();
     private HashMap<List<Integer>, Boolean> metaMultiblockForceSingle = new HashMap<List<Integer>, Boolean>();
+    
+    private List<ItemStack> carbonizationInfoList = new ArrayList<ItemStack>();
+    private List<Integer> carbonizationIndexList = new ArrayList<Integer>();
     
 
     /**
@@ -158,7 +162,7 @@ public class CarbonizationRecipes
      * @param oreSlagType
      * @param output
      */
-    public void addOreSlag(String oreSlagType, Object output)
+    public boolean addOreSlag(String oreSlagType, Object output)
     {
     	if(output instanceof String)//I'm lazy and want to use ore dictionary stuff
     	{
@@ -172,19 +176,55 @@ public class CarbonizationRecipes
     				FMLLog.log(Level.INFO, "OreDictionary Slag Registration of Type: " + oreSlagType + " Failed: OreDictionary entry " 
     						+ (String)output + " invalid.  Contact Mal or the mod author who added the recipe so they can fix it.");
     			else
+    			{
     				this.oreSlagRegistry.put(oreSlagType, OreDictionary.getOres((String)output).get(0));
+    				return true;
+    			}
     		}
     			
     	}
     	else if(output instanceof ItemStack)
     	{
     		this.oreSlagRegistry.put(oreSlagType, (ItemStack)output);
+    		return true;
     	}
     	else
     	{
     		FMLLog.log(Level.INFO, "Ore Slag Registration Failed: Output not in String or ItemStack format.  Contact Mal or the mod author" +
     				" so they can fix it.");
     	}
+		return false;
+    }
+    
+    /**
+     * Adds an item to a list with an index for information
+     * Why is this in recipes?  Because Pandas.
+     * @param item The source ItemStack
+     * @param index The index
+     */
+    public boolean addInfoItem(ItemStack item, int index)
+    {
+    	this.carbonizationInfoList.add(item);
+    	this.carbonizationIndexList.add(index);
+    	return true;
+    }
+    
+    /**
+     * Used to get the index of an item
+     * -1 is used for failure
+     * @param item
+     * @result value
+     */
+    public int getInfoIndex(ItemStack item)
+    {
+    	if(item==null)
+    		return -1;
+    	if(carbonizationInfoList.contains(item))
+    	{
+    		int index = carbonizationInfoList.indexOf(item);
+    		return (int)carbonizationIndexList.get(index);
+    	}
+    	return -1;
     }
 
     /**
@@ -315,6 +355,16 @@ public class CarbonizationRecipes
     	return ret;
     }
 
+    public List<ItemStack> getCarbonizationInfoList()
+    {
+    	return carbonizationInfoList;
+    }
+    
+    public List<Integer> getCarbonizationIndexList()
+    {
+    	return carbonizationIndexList;
+    }
+    
     public Map<List<Integer>, ItemStack> getMetaSmeltingList()
     {
         return metaSmeltingList;

@@ -61,7 +61,7 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
 	private float fuelTimeModifier;//Multiplier to fuel time
 	private float cookTimeModifier;//Multiplier to cook time
 	private int maxFuelCapacity;//Maximum fuel held
-	public float[] componentTiers = new float[2];//average efficiency of the side blocks [0] and base blocks[1] 
+	public double[] componentTiers = new double[2];//average efficiency of the insulation [0] and conduction[1] 
 	public ItemStack[] inputStacks = new ItemStack[9];
 	public ItemStack[] outputStacks = new ItemStack[9];
 	private float fuelStack;//the amount of fuel time available
@@ -534,8 +534,8 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
 		offset[0] = (Integer) params[3];
 		offset[1] = (Integer) params[4];
 		offset[2] = (Integer) params[5];
-		componentTiers[0] = (Float)params[6];
-		componentTiers[1] = (Float)params[7];
+		componentTiers[0] = (Double)params[6];
+		componentTiers[1] = (Double)params[7];
 		calculateData();
 	}
 	
@@ -544,24 +544,24 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
 	{
 		oreCapacity = (xsize-2)*(ysize-2)*(zsize-2);
 		slagCapacity = oreCapacity*1000;
-		maxFuelCapacity = (int)(componentTiers[1]+1)*xsize*zsize*500;
+		maxFuelCapacity = xsize*zsize*1500;
 		
-		slagDistribution = (int) Math.floor(300+(componentTiers[0]+componentTiers[1])*22.5);
-		double lv = Math.pow(xsize*ysize*zsize, 0.3);
-		fuelTimeModifier = (float) (1.4/Math.pow(componentTiers[1]+1,0.4)*Math.log10(lv));
+		slagDistribution = (int) Math.floor(300+(componentTiers[0]+componentTiers[1])*45);
+		double lv = Math.pow(xsize*ysize*zsize, 0.6);
+		fuelTimeModifier = (float) (1.6/Math.pow(componentTiers[0]-0.15*componentTiers[1]+1,0.8)*Math.log10(lv));
 		
 		float d = (8000f-xsize*ysize*zsize)/8000f;
-		cookTimeModifier = (float) (1-0.25*Math.log10(Math.pow(componentTiers[0]+1,3))*d);
+		cookTimeModifier = (float) (1-0.25*Math.log10(Math.pow(componentTiers[1]-0.1*componentTiers[0]+1,3.5))*d);
 		
-		if(worldObj != null)//make sure the data is all loaded properly before we try to initilize everything
+		if(worldObj != null)//make sure the data is all loaded properly before we try to initialize everything
 		{	
 			if(fromLoad)
 			{
 				//verify it is still a multiblock if this is from load
 				MultiBlockMatcher match = new MultiBlockMatcher(xsize, ysize, zsize);
-				match.buildBasedHollowSolid(0, 0, 0, xsize-1, ysize-1, zsize-1, carbonization.structureMultiblock.blockID, (byte)0, carbonization.structureFurnaceMultiblock.blockID, (byte)0, 1);
+				match.buildBasedHollowSolid(0, 0, 0, xsize-1, ysize-1, zsize-1, carbonization.structure.blockID, 0, carbonization.structure.blockID, 1000, 1);
 	
-				int[] value = MultiBlockInstantiator.matchPatternWithOffset(match, xCoord, yCoord, zCoord, worldObj, new Multiblock(worldObj.getBlockId(xCoord, yCoord, zCoord), worldObj.getBlockMetadata(xCoord, yCoord, zCoord)), offset);
+				int[] value = MultiBlockInstantiator.matchPatternWithOffset(match, xCoord, yCoord, zCoord, worldObj, new Multiblock(worldObj.getBlockId(xCoord, yCoord, zCoord), worldObj.getBlockMetadata(xCoord, yCoord, zCoord), true), offset);
 				if(value == null || value != offset)//the multiblock isn't properly set-up, so revert everything that can be reverted
 				{
 					System.out.println("Multiblock erronionus, reverting...");
@@ -581,8 +581,8 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
 						TileEntity te = worldObj.getBlockTileEntity(xCoord-offset[0]+i,yCoord-offset[1]+j,zCoord-offset[2]+k);
 						if(te instanceof ITileEntityMultiblock)
 						{
-							if(te instanceof TileEntityMultiblockDummy)//dummy tile entities
-								((TileEntityMultiblockDummy) te).initilize(new Object[]{this, null});//tell it to initialize
+							if(te instanceof TileEntityStructureBlock)//dummy tile entities
+								((TileEntityStructureBlock) te).initilize(new Object[]{this, null});//tell it to initialize
 							//else
 								//System.out.println("Skipping non-dummy entity");
 						}
@@ -643,8 +643,8 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
 		ysize = nbt.getInteger("ysize");
 		zsize = nbt.getInteger("zsize");
 		offset = nbt.getIntArray("offset");
-		componentTiers[0] = nbt.getFloat("compTier0");
-		componentTiers[1] = nbt.getFloat("compTier1");
+		componentTiers[0] = nbt.getDouble("compTier0");
+		componentTiers[1] = nbt.getDouble("compTier1");
 		setFuelStack(nbt.getFloat("fuelStack"));
 		slagTank = nbt.getInteger("slagTank");
 		numQueueJobs = nbt.getInteger("numJobs");
@@ -710,8 +710,8 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
 		nbt.setInteger("ysize", ysize);
 		nbt.setInteger("zsize", zsize);
 		nbt.setIntArray("offset", offset);
-		nbt.setFloat("compTier0", componentTiers[0]);
-		nbt.setFloat("compTier1", componentTiers[1]);
+		nbt.setDouble("compTier0", componentTiers[0]);
+		nbt.setDouble("compTier1", componentTiers[1]);
 		nbt.setFloat("fuelStack", getFuelStack());
 		nbt.setInteger("slagTank", slagTank);
 		nbt.setInteger("numJobs", numQueueJobs);
@@ -871,11 +871,13 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
                 {
                     return 300;
                 }
+                
+                if (var3 == Block.coalBlock)
+                {
+                    return 16000;
+                }
             }
 
-            if (var2 instanceof ItemTool && ((ItemTool) var2).getToolMaterialName().equals("WOOD")) return 200;
-            if (var2 instanceof ItemSword && ((ItemSword) var2).getToolMaterialName().equals("WOOD")) return 200;
-            if (var2 instanceof ItemHoe && ((ItemHoe) var2).getMaterialName().equals("WOOD")) return 200;
             if (var1 == Item.stick.itemID) return 100;
             if (var1 == Item.coal.itemID) return 1600;
             if (var1 == Item.bucketLava.itemID) return 20000;
@@ -1042,7 +1044,7 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
   	}
   	
   	/*
-  	 * Attempt number 2 at outputting the correct items in the correct quanities
+  	 * Attempt number 2 at outputting the correct items in the correct quantities
   	 */
   	private List<ItemStack> tickSlag()
   	{
@@ -1054,7 +1056,7 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
   		for(String s: oreSlagInQueue.keySet())
   		{
   			//System.out.println("Slag type: " + s + " with value of: " + oreSlagInQueue.get(s));
-  			if(oreSlagInQueue.get(s) >= carbonization.ORESLAGRATIO)
+  			if(oreSlagInQueue.get(s) >= carbonization.ORESLAGRATIO && hasOutputSpace(new ItemStack(CarbonizationRecipes.smelting().getOreSlagOutput(s).itemID, 1, CarbonizationRecipes.smelting().getOreSlagOutput(s).getItemDamage())) != -1)
   			{
   				int value = CarbonizationRecipes.smelting().getOreSlagOutput(s).stackSize;
   				if(outputCounts.containsKey(s))
@@ -1135,11 +1137,11 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
 			int slot = hasOutputSpace(item);
 			if(slot == -1)//there is no slot free, so just dump it
 			{
-				this.dumpItem(item);
+				/*this.dumpItem(item);
 				if(index != -1)
 				{
 					inputStacks[index] = null;
-				}
+				}*/
 				return false;
 			}
 			if(outputStacks[slot] == null)//the slot is empty
@@ -1164,7 +1166,7 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
 					{
 						int diff = outputStacks[slot].getMaxStackSize() - outputStacks[slot].stackSize;
 						outputStacks[slot].stackSize = outputStacks[slot].getMaxStackSize();
-						item.splitStack(item.stackSize-diff);
+						item = item.splitStack(item.stackSize-diff);
 						return insertOutputItem(item, index);
 					}
 				}

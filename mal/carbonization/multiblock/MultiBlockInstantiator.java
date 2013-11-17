@@ -7,9 +7,9 @@ import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.relauncher.Side;
 import mal.carbonization.ITileEntityMultiblock;
 import mal.carbonization.carbonization;
-import mal.carbonization.tileentity.TileEntityMultiblockDummy;
 import mal.carbonization.tileentity.TileEntityMultiblockFurnace;
 import mal.carbonization.tileentity.TileEntityMultiblockInit;
+import mal.carbonization.tileentity.TileEntityStructureBlock;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
@@ -41,12 +41,13 @@ public class MultiBlockInstantiator {
 		MultiBlockMatcher test_matcher = new MultiBlockMatcher(pattern.length, pattern[0].length, pattern[0][0].length);
 		
 		createWorldMultiBlock(test_matcher, startX-offset[0], startY-offset[1], startZ-offset[2], pattern.length, pattern[0].length, pattern[0][0].length, world);
-		if(mbMatch.comparePatternWithSubstitutions(test_matcher.getPattern(), parentBlock, 1, startX, startY, startZ, world))
+		if(mbMatch.comparePatternWithSubstitutions(test_matcher.getPattern(), parentBlock, 1, startX-offset[0], startY-offset[1], startZ-offset[2], world))
 		{
 			return offset;//it matches, so return the offset we gave it
 		}
 		else
 		{
+			System.out.println("Doing full match");
 			return matchPattern(mbMatch, startX, startY, startZ, world, parentBlock);//didn't match, so use the general form instead
 		}
 
@@ -80,7 +81,7 @@ public class MultiBlockInstantiator {
 		else//we are sad and have to do lots of calculations now :[
 			sideAxis = -1;
 		
-		//System.out.println(sideAxis);
+		System.out.println(sideAxis);
 		
 		//now we have limited the options to hopefully 2 planes to iterate through
 		//We loop through the two axises that are used
@@ -207,6 +208,8 @@ public class MultiBlockInstantiator {
 				return false;
 			}
 	
+			double[] eff = new double[2];
+			
 			for(int i = 0; i<pattern.length; i++) {
 				for(int j=0;j<pattern[0].length;j++) {
 					for(int k=0;k<pattern[0][0].length;k++)
@@ -215,32 +218,25 @@ public class MultiBlockInstantiator {
 						{
 							//we do this above, so just chill
 						}
-						else if(pattern[i][j][k].compare(new Multiblock(carbonization.structureBlock.blockID ,pattern[i][j][k].blockMetadata), false))
+						else if(pattern[i][j][k].compare(new Multiblock(carbonization.structure.blockID ,pattern[i][j][k].data, pattern[i][j][k].getTier(), false), false))
 						{
-							pattern[i][j][k].blockMetadata = (byte) world.getBlockMetadata(x-offset[0]+i, y-offset[1]+j, z-offset[2]+k);
-							world.setBlock(x-offset[0]+i, y-offset[1]+j, z-offset[2]+k, carbonization.structureMultiblock.blockID, world.getBlockMetadata(x-offset[0]+i, y-offset[1]+j, z-offset[2]+k), 2);
 							TileEntity mte = world.getBlockTileEntity(x-offset[0]+i, y-offset[1]+j, z-offset[2]+k);
-							if(mte instanceof TileEntityMultiblockDummy)
-								((TileEntityMultiblockDummy)mte).InitData(pattern[i][j][k], te);
-							//else
-								//System.out.println("Tile Entity at index: " + i + ", " + j + ", " + k + " not of type Dummy.");
-						}
-						else if(pattern[i][j][k].compare(new Multiblock(carbonization.structureFurnaceBlock.blockID ,pattern[i][j][k].blockMetadata), false))
-						{
-							pattern[i][j][k].blockMetadata = (byte) world.getBlockMetadata(x-offset[0]+i, y-offset[1]+j, z-offset[2]+k);
-							world.setBlock(x-offset[0]+i, y-offset[1]+j, z-offset[2]+k, carbonization.structureFurnaceMultiblock.blockID, world.getBlockMetadata(x-offset[0]+i, y-offset[1]+j, z-offset[2]+k), 2);
-							TileEntity mte = world.getBlockTileEntity(x-offset[0]+i, y-offset[1]+j, z-offset[2]+k);
-							if(mte instanceof TileEntityMultiblockDummy)
-								((TileEntityMultiblockDummy)mte).InitData(pattern[i][j][k], te);
-							//else
-							//	System.out.println("Tile Entity at index: " + i + ", " + j + ", " + k + " not of type Dummy.");
+							if(mte instanceof TileEntityStructureBlock)
+							{
+								((TileEntityStructureBlock)mte).InitMultiblock(te);
+								eff[0] += ((TileEntityStructureBlock)mte).getInsulationTier();
+								eff[1] += ((TileEntityStructureBlock)mte).getConductionTier();
+							}
+							else
+								System.out.println("Tile Entity at index: " + i + ", " + j + ", " + k + " not a structure block.");
 						}
 					}
 				}
 			}
 			if(te != null)
 			{
-				float[] eff = mbMatch.getEfficiency(ipattern);
+				eff[0]=eff[0]/mbMatch.getSize(false);
+				eff[1]=eff[1]/mbMatch.getSize(false);
 				te.initilize(new Object[]{pattern.length, pattern[0].length, pattern[0][0].length, offset[0], offset[1], offset[2], eff[0], eff[1]});
 			}
 		}
@@ -269,30 +265,16 @@ public class MultiBlockInstantiator {
 							
 							if(te instanceof ITileEntityMultiblock)
 							{
-								if(te instanceof TileEntityMultiblockDummy)
+								if(te instanceof TileEntityStructureBlock)
 								{
-									if(worldObj.getBlockId(xCoord, yCoord, zCoord) != 0)
-									{
-										/*if(((TileEntityMultiblockDummy)te).masterBlock != null)
-											worldObj.setBlock(xCoord, yCoord, zCoord, ((TileEntityMultiblockDummy)te).masterBlock.blockID, ((TileEntityMultiblockDummy)te).masterBlock.blockMetadata, 2);
-										else//we don't have a parent so we have to guess
-										{*/
-										if(worldObj.getBlockId(xCoord, yCoord, zCoord) == carbonization.structureMultiblock.blockID)
-											worldObj.setBlock(xCoord, yCoord, zCoord, carbonization.structureBlock.blockID, worldObj.getBlockMetadata(xCoord, yCoord, zCoord), 2);
-										else if(worldObj.getBlockId(xCoord, yCoord, zCoord) == carbonization.structureFurnaceMultiblock.blockID)
-											worldObj.setBlock(xCoord, yCoord, zCoord, carbonization.structureFurnaceBlock.blockID, worldObj.getBlockMetadata(xCoord, yCoord, zCoord), 2);
-										else
-											worldObj.setBlock(xCoord, yCoord, zCoord, 0, 0, 2);
-									
-										//}
-									}//hopefully the automatic system cleans up the orphan tile entity >.>
+									((TileEntityStructureBlock) te).masterEntity = null;
 								}
 								else if(te instanceof TileEntityMultiblockFurnace)
 								{
 									//if the control block broke, dump the inventory, otherwise save the inventory
 									
 									
-									if(worldObj.getBlockId(xCoord, yCoord, zCoord) != 0 && masterOverride == false)//block still exists
+									if(!worldObj.isAirBlock(xCoord, yCoord, zCoord) && masterOverride == false)//block still exists
 									{
 										//TODO: Fix backup system
 										//System.out.println("making backup nbt");
@@ -302,6 +284,8 @@ public class MultiBlockInstantiator {
 						    			TileEntity tte = worldObj.getBlockTileEntity(xCoord, yCoord, zCoord);
 						    			if(tte instanceof TileEntityMultiblockInit)
 						    				((TileEntityMultiblockInit) tte).initData(((TileEntityMultiblockFurnace) te).xsize, ((TileEntityMultiblockFurnace) te).ysize, ((TileEntityMultiblockFurnace) te).zsize, offset, "furnace");
+						    			else if (tte instanceof TileEntityStructureBlock)
+						    				System.out.println("wat...");
 						    			else
 						    			{
 						    				//System.out.println("dafuq...");
@@ -309,10 +293,10 @@ public class MultiBlockInstantiator {
 							    			tte = worldObj.getBlockTileEntity(xCoord, yCoord, zCoord);
 						    				((TileEntityMultiblockInit) tte).initData(((TileEntityMultiblockFurnace) te).xsize, ((TileEntityMultiblockFurnace) te).ysize, ((TileEntityMultiblockFurnace) te).zsize, offset, "furnace");
 						    			}
+										worldObj.markTileEntityForDespawn(te);
 									}
 								}
 								
-								worldObj.markTileEntityForDespawn(te);
 							}
 							else
 							{
@@ -337,23 +321,12 @@ public class MultiBlockInstantiator {
 			
 			if(te instanceof ITileEntityMultiblock)
 			{
-				if(te instanceof TileEntityMultiblockDummy)
+				if(te instanceof TileEntityStructureBlock)
 				{
 					if(worldObj.getBlockId(x, y, z) != 0)
 					{
-						if(((TileEntityMultiblockDummy)te).masterBlock != null)
-							worldObj.setBlock(x, y, z, ((TileEntityMultiblockDummy)te).masterBlock.blockID, ((TileEntityMultiblockDummy)te).masterBlock.blockMetadata, 2);
-						else//we don't have a parent so we have to guess
-						{
-							if(worldObj.getBlockId(x, y, z) == carbonization.structureMultiblock.blockID)
-								worldObj.setBlock(x, y, z, carbonization.structureMultiblock.blockID, worldObj.getBlockMetadata(x, y, z), 2);
-							else if(worldObj.getBlockId(x, y, z) == carbonization.structureFurnaceMultiblock.blockID)
-								worldObj.setBlock(x, y, z, carbonization.structureFurnaceMultiblock.blockID, worldObj.getBlockMetadata(x, y, z), 2);
-							else
-								worldObj.setBlock(x, y, z, 0, 0, 2);
-						}
-						worldObj.setBlockTileEntity(x, y, z, null);
-					}//hopefully the automatic system cleans up the orphan tile entity >.>
+						((TileEntityStructureBlock) te).masterEntity=null;
+					}
 				}
 				else
 				{
@@ -397,13 +370,13 @@ public class MultiBlockInstantiator {
 			for(int j=0; j<mbMatch.getPattern()[0].length;j++)
 				for(int k=0; k<mbMatch.getPattern()[0][0].length;k++)
 				{
-					//We don't want to pick up a tile entity'd block, so make sure there isn't one here
-					/*if(world.getBlockTileEntity(i+startX, j+startY, k+startZ) != null)
-					{
-						System.err.println("Detect process failed at indices: "+i+", "+j+", "+k+": Tile Entity Present.");
-						return false;
-					}*/
-					boolean succ = mbMatch.setBlock(i, j, k, world.getBlockId(i+startX, j+startY, k+startZ), (byte)world.getBlockMetadata(i+startX, j+startY, k+startZ));
+					TileEntity te = world.getBlockTileEntity(i+startX, j+startY, k+startZ);
+					TileEntityStructureBlock ste = null;
+					if(te instanceof TileEntityStructureBlock)
+						ste = (TileEntityStructureBlock) te;
+					//else
+					//	System.out.println("Tile Entity " + ((te!=null)?te.toString():"null") + " at index: " + i + ", " + j + ", " + k);
+					boolean succ = mbMatch.setBlock(i, j, k, world.getBlockId(i+startX, j+startY, k+startZ), (ste != null)?ste.getData():world.getBlockMetadata(i+startX, j+startY, k+startZ), (ste == null));
 					if(succ==false)
 					{
 						FMLLog.log(Level.WARNING, "Detect process failed at indices: "+i+", "+j+", "+k+": Previous process failed.");

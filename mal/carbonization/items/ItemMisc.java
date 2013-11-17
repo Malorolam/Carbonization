@@ -17,7 +17,7 @@ import net.minecraft.world.World;
 
 public class ItemMisc extends Item{
 
-	private Icon[] iconArray = new Icon[12];
+	private Icon[] iconArray = new Icon[20];
 	
 	public ItemMisc(int par1) {
 		super(par1);
@@ -81,6 +81,30 @@ public class ItemMisc extends Item{
 		case 11://steel gear
 			list.add(setTooltipData("It's a few gears made of medium carbon steel.", ColorReference.LIGHTGREEN));
 			break;
+		case 12://small graphite dust pile
+			list.add(setTooltipData("It's a small pile of graphite dust.", ColorReference.LIGHTGREEN));
+			break;
+		case 13://carbon flake
+			list.add(setTooltipData("It's a flake of carbon.", ColorReference.LIGHTGREEN));
+			break;
+		case 14://carbon thread
+			list.add(setTooltipData("It's a strand of carbon fibre.", ColorReference.LIGHTGREEN));
+			break;
+		case 15://carbon fibre
+			list.add(setTooltipData("It's several strands of carbon fibre.", ColorReference.LIGHTGREEN));
+			break;
+		case 16://carbon nanoflake
+			list.add(setTooltipData("A small pile of carbon nanoflakes.", ColorReference.LIGHTGREEN));
+			break;
+		case 17://carbon nanotube
+			list.add(setTooltipData("A few carbon nanotubes.", ColorReference.LIGHTGREEN));
+			break;
+		case 18://coarse threading
+			list.add(setTooltipData("Coarse Iron threading to improve conduction.", ColorReference.LIGHTGREEN));
+			break;
+		case 19://fine threading
+			list.add(setTooltipData("Fine Steel threading to improve conduction.", ColorReference.LIGHTGREEN));
+			break;
 		default:
 			list.add(setTooltipData("This isn't even an item!",ColorReference.DARKRED));
 			list.add(setTooltipData("Tell Mal about it so he can fix it.", ColorReference.LIGHTRED));
@@ -124,6 +148,22 @@ public class ItemMisc extends Item{
 			return "mildSteelGear";
 		case 11:
 			return "steelGear";
+		case 12:
+			return "smallCarbonPile";
+		case 13:
+			return "carbonFlake";
+		case 14:
+			return "carbonThread";
+		case 15:
+			return "carbonFibre";
+		case 16:
+			return "carbonNanoflake";
+		case 17:
+			return "carbonNanotube";
+		case 18:
+			return "coarseThreading";
+		case 19:
+			return "fineThreading";
 		default:
 			return "ItemMisc";
 		}
@@ -149,6 +189,14 @@ public class ItemMisc extends Item{
 		iconArray[9] = ir.registerIcon("carbonization:pigIronGearTexture");
 		iconArray[10] = ir.registerIcon("carbonization:mildSteelGearTexture");
 		iconArray[11] = ir.registerIcon("carbonization:steelGearTexture");
+		iconArray[12] = ir.registerIcon("carbonization:smallGraphiteDustTexture");
+		iconArray[13] = ir.registerIcon("carbonization:carbonFlakeTexture");
+		iconArray[14] = ir.registerIcon("carbonization:carbonThreadTexture");
+		iconArray[15] = ir.registerIcon("carbonization:carbonFibreTexture");
+		iconArray[16] = ir.registerIcon("carbonization:carbonNanoflakeTexture");
+		iconArray[17] = ir.registerIcon("carbonization:carbonNanotubeTexture");
+		iconArray[18] = ir.registerIcon("carbonization:coarseThreadingTexture");
+		iconArray[19] = ir.registerIcon("carbonization:fineThreadingTexture");
 	}
 	
 	public Icon getIconFromDamage(int value)
@@ -211,6 +259,30 @@ public class ItemMisc extends Item{
 		case 11:
 			r="steelgear";
 			break;
+		case 12:
+			r="smallgraphitedust";
+			break;
+		case 13:
+			r="carbonflake";
+			break;
+		case 14:
+			r="carbonthread";
+			break;
+		case 15:
+			r="carbonfibre";
+			break;
+		case 16:
+			r="carbonnanoflake";
+			break;
+		case 17:
+			r="carbonnanotube";
+			break;
+		case 18:
+			r="coarsethreading";
+			break;
+		case 19:
+			r="finethreading";
+			break;
 		default:
 			r="blaarg";
 			break;
@@ -237,6 +309,14 @@ public class ItemMisc extends Item{
         par3List.add(new ItemStack(par1, 1, 9));
         par3List.add(new ItemStack(par1, 1, 10));
         par3List.add(new ItemStack(par1, 1, 11));
+        par3List.add(new ItemStack(par1, 1, 12));
+        par3List.add(new ItemStack(par1, 1, 13));
+        par3List.add(new ItemStack(par1, 1, 14));
+        par3List.add(new ItemStack(par1, 1, 15));
+        par3List.add(new ItemStack(par1, 1, 16));
+        par3List.add(new ItemStack(par1, 1, 17));
+        par3List.add(new ItemStack(par1, 1, 18));
+        par3List.add(new ItemStack(par1, 1, 19));
     }
 	
     public ItemStack onEaten(ItemStack par1ItemStack, World par2World, EntityPlayer par3EntityPlayer)

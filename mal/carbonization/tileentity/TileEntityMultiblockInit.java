@@ -147,19 +147,28 @@ public class TileEntityMultiblockInit extends TileEntity {
 	{	
 		match = new MultiBlockMatcher(xdiff, ydiff, zdiff);
 		mbEmpty = new MultiBlockMatcher(xdiff, ydiff, zdiff);
-		match.buildBasedHollowSolid(0, 0, 0, xdiff-1, ydiff-1, zdiff-1, carbonization.structureBlock.blockID, (byte)0, carbonization.structureFurnaceBlock.blockID, (byte)0, 1);
+		match.buildBasedHollowSolid(0, 0, 0, xdiff-1, ydiff-1, zdiff-1, carbonization.structure.blockID, 0, carbonization.structure.blockID, 1000, 1);
 
 		int[] value;
-		if(offset[1] == -1000)
-			value = MultiBlockInstantiator.matchPattern(match, xCoord, yCoord, zCoord, worldObj, new Multiblock(worldObj.getBlockId(xCoord, yCoord, zCoord), worldObj.getBlockMetadata(xCoord, yCoord, zCoord)));
-		else//an actual offset
-			value = MultiBlockInstantiator.matchPatternWithOffset(match, xCoord, yCoord, zCoord, worldObj, new Multiblock(worldObj.getBlockId(xCoord, yCoord, zCoord), worldObj.getBlockMetadata(xCoord, yCoord, zCoord)), offset);
+		TileEntity te = worldObj.getBlockTileEntity(xCoord, yCoord, zCoord);
+		TileEntityStructureBlock ste = null;
+		TileEntityMultiblockInit ite = null;
+		if(te instanceof TileEntityStructureBlock)
+			ste = (TileEntityStructureBlock) te;
+		if(te instanceof TileEntityMultiblockInit)
+			ite = (TileEntityMultiblockInit) te;
 		
-		//System.out.println("Offset: " + offset[0] +", "+ offset[1] +", "+ offset[2]);
+		
+		if(offset[1] == -1000)
+			value = MultiBlockInstantiator.matchPattern(match, xCoord, yCoord, zCoord, worldObj, new Multiblock(worldObj.getBlockId(xCoord, yCoord, zCoord), te.blockMetadata, true));
+		else//an actual offset
+			value = MultiBlockInstantiator.matchPatternWithOffset(match, xCoord, yCoord, zCoord, worldObj, new Multiblock(worldObj.getBlockId(xCoord, yCoord, zCoord),te.blockMetadata, true), offset);
+		
+		System.out.println("Offset: " + offset[0] +", "+ offset[1] +", "+ offset[2]);
 		
 		if(value != null)
 		{
-			//System.out.println("Value: " + value[0] +", "+ value[1] +", "+ value[2]);
+			System.out.println("Value: " + value[0] +", "+ value[1] +", "+ value[2]);
 			MultiBlockInstantiator.createMultiBlock(match, xCoord, yCoord, zCoord, worldObj, value);
 		}
 		else

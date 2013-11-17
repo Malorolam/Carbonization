@@ -73,7 +73,7 @@ public class GuiMultiblockFurnace extends GuiContainer{
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float f, int i, int j) {
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        this.mc.func_110434_K().func_110577_a(new ResourceLocation("carbonization", "textures/gui/multiblockFurnace.png"));
+        this.mc.renderEngine.bindTexture(new ResourceLocation("carbonization", "textures/gui/multiblockFurnace.png"));
         int var5 = (this.width - this.xSize) / 2;
         int var6 = (this.height - this.ySize) / 2;
         this.drawTexturedModalRect(var5, var6, 0, 0, this.xSize, this.ySize);
@@ -146,6 +146,8 @@ public class GuiMultiblockFurnace extends GuiContainer{
 			list.add(ColorReference.DARKGREY.getCode() + "Metal Slag Yield: " + furnaceInventory.getSlagDistribution());
 			list.add(ColorReference.DARKGREY.getCode() + "Resource Reductions:");
 			list.add(ColorReference.DARKGREY.getCode() + "Fuel Tick: " + String.format("%.2f", furnaceInventory.getFuelTimeModifier()*100) + "%  Cook Tick: " + String.format("%.2f", furnaceInventory.getCookTimeModifier()*100) + "%");
+			list.add(ColorReference.DARKGREY.getCode() + "Tiers:");
+			list.add(ColorReference.DARKGREY.getCode() + "Conduction: " + String.format("%.2f", furnaceInventory.componentTiers[0]) + "    Insulation: " + String.format("%.2f", furnaceInventory.componentTiers[1]));
 			
 			this.drawHoveringText(list, par1, par2, fontRenderer);
 		}

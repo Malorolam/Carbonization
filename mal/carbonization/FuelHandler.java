@@ -49,7 +49,7 @@ public class FuelHandler implements IFuelHandler {
 					return 300;
 				}
 
-				if (block == Block.field_111034_cE)
+				if (block == Block.coalBlock)
 				{
 					return 16000;
 				}

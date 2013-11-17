@@ -64,11 +64,8 @@ public class MultiBlockMatcher {
 			{
 				for (int k=0;k<zdiff;k++)
 				{
-					if(ipattern[i][j][k].tier != -1)
-						if(j==0)
-							efficiency[1]+=ipattern[i][j][k].tier;
-						else
-							efficiency[0]+=ipattern[i][j][k].tier;
+					efficiency[1]+=ipattern[i][j][k].ConductionTier;
+					efficiency[0]+=ipattern[i][j][k].InsulationTier;
 				}
 			}
 		}
@@ -77,7 +74,7 @@ public class MultiBlockMatcher {
 		return efficiency;
 	}
 	
-	private int getSize(boolean base)
+	public int getSize(boolean base)
 	{
 		if(base)//base area
 			return pattern.length*pattern[0][0].length;
@@ -142,7 +139,7 @@ public class MultiBlockMatcher {
 		//Make sure that there is an exception block in the first place
 		if(exceptionBlock == null || exceptionCount==0)
 		{
-			//System.out.println("No exceptions allowed, using basic comparison instead.");
+			System.out.println("No exceptions allowed, using basic comparison instead.");
 			return comparePattern(test_pattern);
 		}
 		
@@ -160,12 +157,13 @@ public class MultiBlockMatcher {
 			for(int j = 0; j<pattern[0].length; j++)
 				for(int k = 0; k<pattern[0][0].length; k++)
 				{
+					//System.out.println(i + ", " + j + ", " + k);
 					if(!pattern[i][j][k].compare(test_pattern[i][j][k],false))
 					{
-						if(test_pattern[i][j][k].compare(exceptionBlock,true) && count<exceptionCount)
+						if(test_pattern[i][j][k].compare(exceptionBlock,false) && count<exceptionCount)
 						{
 							count++;
-							//System.out.println("Compare process bypassed substituted block ID: " + exceptionBlock.blockID + ", metadata: " + exceptionBlock.blockMetadata
+							//System.out.println("Compare process bypassed substituted block ID: " + exceptionBlock.blockID + ", metadata: " + exceptionBlock.data
 							//		+ "; instances bypassed: "+count+"/"+exceptionCount+".");
 								
 						}
@@ -173,7 +171,7 @@ public class MultiBlockMatcher {
 						{
 							if(pattern[i][j][k].blockID == 0)
 							{
-								if(Block.blocksList[test_pattern[i][j][k].blockID].isAirBlock(world, xstart+i, ystart+j, zstart+k))
+								if(Block.blocksList[test_pattern[i][j][k].blockID] == null || Block.blocksList[test_pattern[i][j][k].blockID].isAirBlock(world, xstart+i, ystart+j, zstart+k))
 								{
 									
 								}
@@ -195,7 +193,7 @@ public class MultiBlockMatcher {
 	 * May have to change blockID to reference a special object that can be metadata specific
 	 * ...or make another array for metadata... whatever, I'll figure it out later
 	 */
-	public boolean buildSolid(int minX, int minY, int minZ, int maxX, int maxY, int maxZ, int blockID, byte metadata)
+	public boolean buildSolid(int minX, int minY, int minZ, int maxX, int maxY, int maxZ, int blockID, int data)
 	{	
 		//make sure none of the min values is less than 0, since that makes arrays explode
 		if(minX < 0 || minY < 0 || minZ < 0)
@@ -219,7 +217,7 @@ public class MultiBlockMatcher {
 			{
 				for(int k=minZ; k<=maxZ; k++)
 				{
-					pattern[i][j][k] = new Multiblock(blockID, metadata); 
+					pattern[i][j][k] = new Multiblock(blockID, data, false); 
 				}
 			}
 		}
@@ -239,7 +237,7 @@ public class MultiBlockMatcher {
 	 * The format is, in differnt objects, String shape, String location, Multiblock block
 	 * Will continue making this work at some other time
 	 */
-	public boolean buildComplexSolid(Object[] shape, int minX, int minY, int minZ, int maxX, int maxY, int maxZ)
+	/*public boolean buildComplexSolid(Object[] shape, int minX, int minY, int minZ, int maxX, int maxY, int maxZ)
 	{
 		boolean succ = false;
 		if(shape.length%3 != 0)
@@ -301,12 +299,12 @@ public class MultiBlockMatcher {
 			}
 		}
 		return false;
-	}
+	}*/
 	
 	/*
 	 * Build a homogeneous hollow rectangular solid
 	 */
-	public boolean buildHollowSolid(int minX, int minY, int minZ, int maxX, int maxY, int maxZ, int blockID, byte metadata, int wallThickness)
+	public boolean buildHollowSolid(int minX, int minY, int minZ, int maxX, int maxY, int maxZ, int blockID, int data, int wallThickness)
 	{			
 		//make sure none of the min values is less than 0, since that makes arrays explode
 		if(minX < 0 || minY < 0 || minZ < 0)
@@ -327,7 +325,7 @@ public class MultiBlockMatcher {
 		if(maxX-minX < 2 || maxY-minY < 2 || maxZ-minZ < 2)
 		{
 			System.err.println("Build Hollow Solid process redundant: Geometry Invalid, using Build Solid instead.");
-			return buildSolid(minX, minY, minZ, maxX, maxY, maxZ, blockID, metadata);
+			return buildSolid(minX, minY, minZ, maxX, maxY, maxZ, blockID, data);
 		}
 		
 		//make sure that with the wallThickness there is a solid and it isn't sticking walls in itself
@@ -342,7 +340,7 @@ public class MultiBlockMatcher {
 		//Now build the solid positive space first
 		//then negative space
 		//Exterior shape
-		success=buildSolid(minX, minY, minZ, maxX, maxY, maxZ, blockID, metadata);
+		success=buildSolid(minX, minY, minZ, maxX, maxY, maxZ, blockID, data);
 		if(success==false)
 		{
 			System.err.println("Build Hollow Solid process failed: Previous process failed.");
@@ -363,18 +361,18 @@ public class MultiBlockMatcher {
 	/*
 	 * Build a hollow rectangular solid whose base is a different block
 	 */
-	public boolean buildBasedHollowSolid(int minX, int minY, int minZ, int maxX, int maxY, int maxZ, int blockID1, byte metadata1, int blockID2, byte metadata2, int wallThickness)
+	public boolean buildBasedHollowSolid(int minX, int minY, int minZ, int maxX, int maxY, int maxZ, int blockID1, int data1, int blockID2, int data2, int wallThickness)
 	{
-		if(blockID1==blockID2 && metadata1==metadata2)
-			return buildHollowSolid(minX, minY, minZ, maxX, maxY, maxZ, blockID1, metadata1, wallThickness);
+		if(blockID1==blockID2 && data1==data2)
+			return buildHollowSolid(minX, minY, minZ, maxX, maxY, maxZ, blockID1, data1, wallThickness);
 		
-		boolean succ = buildHollowSolid(minX, minY, minZ, maxX, maxY, maxZ, blockID1, metadata1, wallThickness);
+		boolean succ = buildHollowSolid(minX, minY, minZ, maxX, maxY, maxZ, blockID1, data1, wallThickness);
 		if(!succ)
 		{
 			System.err.println("Build Process Failed Pass 1: Previous process failed.");
 			return false;
 		}
-		succ = buildSolid(minX, minY, minZ, maxX, minY, maxZ, blockID2, metadata2);
+		succ = buildSolid(minX, minY, minZ, maxX, minY, maxZ, blockID2, data2);
 		if(!succ)
 		{
 			System.err.println("Build Process Failed Pass 2: Previous process failed.");
@@ -386,7 +384,7 @@ public class MultiBlockMatcher {
 	/*
 	 * set a specific location in the pattern to be a certain id
 	 */
-	public boolean setBlock(int i, int j, int k, int blockID, byte metadata)
+	public boolean setBlock(int i, int j, int k, int blockID, int l, boolean metadata)
 	{
 		//Make sure that the index is within the pattern
 		if(i<0||j<0||k<0||i>=pattern.length||j>=pattern[0].length||k>=pattern[0][0].length)
@@ -395,7 +393,7 @@ public class MultiBlockMatcher {
 			return false;
 		}
 		
-		pattern[i][j][k] = new Multiblock(blockID, metadata);
+		pattern[i][j][k] = new Multiblock(blockID, l, metadata);
 		
 		return true;
 	}

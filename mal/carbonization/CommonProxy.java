@@ -1,13 +1,7 @@
 package mal.carbonization;
 
-import mal.carbonization.network.ContainerFurnaces;
-import mal.carbonization.network.ContainerMultiblockFurnace;
-import mal.carbonization.network.ContainerMultiblockInit;
-import mal.carbonization.network.ContainerTest;
-import mal.carbonization.tileentity.TileEntityFurnaces;
-import mal.carbonization.tileentity.TileEntityMultiblockFurnace;
-import mal.carbonization.tileentity.TileEntityMultiblockInit;
-import mal.carbonization.tileentity.TileEntityTest;
+import mal.carbonization.network.*;
+import mal.carbonization.tileentity.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
@@ -34,6 +28,8 @@ public class CommonProxy implements IGuiHandler
         	//System.out.println("got to make the gui server side");
         	return new ContainerMultiblockFurnace(player.inventory, (TileEntityMultiblockFurnace)tileEntity);
         }
+        if(tileEntity instanceof TileEntityAutocraftingBench)
+        	return new ContainerAutocraftingBench(player.inventory, (TileEntityAutocraftingBench)tileEntity);
         if(tileEntity instanceof TileEntityTest)
         	return new ContainerTest(player.inventory, (TileEntityTest)tileEntity);
 		return null;

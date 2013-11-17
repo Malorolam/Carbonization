@@ -93,9 +93,9 @@ public class PacketHandler implements IPacketHandler {
 					offset[1] = data.readInt();
 					offset[2] = data.readInt();
 
-					float[] comptT = new float[2];
-					comptT[0] = data.readFloat();
-					comptT[1] = data.readFloat();
+					double[] comptT = new double[2];
+					comptT[0] = data.readDouble();
+					comptT[1] = data.readDouble();
 					
 					float fuelTime = data.readFloat();
 					int slagVolume = data.readInt();
@@ -139,10 +139,37 @@ public class PacketHandler implements IPacketHandler {
 					fte.setOreMap(oreSlagInQueue);
 					
 				}
-				else
+				else if(te instanceof TileEntityAutocraftingBench)
+				{
+					double fueltank = data.readDouble();
+					int fueluse = data.readInt();
+					double upgrade = data.readDouble();
+					int process = data.readInt();
+					int cooldown = data.readInt();
+					
+					int itemSize = data.readInt();
+					
+					int[] items = new int[itemSize];
+					for(int i = 0; i < itemSize; i++)
+					{
+						items[i] = data.readInt();
+					}
+					
+					TileEntityAutocraftingBench ate = (TileEntityAutocraftingBench) te;
+					ate.updating = true;
+					
+					ate.fuelTank = fueltank;
+					ate.fuelUsePercent = fueluse;
+					ate.upgradeTier = upgrade;
+					ate.processTime = process;
+					ate.craftingCooldown = cooldown;
+					ate.recoverIntList(items);
+					ate.updating = false;
+				}
+/*				else
 				{
 					System.out.println("Got a packet for TileEntity: " + (te==null?"null":te.getClass().toString()) + ".");
-				}
+				}*/
 			}
 		}
 		catch (Exception e)
@@ -234,8 +261,8 @@ public class PacketHandler implements IPacketHandler {
 			int oy = fte.offset[1];
 			int oz = fte.offset[2];
 
-			float ctx = fte.componentTiers[0];
-			float cty = fte.componentTiers[1];
+			double ctx = fte.componentTiers[0];
+			double cty = fte.componentTiers[1];
 			
 			float fuelStack = fte.getFuelStack();
 			int slagVolume = fte.slagTank;
@@ -269,8 +296,8 @@ public class PacketHandler implements IPacketHandler {
 				dos.writeInt(ox);
 				dos.writeInt(oy);
 				dos.writeInt(oz);
-				dos.writeFloat(ctx);
-				dos.writeFloat(cty);
+				dos.writeDouble(ctx);
+				dos.writeDouble(cty);
 				dos.writeFloat(fuelStack);
 				dos.writeInt(slagVolume);
 				dos.writeInt(grossCookTime);
@@ -294,6 +321,41 @@ public class PacketHandler implements IPacketHandler {
 			{
 				System.out.println("HODOR HODOR");
 			}
+		}
+		else if(te instanceof TileEntityAutocraftingBench)
+		{
+			TileEntityAutocraftingBench ate = (TileEntityAutocraftingBench) te;
+			ate.updating = true;
+			double fueltank = ate.fuelTank;
+			int fueluse = ate.fuelUsePercent;
+			double upgrade = ate.upgradeTier;
+			int process = ate.processTime;
+			int cooldown = ate.craftingCooldown;
+		
+			
+			int[] items = ate.buildIntList();
+			int itemSize = items.length;
+			
+			try
+			{
+				dos.writeDouble(fueltank);
+				dos.writeInt(fueluse);
+				dos.writeDouble(upgrade);
+				dos.writeInt(process);
+				dos.writeInt(cooldown);
+				dos.writeInt(itemSize);
+				
+				for(int i = 0; i < itemSize; i++)
+				{
+					dos.writeInt(items[i]);
+				}
+			}
+			catch(IOException e)
+			{
+				System.out.println("RAAWR");
+			}
+			
+			ate.updating = false;
 		}
 		else
 		{

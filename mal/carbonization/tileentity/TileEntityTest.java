@@ -60,7 +60,7 @@ public class TileEntityTest extends TileEntity {
 		}
 			match = new MultiBlockMatcher(xdiff, ydiff, zdiff);
 			mbEmpty = new MultiBlockMatcher(xdiff, ydiff, zdiff);
-			match.buildBasedHollowSolid(0, 0, 0, xdiff-1, ydiff-1, zdiff-1, carbonization.structureBlock.blockID, (byte)0, carbonization.structureBlock.blockID, (byte)1, 1);
+			//match.buildBasedHollowSolid(0, 0, 0, xdiff-1, ydiff-1, zdiff-1, carbonization.structureBlock.blockID, (byte)0, carbonization.structureBlock.blockID, (byte)1, 1);
 			
 			this.processFunction();
 	}
