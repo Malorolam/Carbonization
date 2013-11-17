@@ -11,9 +11,17 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Icon;
 import net.minecraft.world.IBlockAccess;
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
+import cpw.mods.fml.client.registry.RenderingRegistry;
 
 public class StructureBlockRenderer implements ISimpleBlockRenderingHandler {
 
+	public static int structureBlockRenderType;
+	
+	public StructureBlockRenderer()
+	{
+		structureBlockRenderType = RenderingRegistry.getNextAvailableRenderId();
+		System.out.println("made new renderer");
+	}
 	@Override
 	public void renderInventoryBlock(Block block, int metadata, int modelID,
 			RenderBlocks renderer) {
@@ -26,9 +34,10 @@ public class StructureBlockRenderer implements ISimpleBlockRenderingHandler {
 			Block block, int modelId, RenderBlocks renderer) {
         
 		Tessellator tessellator = Tessellator.instance;
-        renderer.renderStandardBlock(block, x, y, z);
         
-		//tessellator.setColorOpaque_F(1.0f, 1.0f, 1.0f);
+		int lightValue = Block.blocksList[Block.stone.blockID].getMixedBrightnessForBlock(world, x, y, z);
+		tessellator.setBrightness(lightValue);
+		tessellator.setColorOpaque_F(1.0F, 1.0F, 1.0F);
 
 		TileEntity te = world.getBlockTileEntity(x, y, z);
 		TileEntityStructureBlock dte = null;
@@ -58,6 +67,7 @@ public class StructureBlockRenderer implements ISimpleBlockRenderingHandler {
 		}
 		else
 		{
+			System.out.println("block isn't right!");
 			return false;
 		}
 
@@ -82,73 +92,91 @@ public class StructureBlockRenderer implements ISimpleBlockRenderingHandler {
 			default:
 				icon = null;
 			}
+			//System.out.println("pass " + i + " with icon: " + ((icon!=null)?(icon.toString()):"null"));
 
 			// xpos face textures
 			if(icon != null)
 			{
-				renderer.renderFaceXPos(block, x, y, z, icon);
-/*				tessellator.setNormal(1.0F, 0.0F, 0.0F);
-				tessellator.addVertexWithUV(1.0, 0.0, 0.0, (double)icon.getMaxU(), (double)icon.getMaxV());
-				tessellator.addVertexWithUV(1.0, 1.0, 0.0, (double)icon.getMaxU(), (double)icon.getMinV());
-				tessellator.addVertexWithUV(1.0, 1.0, 1.0, (double)icon.getMinU(), (double)icon.getMinV());
-				tessellator.addVertexWithUV(1.0, 0.0, 1.0, (double)icon.getMinU(), (double)icon.getMaxV());*/
+				//renderer.renderFaceXPos(block, x, y, z, icon);
+				tessellator.setNormal(1.0F, 1.0F, 0.0F);
+				tessellator.setBrightness(block.getMixedBrightnessForBlock(world, x+1, y, z));
+				tessellator.addVertexWithUV(x+1.0, y+0.0, z+0.0, (double)icon.getMaxU(), (double)icon.getMaxV());
+				tessellator.addVertexWithUV(x+1.0, y+1.0, z+0.0, (double)icon.getMaxU(), (double)icon.getMinV());
+				tessellator.addVertexWithUV(x+1.0, y+1.0, z+1.0, (double)icon.getMinU(), (double)icon.getMinV());
+				tessellator.addVertexWithUV(x+1.0, y+0.0, z+1.0, (double)icon.getMinU(), (double)icon.getMaxV());
 			}
+			tessellator.draw();
 
+			tessellator.startDrawingQuads();
 			// xneg face textures
 			if(icon != null)
 			{
-				renderer.renderFaceXNeg(block, x, y, z, icon);
-/*				tessellator.setNormal(-1.0F, 0.0F, 0.0F);
-				tessellator.addVertexWithUV(0.0, 0.0, 1.0, (double)icon.getMaxU(), (double)icon.getMaxV());
-				tessellator.addVertexWithUV(0.0, 1.0, 1.0, (double)icon.getMaxU(), (double)icon.getMinV());
-				tessellator.addVertexWithUV(0.0, 1.0, 0.0, (double)icon.getMinU(), (double)icon.getMinV());
-				tessellator.addVertexWithUV(0.0, 0.0, 0.0, (double)icon.getMinU(), (double)icon.getMaxV());*/
+//				renderer.renderFaceXNeg(block, x, y, z, icon);
+				tessellator.setNormal(-1.0F, 1.0F, 0.0F);
+				tessellator.setBrightness(block.getMixedBrightnessForBlock(world, x-1, y, z));
+				tessellator.addVertexWithUV(x+0.0, y+0.0, z+1.0, (double)icon.getMaxU(), (double)icon.getMaxV());
+				tessellator.addVertexWithUV(x+0.0, y+1.0, z+1.0, (double)icon.getMaxU(), (double)icon.getMinV());
+				tessellator.addVertexWithUV(x+0.0, y+1.0, z+0.0, (double)icon.getMinU(), (double)icon.getMinV());
+				tessellator.addVertexWithUV(x+0.0, y+0.0, z+0.0, (double)icon.getMinU(), (double)icon.getMaxV());
 			}
+			tessellator.draw();
 
+			tessellator.startDrawingQuads();
 			// zneg face textures
 			if(icon != null)
 			{
-				renderer.renderFaceZNeg(block, x, y, z, icon);
-/*				tessellator.setNormal(0.0F, 0.0F, -1.0F);
-				tessellator.addVertexWithUV(0.0, 0.0, 0.0, (double)icon.getMaxU(), (double)icon.getMaxV());
-				tessellator.addVertexWithUV(0.0, 1.0, 0.0, (double)icon.getMaxU(), (double)icon.getMinV());
-				tessellator.addVertexWithUV(1.0, 1.0, 0.0, (double)icon.getMinU(), (double)icon.getMinV());
-				tessellator.addVertexWithUV(1.0, 0.0, 0.0, (double)icon.getMinU(), (double)icon.getMaxV());*/
+//				renderer.renderFaceZNeg(block, x, y, z, icon);
+				tessellator.setNormal(0.0F, 1.0F, -1.0F);
+				tessellator.setBrightness(block.getMixedBrightnessForBlock(world, x, y, z-1));
+				tessellator.addVertexWithUV(x+0.0, y+0.0, z+0.0, (double)icon.getMaxU(), (double)icon.getMaxV());
+				tessellator.addVertexWithUV(x+0.0, y+1.0, z+0.0, (double)icon.getMaxU(), (double)icon.getMinV());
+				tessellator.addVertexWithUV(x+1.0, y+1.0, z+0.0, (double)icon.getMinU(), (double)icon.getMinV());
+				tessellator.addVertexWithUV(x+1.0, y+0.0, z+0.0, (double)icon.getMinU(), (double)icon.getMaxV());
 			}
+			tessellator.draw();
 
+			tessellator.startDrawingQuads();
 			// zpos face textures
 			if(icon != null)
 			{
-				renderer.renderFaceZPos(block, x, y, z, icon);
-/*				tessellator.setNormal(0.0F, 0.0F, -1.0F);
-				tessellator.addVertexWithUV(1.0, 0.0, 1.0, (double)icon.getMaxU(), (double)icon.getMaxV());
-				tessellator.addVertexWithUV(1.0, 1.0, 1.0, (double)icon.getMaxU(), (double)icon.getMinV());
-				tessellator.addVertexWithUV(0.0, 1.0, 1.0, (double)icon.getMinU(), (double)icon.getMinV());
-				tessellator.addVertexWithUV(0.0, 0.0, 1.0, (double)icon.getMinU(), (double)icon.getMaxV());*/
+//				renderer.renderFaceZPos(block, x, y, z, icon);
+				tessellator.setNormal(0.0F, 1.0F, 1.0F);
+				tessellator.setBrightness(block.getMixedBrightnessForBlock(world, x, y, z+1));
+				tessellator.addVertexWithUV(x+1.0, y+0.0, z+1.0, (double)icon.getMaxU(), (double)icon.getMaxV());
+				tessellator.addVertexWithUV(x+1.0, y+1.0, z+1.0, (double)icon.getMaxU(), (double)icon.getMinV());
+				tessellator.addVertexWithUV(x+0.0, y+1.0, z+1.0, (double)icon.getMinU(), (double)icon.getMinV());
+				tessellator.addVertexWithUV(x+0.0, y+0.0, z+1.0, (double)icon.getMinU(), (double)icon.getMaxV());
 			}
 
 			if(i<2)
 			{
+				tessellator.draw();
+
+				tessellator.startDrawingQuads();
 				// ypos face textures
 				if(icon != null)
 				{
-					renderer.renderFaceYPos(block, x, y, z, icon);
-/*					tessellator.setNormal(0.0F, 1.0F, 0.0F);
-					tessellator.addVertexWithUV(1.0, 1.0, 1.0, (double)icon.getMaxU(), (double)icon.getMaxV());
-					tessellator.addVertexWithUV(1.0, 1.0, 0.0, (double)icon.getMaxU(), (double)icon.getMinV());
-					tessellator.addVertexWithUV(0.0, 1.0, 0.0, (double)icon.getMinU(), (double)icon.getMinV());
-					tessellator.addVertexWithUV(0.0, 1.0, 1.0, (double)icon.getMinU(), (double)icon.getMaxV());*/
+//					renderer.renderFaceYPos(block, x, y, z, icon);
+					tessellator.setNormal(0.0F, 1.0F, 0.0F);
+					tessellator.setBrightness(block.getMixedBrightnessForBlock(world, x, y+1, z));
+					tessellator.addVertexWithUV(x+1.0, y+1.0, z+1.0, (double)icon.getMaxU(), (double)icon.getMaxV());
+					tessellator.addVertexWithUV(x+1.0, y+1.0, z+0.0, (double)icon.getMaxU(), (double)icon.getMinV());
+					tessellator.addVertexWithUV(x+0.0, y+1.0, z+0.0, (double)icon.getMinU(), (double)icon.getMinV());
+					tessellator.addVertexWithUV(x+0.0, y+1.0, z+1.0, (double)icon.getMinU(), (double)icon.getMaxV());
 				}
+				tessellator.draw();
 
+				tessellator.startDrawingQuads();
 				// yneg face textures
 				if(icon != null)
 				{
-					renderer.renderFaceYNeg(block, x, y, z, icon);
-/*					tessellator.setNormal(0.0F, -1.0F, 0.0F);
-					tessellator.addVertexWithUV(0.0, 0.0, 1.0, (double)icon.getMaxU(), (double)icon.getMaxV());
-					tessellator.addVertexWithUV(0.0, 0.0, 0.0, (double)icon.getMaxU(), (double)icon.getMinV());
-					tessellator.addVertexWithUV(1.0, 0.0, 0.0, (double)icon.getMinU(), (double)icon.getMinV());
-					tessellator.addVertexWithUV(1.0, 0.0, 1.0, (double)icon.getMinU(), (double)icon.getMaxV());*/
+//					renderer.renderFaceYNeg(block, x, y, z, icon);
+					tessellator.setNormal(0.0F, -1.0F, 0.0F);
+					tessellator.setBrightness(block.getMixedBrightnessForBlock(world, x, y-1, z));
+					tessellator.addVertexWithUV(x+0.0, y+0.0, z+1.0, (double)icon.getMaxU(), (double)icon.getMaxV());
+					tessellator.addVertexWithUV(x+0.0, y+0.0, z+0.0, (double)icon.getMaxU(), (double)icon.getMinV());
+					tessellator.addVertexWithUV(x+1.0, y+0.0, z+0.0, (double)icon.getMinU(), (double)icon.getMinV());
+					tessellator.addVertexWithUV(x+1.0, y+0.0, z+1.0, (double)icon.getMinU(), (double)icon.getMaxV());
 				}
 			}
 		}
@@ -165,7 +193,7 @@ public class StructureBlockRenderer implements ISimpleBlockRenderingHandler {
 
 	@Override
 	public int getRenderId() {
-		return ClientProxy.structureBlockRenderType;
+		return structureBlockRenderType;
 	}
 
 }

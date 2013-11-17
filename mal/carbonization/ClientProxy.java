@@ -20,13 +20,10 @@ import net.minecraftforge.client.MinecraftForgeClient;
 public class ClientProxy extends CommonProxy {
 
 	public static int renderPass;
-	public static int structureBlockRenderType;
 	
-	public static void setCustomRenderers()
+	@Override
+	public void setCustomRenderers()
 	{
-		structureBlockRenderType = RenderingRegistry.getNextAvailableRenderId();
-		RenderingRegistry.registerBlockHandler(new StructureBlockRenderer());
-		
 		MinecraftForgeClient.registerItemRenderer(carbonization.itemStructureBlock.itemID, new StructureItemRenderer());
 	}
 	@Override

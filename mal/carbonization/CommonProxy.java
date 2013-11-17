@@ -46,6 +46,11 @@ public class CommonProxy implements IGuiHandler
     {
         return null;
     }
+    
+    public void setCustomRenderers()
+    {
+    	
+    }
 }
 /*******************************************************************************
 * Copyright (c) 2013 Malorolam.

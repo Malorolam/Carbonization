@@ -89,9 +89,9 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
 		{
 			if(craftingCooldown > 0)
 				craftingCooldown--;
+			if(craftingCooldown == 0)
+				inventoryChanged = true;
 			
-/*			if(updating)
-				return;*/
 		
 			boolean action = false;
 			
@@ -172,7 +172,7 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
     	int craftmaterialcount = 0;//initiate a craft when this reaches the max value
     	int maxmaterialcount = 9;
 
-    	if(hasRecipe() && canCraft() )//&& inventoryChanged)
+    	if(hasRecipe() && canCraft() && inventoryChanged)
     	{
     		lookforcrafting = true;
     
@@ -204,7 +204,7 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
     	
     	for(int i = 0; i<inputStacks.length; i++)
     	{
-    		if(inputStacks[i]==null || inputStacks[i].stackSize == 0)
+    		if(inputStacks[i]==null || inputStacks[i].stackSize <= 0)
     		{
     			//do nada
     		}
@@ -225,7 +225,7 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
     						{
     		    				//System.out.println("set tool index to inventory location " + i);
 								toolInInventory[j] = true;
-								craftmaterialcount++;
+								//craftmaterialcount++;
 								
 								recipe[j] = inputStacks[i].splitStack(1);
     							if(inputStacks[i].stackSize <= 0)
@@ -519,12 +519,12 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
 
                 if (var3 == Block.woodSingleSlab)
                 {
-                    return 150;
+                    return 0;
                 }
 
                 if (var3.blockMaterial == Material.wood)
                 {
-                    return 300;
+                    return 0;
                 }
                 
                 if (var3 == Block.coalBlock)
@@ -533,11 +533,11 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
                 }
             }
 
-            if (var1 == Item.stick.itemID) return 100;
+            if (var1 == Item.stick.itemID) return 0;
             if (var1 == Item.coal.itemID) return 1600;
-            if (var1 == Item.bucketLava.itemID) return 20000;
-            if (var1 == Block.sapling.blockID) return 100;
-            if (var1 == Item.blazeRod.itemID) return 2400;
+            if (var1 == Item.bucketLava.itemID) return 0;
+            if (var1 == Block.sapling.blockID) return 0;
+            if (var1 == Item.blazeRod.itemID) return 0;
             return GameRegistry.getFuelValue(par0ItemStack);
         }
     }

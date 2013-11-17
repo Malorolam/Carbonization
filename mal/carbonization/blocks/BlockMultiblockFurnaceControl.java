@@ -85,6 +85,8 @@ public class BlockMultiblockFurnaceControl extends BlockContainer {
     	TileEntity te = par1World.getBlockTileEntity(par2, par3, par4);
     	if(te instanceof TileEntityMultiblockFurnace)
     		((TileEntityMultiblockFurnace)te).selfRevert();
+    	
+    	par1World.setBlockTileEntity(par2, par3, par4, null);
     }
 
 	/**

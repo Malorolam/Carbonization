@@ -5,6 +5,7 @@ import java.util.logging.Level;
 
 import cpw.mods.fml.common.FMLLog;
 import mal.carbonization.ClientProxy;
+import mal.carbonization.StructureBlockRenderer;
 import mal.carbonization.carbonization;
 import mal.carbonization.tileentity.TileEntityFurnaces;
 import mal.carbonization.tileentity.TileEntityMultiblockFurnace;
@@ -37,7 +38,7 @@ public class BlockStructureBlock extends BlockContainer{
 		this.setHardness(3.0f);
 		this.setResistance(25.0f);
 		this.setCreativeTab(CreativeTabs.tabDecorations);
-		this.setLightOpacity(0);
+		this.setLightOpacity(15);
 	}
 
 	public void registerIcons(IconRegister ir)
@@ -170,11 +171,11 @@ public class BlockStructureBlock extends BlockContainer{
     	return false;
     }
 
-/*    //And this tell it that you can see through this block, and neighbor blocks should be rendered.
+    //And this tell it that you can see through this block, and neighbor blocks should be rendered.
     public boolean isOpaqueCube()
     {
-       return false;
-    }*/
+       return true;
+    }
     
 	/*
 	 * Get the texture from the side, and pass for a certain block
@@ -216,6 +217,8 @@ public class BlockStructureBlock extends BlockContainer{
     	TileEntity te = par1World.getBlockTileEntity(par2, par3, par4);
     	if(te instanceof TileEntityStructureBlock)
     		((TileEntityStructureBlock)te).revert();
+    	
+    	par1World.setBlockTileEntity(par2, par3, par4, null);
     }
     
     /**
@@ -309,7 +312,7 @@ public class BlockStructureBlock extends BlockContainer{
 	@Override
 	public int getRenderType()
 	{
-		return ClientProxy.structureBlockRenderType;
+		return StructureBlockRenderer.structureBlockRenderType;
 	}
 
 /*	@Override

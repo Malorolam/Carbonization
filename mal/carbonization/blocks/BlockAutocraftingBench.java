@@ -98,15 +98,15 @@ public class BlockAutocraftingBench extends BlockContainer {
         }
         else
         {
-            TileEntityAutocraftingBench var10 = (TileEntityAutocraftingBench)world.getBlockTileEntity(x, y, z);
-
-            if (var10 == null || par5EntityPlayer.isSneaking())
+        	TileEntity var10 = world.getBlockTileEntity(x,y,z);
+        	if(!(var10 instanceof TileEntityAutocraftingBench) || var10 == null || par5EntityPlayer.isSneaking())
             {
-            	//System.out.println("oh noes, the bench isn't a bench.");
+            	System.out.println("oh noes, the bench isn't a bench.");
             	return false;
             }
-            var10.activate(world, x, y, z, par5EntityPlayer);
 
+            ((TileEntityAutocraftingBench) var10).activate(world, x, y, z, par5EntityPlayer);
+            
             return true;
         }
     }
@@ -121,6 +121,8 @@ public class BlockAutocraftingBench extends BlockContainer {
     	TileEntity te = par1World.getBlockTileEntity(par2, par3, par4);
     	if(te instanceof TileEntityAutocraftingBench)
     		((TileEntityAutocraftingBench)te).dumpInventory();
+    	
+        super.breakBlock(par1World, par2, par3, par4, par5, par6);
     }
     
 	@Override

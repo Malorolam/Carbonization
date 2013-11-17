@@ -252,7 +252,9 @@ public class BlockFurnaces extends BlockContainer
         }
         else
         {
-            TileEntityFurnaces var10 = (TileEntityFurnaces)world.getBlockTileEntity(x, y, z);
+            TileEntity var10 = world.getBlockTileEntity(x, y, z);
+            if(!(var10 instanceof TileEntityFurnaces))
+            	return false;
 
             if (var10 == null || par5EntityPlayer.isSneaking())
             {

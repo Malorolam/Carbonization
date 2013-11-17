@@ -40,11 +40,13 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.FurnaceRecipes;
+import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
+import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
@@ -182,9 +184,7 @@ public class carbonization {
     		multiblockFurnaceControl = new BlockMultiblockFurnaceControl(multiblockfurnacecontrolID, Material.iron);
     		structure = new BlockStructureBlock(structureMachineID, Material.iron);
     		autocraftingBench = new BlockAutocraftingBench(autocraftingBenchID,Material.iron);
-    		//Item.itemsList[blockID] = new ItemBlockFuels(blockID-256);
     		Item.itemsList[furnaceID] = new ItemBlockFurnaces(furnaceID-256,furnaceBlock);
-    		//Item.itemsList[structureID] = new ItemBlockStructure(structureID-256);
     		
     		//TODO: remember to disable on releases
     		//testBlock = new TestBlock(structureID+200,Material.rock);
@@ -198,7 +198,8 @@ public class carbonization {
     		GameRegistry.registerFuelHandler(new FuelHandler());
     		GameRegistry.registerWorldGenerator(new WorldgeneratorCarbonization());
     		NetworkRegistry.instance().registerGuiHandler(instance, prox);
-    		ClientProxy.setCustomRenderers();
+
+
     		
     		
     		GameRegistry.registerTileEntity(TileEntityFurnaces.class, "TileEntityFurnaces");
@@ -211,14 +212,9 @@ public class carbonization {
     		
     		
     		GameRegistry.registerBlock(fuelBlock, ItemBlockFuels.class, "fuelBlock");
-    		//GameRegistry.registerBlock(structureBlock, ItemBlockStructure.class, "structureBlock");
-    		//GameRegistry.registerBlock(structureMultiblock, ItemBlockStructure.class, "structureMultiblock");
-    		//GameRegistry.registerBlock(structureFurnaceBlock, ItemBlockStructureFurnace.class, "structureFurnaceBlock");
-    		//GameRegistry.registerBlock(structureMachineBlock, ItemBlockStructureMachine.class, "structureMachineBlock");
     		GameRegistry.registerBlock(FurnaceControl, ItemBlockMultiblockFurnaceControl.class, "furnacecontrol");
     		GameRegistry.registerBlock(autocraftingBench, ItemBlockAutocraftingBench.class, "autocraftingbench");
     		GameRegistry.registerItem(itemStructureBlock, "itemStructureBlock");
-    		//GameRegistry.registerBlock(multiblockFurnaceControl, null, "furnacemultiblockcontrol");
     		
     		//Names
     		//Fuels
@@ -310,7 +306,8 @@ public class carbonization {
 	public void load(FMLInitializationEvent event)
 	{	
 		
-		
+		RenderingRegistry.registerBlockHandler(new StructureBlockRenderer());
+		prox.setCustomRenderers();
 		
 		//Ore dictionary
 		OreDictionary.registerOre("brickPeat", new ItemStack(fuel, 1, 0));
@@ -356,7 +353,7 @@ public class carbonization {
 
 		if(Loader.isModLoaded("IC2"))
 		{
-			if(IC2.getInstance().checkVersion("2.0"))
+			if(IC2.getInstance().VERSION.contains("2.0"))
 				ic=true;
 			else
 				FMLLog.log(Level.WARNING, "IC2 version incompatable, IC2 Integration Disabled.");
@@ -634,29 +631,29 @@ public class carbonization {
 		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(misc,1,13), new Object[]{new ItemStack(itemStructureBlock,1,4)}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(itemStructureBlock,5,5), new Object[]{"x x", " y ", "x x", 'x', new ItemStack(Item.ingotIron), 'y', new ItemStack(misc,1,13)}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(Item.ingotIron), new Object[]{new ItemStack(itemStructureBlock,1,5)}));
-		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(itemStructureBlock,5,6), new Object[]{"x x", " y ", "x x", 'x', new ItemStack(ingots,1,0), 'y', new ItemStack(ingots,1,0)}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(itemStructureBlock,5,6), new Object[]{"x x", " y ", "x x", 'x', "ingotRefinedIron", 'y', "ingotRefinedIron"}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(ingots,1,0), new Object[]{new ItemStack(itemStructureBlock,1,6)}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(itemStructureBlock,5,7), new Object[]{"x x", " y ", "x x", 'x', new ItemStack(misc,1,14), 'y', new ItemStack(misc,1,14)}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(misc,1,14), new Object[]{new ItemStack(itemStructureBlock,1,7)}));
-		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(itemStructureBlock,5,8), new Object[]{"x x", " y ", "x x", 'x', new ItemStack(ingots,1,0), 'y', new ItemStack(misc,1,14)}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(itemStructureBlock,5,8), new Object[]{"x x", " y ", "x x", 'x', "ingotRefinedIron", 'y', new ItemStack(misc,1,14)}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(ingots,1,0), new Object[]{new ItemStack(itemStructureBlock,1,8)}));
-		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(itemStructureBlock,5,9), new Object[]{"x x", " y ", "x x", 'x', new ItemStack(ingots,1,1), 'y', new ItemStack(ingots,1,1)}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(itemStructureBlock,5,9), new Object[]{"x x", " y ", "x x", 'x', "ingotPigIron", 'y', "ingotPigIron"}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(ingots,1,1), new Object[]{new ItemStack(itemStructureBlock,1,9)}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(itemStructureBlock,5,10), new Object[]{"x x", " y ", "x x", 'x', new ItemStack(misc,1,15), 'y', new ItemStack(misc,1,15)}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(misc,1,15), new Object[]{new ItemStack(itemStructureBlock,1,10)}));
-		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(itemStructureBlock,5,11), new Object[]{"x x", " y ", "x x", 'x', new ItemStack(ingots,1,1), 'y', new ItemStack(misc,1,15)}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(itemStructureBlock,5,11), new Object[]{"x x", " y ", "x x", 'x', "ingotPigIron", 'y', new ItemStack(misc,1,15)}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(ingots,1,1), new Object[]{new ItemStack(itemStructureBlock,1,11)}));
-		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(itemStructureBlock,5,12), new Object[]{"x x", " y ", "x x", 'x', new ItemStack(ingots,1,2), 'y', new ItemStack(ingots,1,2)}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(itemStructureBlock,5,12), new Object[]{"x x", " y ", "x x", 'x', "ingotHCSteel", 'y', "ingotHCSteel"}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(ingots,1,2), new Object[]{new ItemStack(itemStructureBlock,1,12)}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(itemStructureBlock,5,13), new Object[]{"x x", " y ", "x x", 'x', new ItemStack(misc,1,16), 'y', new ItemStack(misc,1,16)}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(misc,1,16), new Object[]{new ItemStack(itemStructureBlock,1,13)}));
-		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(itemStructureBlock,5,14), new Object[]{"x x", " y ", "x x", 'x', new ItemStack(ingots,1,2), 'y', new ItemStack(misc,1,16)}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(itemStructureBlock,5,14), new Object[]{"x x", " y ", "x x", 'x', "ingotHCSteel", 'y', new ItemStack(misc,1,16)}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(ingots,1,2), new Object[]{new ItemStack(itemStructureBlock,1,14)}));
-		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(itemStructureBlock,5,15), new Object[]{"x x", " y ", "x x", 'x', new ItemStack(ingots,1,3), 'y', new ItemStack(ingots,1,3)}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(itemStructureBlock,5,15), new Object[]{"x x", " y ", "x x", 'x', "ingotSteel", 'y', "ingotSteel"}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(ingots,1,3), new Object[]{new ItemStack(itemStructureBlock,1,15)}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(itemStructureBlock,5,16), new Object[]{"x x", " y ", "x x", 'x', new ItemStack(misc,1,17), 'y', new ItemStack(misc,1,17)}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(misc,1,17), new Object[]{new ItemStack(itemStructureBlock,1,16)}));
-		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(itemStructureBlock,5,17), new Object[]{"x x", " y ", "x x", 'x', new ItemStack(ingots,1,3), 'y', new ItemStack(misc,1,17)}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(itemStructureBlock,5,17), new Object[]{"x x", " y ", "x x", 'x', "ingotSteel", 'y', new ItemStack(misc,1,17)}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(ingots,1,3), new Object[]{new ItemStack(itemStructureBlock,1,17)}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(itemStructureBlock,2,18), new Object[]{"x x", " y ", "x x", 'x', new ItemStack(Item.netherStar), 'y', new ItemStack(Block.dragonEgg)}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(Block.dragonEgg), new Object[]{new ItemStack(itemStructureBlock,1,18)}));
