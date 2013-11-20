@@ -6,8 +6,10 @@ import org.lwjgl.opengl.GL11;
 
 import mal.carbonization.ColorReference;
 import mal.carbonization.network.ContainerAutocraftingBench;
+import mal.carbonization.network.ContainerFuelConverter;
 import mal.carbonization.network.ContainerFurnaces;
 import mal.carbonization.tileentity.TileEntityAutocraftingBench;
+import mal.carbonization.tileentity.TileEntityFuelConverter;
 import mal.carbonization.tileentity.TileEntityFurnaces;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -16,15 +18,16 @@ import net.minecraft.inventory.Container;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
 
-public class GuiAutocraftingBench extends GuiContainer {
+public class GuiFuelConverter extends GuiContainer {
 	
-	private TileEntityAutocraftingBench bench;
+	private TileEntityFuelConverter bench;
 	private GuiButton upBtn;
 	private GuiButton downBtn;
+	private GuiButton dustBtn;
 	
-	public GuiAutocraftingBench(InventoryPlayer par1InventoryPlayer, TileEntityAutocraftingBench par2)
+	public GuiFuelConverter(InventoryPlayer par1InventoryPlayer, TileEntityFuelConverter par2)
 	{
-		super(new ContainerAutocraftingBench(par1InventoryPlayer, par2));
+		super(new ContainerFuelConverter(par1InventoryPlayer, par2));
 		//System.out.println("Made a new gui");
 		bench = par2;
 		ySize = 220;
@@ -34,11 +37,9 @@ public class GuiAutocraftingBench extends GuiContainer {
 	{
 		super.initGui();
 		
-		if(!bench.disableButtons)
-		{
-			this.buttonList.add(this.upBtn = new GuiButton(1, this.width / 2 + 10, this.height / 2 -44, 27, 12, "+5%"));
-			this.buttonList.add(this.downBtn = new GuiButton(2, this.width / 2 - 37, this.height / 2 -44, 27, 12, "-5%"));
-		}
+		this.buttonList.add(this.upBtn = new GuiButton(1, this.width / 2 - 42, this.height / 2 -44, 32, 12, "Prev."));
+		this.buttonList.add(this.downBtn = new GuiButton(2, this.width / 2 + 9, this.height / 2 -44, 32, 12, "Next"));
+		this.buttonList.add(this.dustBtn = new GuiButton(3, this.width/2 -15, this.height/2-81, 32, 16, (bench.makeDust)?("Dust"):("Fuel")));
 	}
 
 	/**
@@ -49,10 +50,14 @@ public class GuiAutocraftingBench extends GuiContainer {
         switch (par1GuiButton.id)
         {
         case 1:
-        	bench.changeFuelUsage(true);
+        	bench.changeTargetFuel(false);
         	break;
         case 2:
-			bench.changeFuelUsage(false);
+			bench.changeTargetFuel(true);
+        	break;
+        case 3:
+        	bench.swapDustState();
+        	dustBtn.displayString = (bench.makeDust)?("Dust"):("Fuel");
         	break;
         }
         bench.closeGui();
@@ -63,11 +68,9 @@ public class GuiAutocraftingBench extends GuiContainer {
      */
     protected void drawGuiContainerForegroundLayer(int par1, int par2)
     {
-    	if(!bench.disableButtons)
-    		this.fontRenderer.drawString(((Integer)bench.getFuelUsagePercent()).toString(), 79, 68, 4210752);
-
+    	//this.fontRenderer.drawString(((Integer)bench.getFuelUsagePercent()).toString(), 79, 68, 4210752);
 		GL11.glScalef(0.75f, 0.75f, 0.75f);
-        this.fontRenderer.drawString("Autocrafting Bench", 64, 5, 4210752);
+        this.fontRenderer.drawString("Fuel Conversion Bench", 54, 6, 4210752);
 		GL11.glScalef(1.335f, 1.335f, 1.35f);
     }
 
@@ -77,16 +80,25 @@ public class GuiAutocraftingBench extends GuiContainer {
     protected void drawGuiContainerBackgroundLayer(float par1, int par2, int par3)
     {
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        this.mc.renderEngine.bindTexture(new ResourceLocation("carbonization", "textures/gui/autocraftingTable.png"));
+        this.mc.renderEngine.bindTexture(new ResourceLocation("carbonization", "textures/gui/fuelConversionTable.png"));
         int var5 = (this.width - this.xSize) / 2;
         int var6 = (this.height - this.ySize) / 2;
         this.drawTexturedModalRect(var5, var6, 0, 0, this.xSize, this.ySize);
         
+        
+        
         int var7 = this.bench.getFuelCapacityScaled(52);
         this.drawTexturedModalRect(var5+152, var6+63-var7, 176, 68-var7, 16, var7);
         
+        var7 = this.bench.getPotentialCapacityScaled(52);
+        this.drawTexturedModalRect(var5+8, var6+63-var7, 176, 68-var7, 16, var7);
+        
         var7 = bench.getCooldownScaled(24);
-        this.drawTexturedModalRect(var5+68, var6+29, 176, 0, 24-var7, 17);
+        this.drawTexturedModalRect(var5+25, var6+29, 176, 0, 24-var7, 17);
+        
+        var7 = bench.currentIndex;
+        boolean dust = bench.makeDust;
+        this.drawTexturedModalRect(var5+51, var6+28, 200 + 18*((dust)?(1):(0)), 18*var7, 18, 18);
     }
 
     @Override
@@ -105,19 +117,41 @@ public class GuiAutocraftingBench extends GuiContainer {
 	        this.drawHoveringText(list, par1, par2, fontRenderer);
 		}
 		
+		//see if the mouse is over the potential bar
+		if(this.isPointInRegion(8, 11, 16, 52, par1, par2))
+		{
+			ArrayList list = new ArrayList();
+			
+			list.add(ColorReference.DARKCYAN.getCode() + "Stored Potential Fuel:");
+			list.add(ColorReference.DARKGREY.getCode() + String.format("%.2f", bench.potentialTank)+"/"+bench.maxPotentialTank);
+			
+	        this.drawHoveringText(list, par1, par2, fontRenderer);
+		}
+		
 		//see if the mouse is over the upgrade slot
 		if(this.isPointInRegion(134, 11, 16, 16, par1, par2) && bench.upgradeStacks[0]==null)
 		{
 			ArrayList list = new ArrayList();
 			
 			list.add(ColorReference.ORANGE.getCode() + "Put Machine Structure Blocks");
+			list.add(ColorReference.ORANGE.getCode() + "here to improve processing speed");
+			
+	        this.drawHoveringText(list, par1, par2, fontRenderer);
+		}
+		
+		//see if the mouse is over the upgrade slot
+		if(this.isPointInRegion(134, 29, 16, 16, par1, par2) && bench.upgradeStacks[1]==null)
+		{
+			ArrayList list = new ArrayList();
+			
+			list.add(ColorReference.ORANGE.getCode() + "Put Furnace Structure Blocks");
 			list.add(ColorReference.ORANGE.getCode() + "here to improve fuel efficiency");
 			
 	        this.drawHoveringText(list, par1, par2, fontRenderer);
 		}
 		
 		//see if the mouse is over the fuel slot
-		if(this.isPointInRegion(134, 47, 16, 16, par1, par2) && bench.upgradeStacks[1]==null)
+		if(this.isPointInRegion(134, 47, 16, 16, par1, par2) && bench.upgradeStacks[2]==null)
 		{
 			ArrayList list = new ArrayList();
 			
@@ -127,24 +161,26 @@ public class GuiAutocraftingBench extends GuiContainer {
 		}
 		
 		//see if the mouse is over the cooldown
-		if(this.isPointInRegion(66, 28, 24, 24, par1, par2))
+		if(this.isPointInRegion(25, 28, 24, 24, par1, par2))
 		{
 			ArrayList list = new ArrayList();
 			
 			list.add(ColorReference.DARKCYAN.getCode() + "Ticks until crafting: ");
 			list.add(bench.craftingCooldown + "/" + bench.processTime);
+			list.add(ColorReference.DARKCYAN.getCode() + "Fuel Usage per Job: ");
+			list.add(String.format("%.2f",bench.getFuelUsage()));
+			//list.add(bench.efficiencyUpgrade + " " + bench.speedUpgrade);
 			
 	        this.drawHoveringText(list, par1, par2, fontRenderer);
 		}
 				
 		//add in furnace specific information
-		if(this.isPointInRegion(52, 65, 70, 12, par1, par2) && !bench.disableButtons)
+		if(this.isPointInRegion(51, 28, 18, 18, par1, par2))
 		{
 			ArrayList list = new ArrayList();
 			
-			list.add(ColorReference.DARKCYAN.getCode() + "Bench Information:");
-			list.add(ColorReference.DARKCYAN.getCode() + "Fuel Usage Percent: " + bench.fuelUsePercent + "%");
-			list.add(ColorReference.DARKCYAN.getCode() + "Fuel Usage Per Job: " + String.format("%.2f", bench.getFuelUsage()));
+			list.add(ColorReference.DARKCYAN.getCode() + "Current Fuel:");
+			list.add(ColorReference.DARKCYAN.getCode() + bench.getCurrentFuel(bench.currentIndex).getDisplayName() + ((bench.makeDust)?" Dust":""));
 
 			this.drawHoveringText(list, par1, par2, fontRenderer);
 		}

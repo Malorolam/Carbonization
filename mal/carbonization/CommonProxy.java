@@ -30,6 +30,8 @@ public class CommonProxy implements IGuiHandler
         }
         if(tileEntity instanceof TileEntityAutocraftingBench)
         	return new ContainerAutocraftingBench(player.inventory, (TileEntityAutocraftingBench)tileEntity);
+        if(tileEntity instanceof TileEntityFuelConverter)
+        	return new ContainerFuelConverter(player.inventory, (TileEntityFuelConverter)tileEntity);
         if(tileEntity instanceof TileEntityTest)
         	return new ContainerTest(player.inventory, (TileEntityTest)tileEntity);
 		return null;

@@ -3,6 +3,7 @@ package mal.carbonization.items;
 import java.util.List;
 
 import mal.carbonization.ColorReference;
+import mal.carbonization.carbonization;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -17,7 +18,7 @@ public class ItemHHPurifyer extends Item {
 		this.setMaxDamage(1499);
 		this.setMaxStackSize(1);
 		this.setUnlocalizedName("HHPurifyer");
-		this.setCreativeTab(CreativeTabs.tabTools);
+		this.setCreativeTab(carbonization.tabItems);
 	}
 	
 	public void addInformation(ItemStack is, EntityPlayer ep, List list, boolean bool)

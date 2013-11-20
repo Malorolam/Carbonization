@@ -177,6 +177,21 @@ public class BlockStructureBlock extends BlockContainer{
        return true;
     }
     
+    @Override
+    public int getLightValue(IBlockAccess world, int x, int y, int z)
+    {
+        TileEntity te = world.getBlockTileEntity(x, y, z);
+        
+        if(te instanceof TileEntityStructureBlock)
+        {
+        	if(((TileEntityStructureBlock)te).baseMaterial == 18)
+        		return 10;
+        	if(((TileEntityStructureBlock)te).purpose == 1)
+        		return 2;
+        }
+        return super.getLightValue(world, x, y, z);
+    }
+    
 	/*
 	 * Get the texture from the side, and pass for a certain block
 	 * data: the index of the correct layer, so base, secondary, or purpose

@@ -1,6 +1,7 @@
 package mal.carbonization.items;
 
 import java.util.List;
+import java.util.Random;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -11,20 +12,33 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemMultiTextureTile;
 import net.minecraft.item.ItemStack;
 
-public class ItemBlockAutocraftingBench extends ItemMultiTextureTile {
+public class ItemBlockAutocraftingBench extends ItemBlock {
 	
-	private static String[] string = new String[]{"ironfurnace", "insulatedfurnace", "steelfurnace"};
 
 	public ItemBlockAutocraftingBench(int par1, Block block) {
-		super(par1, block, string);
+		super(par1);
 		this.setHasSubtypes(true);
 	}
 	
 	public void addInformation(ItemStack is, EntityPlayer ep, List list, boolean bool)
 	{
-		list.add(setTooltipData("A series of powered assemblies", ColorReference.LIGHTRED));
-		list.add(setTooltipData("work to construct items without", ColorReference.LIGHTRED));
-		list.add(setTooltipData("your input", ColorReference.LIGHTRED));
+		switch(is.getItemDamage())
+		{
+		case 0:
+			list.add(setTooltipData("A series of powered assemblies", ColorReference.LIGHTRED));
+			list.add(setTooltipData("work to construct items without", ColorReference.LIGHTRED));
+			list.add(setTooltipData("your input", ColorReference.LIGHTRED));
+			break;
+		case 1:
+			list.add(setTooltipData("This machine allows for fuel", ColorReference.LIGHTRED));
+			list.add(setTooltipData("to be converted without", ColorReference.LIGHTRED));
+			list.add(setTooltipData("your input", ColorReference.LIGHTRED));
+			break;
+		default:
+			list.add(setTooltipData("This isn't even a workbench!",ColorReference.DARKRED));
+			list.add(setTooltipData("Tell Mal about it so he can fix it.", ColorReference.LIGHTRED));
+			list.add(setTooltipData("Tier Error Material", ColorReference.DARKCYAN));
+		}
 	}
 	
 	//The tool tip information
@@ -40,9 +54,31 @@ public class ItemBlockAutocraftingBench extends ItemMultiTextureTile {
 		return par1;
 	}
 	
+	@Override
+	public String getUnlocalizedName(ItemStack is)
+	{
+		switch(is.getItemDamage())
+		{
+		case 0:
+			return "tile.autocraftingbench";
+		case 1:
+			return "tile.fuelconverter";
+		default:
+			return "blaarg";
+		}
+	}
+	
 	public String getItemNameIS(ItemStack itemstack) 
 	{
-		return "autocraftingbench";
+		switch(itemstack.getItemDamage())
+		{
+		case 0:
+			return "autocraftingbench";
+		case 1:
+			return "fuelconverter";
+		default:
+			return "blaarg";
+		}
 	}
 
 }

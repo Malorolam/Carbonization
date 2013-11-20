@@ -36,7 +36,7 @@ public class ItemStructureBlock extends Item{
 	public ItemStructureBlock(int par1) {
 		super(par1);
 		this.hasSubtypes = true;
-		this.setCreativeTab(CreativeTabs.tabDecorations);
+		this.setCreativeTab(carbonization.tabStructure);
 	}
 	
 	public void addInformation(ItemStack is, EntityPlayer ep, List list, boolean bool)

@@ -166,6 +166,38 @@ public class PacketHandler implements IPacketHandler {
 					ate.recoverIntList(items);
 					ate.updating = false;
 				}
+				else if(te instanceof TileEntityFuelConverter)
+				{
+					double fueltank = data.readDouble();
+					double effupgrade = data.readDouble();
+					double spupgrade = data.readDouble();
+					double pottank = data.readDouble();
+					boolean makeDust = data.readBoolean();
+					int process = data.readInt();
+					int cooldown = data.readInt();
+					int currentIndex = data.readInt();
+					
+					int itemSize = data.readInt();
+					
+					int[] items = new int[itemSize];
+					for(int i = 0; i < itemSize; i++)
+					{
+						items[i] = data.readInt();
+					}
+					
+					TileEntityFuelConverter ate = (TileEntityFuelConverter) te;
+					
+					ate.fuelTank = fueltank;
+					ate.efficiencyUpgrade = effupgrade;
+					ate.speedUpgrade = spupgrade;
+					ate.potentialTank = pottank;
+					ate.processTime = process;
+					ate.craftingCooldown = cooldown;
+					ate.makeDust = makeDust;
+					ate.currentIndex = currentIndex;
+					ate.recoverIntList(items);
+					ate.calculateProcessTime();
+				}
 /*				else
 				{
 					System.out.println("Got a packet for TileEntity: " + (te==null?"null":te.getClass().toString()) + ".");
@@ -356,6 +388,44 @@ public class PacketHandler implements IPacketHandler {
 			}
 			
 			ate.updating = false;
+		}
+		else if(te instanceof TileEntityFuelConverter)
+		{
+			TileEntityFuelConverter ate = (TileEntityFuelConverter) te;
+			double fueltank = ate.fuelTank;
+			double effupgrade = ate.efficiencyUpgrade;
+			double pottank = ate.potentialTank;
+			double spupgrade = ate.speedUpgrade;
+			int process = ate.processTime;
+			int cooldown = ate.craftingCooldown;
+			boolean makeDust = ate.makeDust;
+			int currentIndex = ate.currentIndex;
+		
+			
+			int[] items = ate.buildIntList();
+			int itemSize = items.length;
+			
+			try
+			{
+				dos.writeDouble(fueltank);
+				dos.writeDouble(effupgrade);
+				dos.writeDouble(spupgrade);
+				dos.writeDouble(pottank);
+				dos.writeBoolean(makeDust);
+				dos.writeInt(process);
+				dos.writeInt(cooldown);
+				dos.writeInt(currentIndex);
+				dos.writeInt(itemSize);
+				
+				for(int i = 0; i < itemSize; i++)
+				{
+					dos.writeInt(items[i]);
+				}
+			}
+			catch(IOException e)
+			{
+				System.out.println("RAAWR");
+			}
 		}
 		else
 		{

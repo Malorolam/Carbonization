@@ -27,7 +27,7 @@ public class BlockFuel extends Block {
 	public BlockFuel(int par1, int par2, Material par3Material) {
 		super(par1, par3Material);
 		this.setUnlocalizedName("BlockFuel");
-		this.setCreativeTab(CreativeTabs.tabBlock);
+		this.setCreativeTab(carbonization.tabMachine);
 	}
 	
 	@Override

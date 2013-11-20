@@ -59,7 +59,7 @@ public class BlockFurnaces extends BlockContainer
         this.setHardness(1.5f);
         this.setResistance(20f);
         this.isActive = par2;
-        this.setCreativeTab(CreativeTabs.tabDecorations);
+        this.setCreativeTab(carbonization.tabMachine);
     }
     
     @Override

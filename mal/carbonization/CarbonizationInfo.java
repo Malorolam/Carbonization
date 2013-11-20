@@ -33,6 +33,16 @@ public class CarbonizationInfo {
 			return autocraftingBenchInfo2();
 		case 9://furnaces
 			return furnaceInfo();
+		case 10://fuel conversion bench page 1
+			return fuelconversion1();
+		case 11://fuel conversion bench page 2
+			return fuelconversion2();
+		case 12://fuel info page 1
+			return fuelInfo1();
+		case 13://fuel info page 2
+			return fuelInfo2();
+		case 14://fuel info page 3
+			return fuelInfo3();
 		default:
 			return defaultInfo();
 		}
@@ -228,4 +238,118 @@ public class CarbonizationInfo {
 		
 		return list;
 	}
+	
+	private static List<String> fuelconversion1()
+	{
+		List<String> list = new ArrayList<String>();
+		
+		list.add("Fuel Conversion Bench Info:");
+		list.add("");
+		list.add("This machine streamlines the process");
+		list.add("of converting fuel for a nominal fuel");
+		list.add("cost per process.  Like the Autocrafting");
+		list.add("Bench, this machine has a cooldown");
+		list.add("instead of a process time.  Similarly,");
+		list.add("machine and furnace structure blocks");
+		list.add("can be inserted in their respective");
+		list.add("upgrade slots to improve speed and");
+		list.add("fuel efficiency of the machine.  Like");
+		list.add("the Industrial Furnace, upgrading one");
+		list.add("value has a negative effect on the ");
+		list.add("other.  The different fuel choices can");
+		
+		return list;
+	}
+	
+	private static List<String> fuelconversion2()
+	{
+		List<String> list = new ArrayList<String>();
+		
+		list.add("Fuel Conversion Bench Info:");
+		list.add("");
+		list.add("be cycled through with the prev/next");
+		list.add("buttons in the GUI, and the Fuel/Dust");
+		list.add("toggle will swap between outputting");
+		list.add("solid fuel or the dust form.  Skipping");
+		list.add("the final compression step obviously");
+		list.add("reduces the amount of fuel needed by");
+		list.add("a small amount.  The machine can ");
+		list.add("input from the top, extract from any ");
+		list.add("side or the bottom, and insert fuel ");
+		list.add("in any side or the bottom.");
+		
+		return list;
+	}
+	
+	private static List<String> fuelInfo1()
+	{
+		List<String> list = new ArrayList<String>();
+		
+		list.add("Fuel Conversion Info:");
+		list.add("");
+		list.add("One of the core mechanics in");
+		list.add("Carbonization is the ability to");
+		list.add("convert between different fuels.");
+		list.add("This is accomplished through three");
+		list.add("steps: Mash, Remake, and Mush.");
+		list.add("You Mash the fuel into dust, which");
+		list.add("you then Remake into a different");
+		list.add("dust, which is then Mushed into");
+		list.add("a solid form that other machines");
+		list.add("can accept.  ");
+		
+		return list;
+	}
+	
+	private static List<String> fuelInfo2()
+	{
+		List<String> list = new ArrayList<String>();
+		
+		list.add("Fuel Conversions:");
+		list.add("");
+		list.add("The conversions between different ");
+		list.add("dusts is as follows:");
+		list.add("");
+		list.add("1 Charcoal = 1 Coal");
+		list.add("1 Peat = 1 Lignite");
+		list.add("5 Lignite = 4 Sub-Bituminous");
+		list.add("3 S-Bit = 2 Bit");
+		list.add("3 Bit = 2 Coal");
+		list.add("6 Coal = 5 Anthracite");
+		list.add("1 Anthracite = 6 Graphite");
+		
+		return list;
+	}
+	
+	private static List<String> fuelInfo3()
+	{
+		List<String> list = new ArrayList<String>();
+		
+		list.add("Fuel Values:");
+		list.add("");
+		list.add("All fuel has an internal worth,");
+		list.add("which is used by all machines to");
+		list.add("determine how long they last.  The ");
+		list.add("values of fuels are as follows:");
+		list.add("Each tick is one cycle of the game,");
+		list.add("usually 1/20th a second.");
+		list.add("");
+		list.add("Charcoal = Coal = 1600 Ticks");
+		list.add("Peat = 600  Lignite = 800");
+		list.add("S-Bit = 1000  Bit = 1200");
+		list.add("Anthracite = 2000");
+		list.add("Graphite = 333");
+		
+		return list;
+	}
 }
+/*******************************************************************************
+* Copyright (c) 2013 Malorolam.
+* 
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the GNU Public License v3.0
+* which accompanies this distribution, and is available at
+* http://www.gnu.org/licenses/gpl.html
+* 
+* 
+*********************************************************************************/

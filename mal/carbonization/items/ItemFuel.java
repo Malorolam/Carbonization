@@ -3,6 +3,7 @@ package mal.carbonization.items;
 import java.util.List;
 
 import mal.carbonization.ColorReference;
+import mal.carbonization.carbonization;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -24,7 +25,7 @@ public class ItemFuel extends Item {
 		this.hasSubtypes=true;
 		this.setMaxDamage(0);
 		this.setUnlocalizedName("ItemFuel");
-		this.setCreativeTab(CreativeTabs.tabMaterials);
+		this.setCreativeTab(carbonization.tabItems);
 	}
 	
 	public void addInformation(ItemStack is, EntityPlayer ep, List list, boolean bool)

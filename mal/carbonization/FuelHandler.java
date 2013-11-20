@@ -26,6 +26,8 @@ public class FuelHandler implements IFuelHandler {
 				return 1200;
 			case 4:
 				return 2000;
+			case 5:
+				return 333;
 			default:
 				return 0;
 			}

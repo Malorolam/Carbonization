@@ -45,13 +45,20 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
 	public double fuelTank;//fuel stored
 	public int fuelUsePercent;//percentage of fuel used per process
 	public double upgradeTier;//upgrade tier, dependant on the upgrade item
-	public int processTime=carbonization.BASEAUTOCRAFTTIME;//time to process an item, dependant on fuel usage
+	public int processTime = carbonization.MAXAUTOCRAFTTIME;//time to process an item, dependant on fuel usage
 	public int fuelUsage = carbonization.BASEAUTOCRAFTFUEL;
 	public int craftingCooldown; //amount of time before a new item can be crafted
 	
 	public boolean updating = false;//disable things because a packet is doing things
 	private boolean inventoryChanged = true;//recheck the inventories
+	public boolean disableButtons = false;//set to true when the buttons wouldn't do anything (like max time = min time)
 
+	public TileEntityAutocraftingBench()
+	{
+		if(carbonization.MAXAUTOCRAFTTIME==carbonization.MINAUTOCRAFTTIME)
+			disableButtons = true;
+	}
+	
 	public void activate(World world, int x, int y, int z,
 			EntityPlayer player) {
 		//System.out.println("Component Tiers: " + componentTiers[0] + ", " + componentTiers[1] +"; queue capacity: " + queue.maxJobs + "; activated: " + properlyActivated);
@@ -278,6 +285,7 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
 	    					{
 	    						//System.out.println("removed item in crafting slot " + toolIndex[i]);
 	    						recipeStacks[i] = null;
+	    						recipeStacks[9] = null;//since we're removing a crafting item, the recipe isn't valid anymore
 	    					}
 	    				}
 	    				else
@@ -549,7 +557,7 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
 
 	public void calculateProcessTime()
 	{
-		processTime = (int)Math.floor(carbonization.BASEAUTOCRAFTTIME-2.55*fuelUsePercent);
+		processTime = (int)Math.floor(carbonization.MAXAUTOCRAFTTIME-(carbonization.MAXAUTOCRAFTTIME-carbonization.MINAUTOCRAFTTIME)*fuelUsePercent/100);
 		if(processTime < 1)
 			processTime = 1;
 	}
@@ -1042,6 +1050,8 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
 				this.upgradeStacks[var5] = ItemStack.loadItemStackFromNBT(var4);
 			}
 		}
+		
+		calculateProcessTime();
 	}
 
 	/*

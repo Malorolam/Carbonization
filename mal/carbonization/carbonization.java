@@ -3,6 +3,7 @@ package mal.carbonization;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.Random;
 import java.util.logging.Level;
 
 import ic2.api.item.*;
@@ -28,6 +29,7 @@ import mal.carbonization.items.ItemStructureBlock;
 import mal.carbonization.items.ItemTestBlock;
 import mal.carbonization.network.PacketHandler;
 import mal.carbonization.tileentity.TileEntityAutocraftingBench;
+import mal.carbonization.tileentity.TileEntityFuelConverter;
 import mal.carbonization.tileentity.TileEntityFurnaces;
 import mal.carbonization.tileentity.TileEntityMultiblockFurnace;
 import mal.carbonization.tileentity.TileEntityMultiblockInit;
@@ -35,6 +37,7 @@ import mal.carbonization.tileentity.TileEntityStructureBlock;
 import mal.carbonization.tileentity.TileEntityTest;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
@@ -67,12 +70,13 @@ import cpw.mods.fml.common.registry.LanguageRegistry;
 import ic2.api.recipe.*;
 import ic2.core.IC2;
 
-@Mod(modid="carbonization", name="Carbonization", version="0.8.1", dependencies = "required-after:Forge@[9.11,);required-after:FML@[6.4.30,)")
+@Mod(modid="carbonization", name="Carbonization", version="0.8.6", dependencies = "required-after:Forge@[9.11,);required-after:FML@[6.4.30,)")
 @NetworkMod(clientSideRequired=true, channels={"CarbonizationChn"}, packetHandler = PacketHandler.class)
 public class carbonization {
 
 	public static int ORESLAGRATIO = 300;//number of millibuckets needed for an item
-	public static int BASEAUTOCRAFTTIME = 260;//maximum amount of time to cooldown
+	public static int MAXAUTOCRAFTTIME = 600;//maximum amount of time to cooldown
+	public static int MINAUTOCRAFTTIME = 5;//minimum  amount of time to cooldown
 	public static int BASEAUTOCRAFTFUEL = 800;//maximum amount of fuel per craft
 	public static ItemFuel fuel;
 	public static ItemDust dust;
@@ -113,6 +117,16 @@ public class carbonization {
 	private static ItemStack HHPulv;
 	private static ItemStack HHComp;
 	private static ItemStack HHPure;
+
+	public static CreativeTabs tabStructure = new CreativeTabs("tabStructure"){
+		public ItemStack getIconItemStack() { return new ItemStack(itemStructureBlock,1,1007);}
+	};
+	public static CreativeTabs tabMachine = new CreativeTabs("tabMachine"){
+		public ItemStack getIconItemStack() { return new ItemStack(autocraftingBench,1,0);}
+	};
+	public static CreativeTabs tabItems = new CreativeTabs("tabItems"){
+		public ItemStack getIconItemStack() { return new ItemStack(fuel,1,5);}
+	};
 	
 	@Instance
 	public static carbonization instance;
@@ -149,11 +163,22 @@ public class carbonization {
     			FMLLog.log(Level.WARNING, "Metal Cook time modifier is a invalid number, using the default value instead.");
     			difficultyMod = 10;
     		}
-    		BASEAUTOCRAFTTIME = config.get("Modifiers", "Max Autocrafting Cooldown Time", 260).getInt();
-    		if (BASEAUTOCRAFTTIME<=0)
+    		MAXAUTOCRAFTTIME = config.get("Modifiers", "Max Autocrafting Cooldown Time", 300).getInt();
+    		if (MAXAUTOCRAFTTIME<=0)
     		{
-    			FMLLog.log(Level.WARNING, "Autocrafting cooldown time modifier is a invalid number, using the default value instead.");
-    			BASEAUTOCRAFTTIME = 260;
+    			FMLLog.log(Level.WARNING, "Max Autocrafting cooldown time modifier is a invalid number, using the default value instead.");
+    			MAXAUTOCRAFTTIME = 300;
+    		}
+    		MINAUTOCRAFTTIME = config.get("Modifiers", "Min Autocrafting Cooldown Time", 5).getInt();
+    		if(MINAUTOCRAFTTIME<=0)
+    		{
+    			FMLLog.log(Level.WARNING, "Min Autocrafting cooldown time modifier is a invalid number, using the default value instead.");
+    			MINAUTOCRAFTTIME = 5;
+    		}
+    		if(MINAUTOCRAFTTIME > MAXAUTOCRAFTTIME)
+    		{
+    			FMLLog.log(Level.WARNING, "Min Autocrafting cooldown less then Max, setting minimum value to maximum");
+    			MINAUTOCRAFTTIME = MAXAUTOCRAFTTIME;
     		}
     		BASEAUTOCRAFTFUEL = config.get("Modifiers", "Max Autocrafting Fuel Usage", 800).getInt();
     		if (BASEAUTOCRAFTFUEL<=0)
@@ -163,7 +188,6 @@ public class carbonization {
     		}
     		
     		config.save();
-    		
     		
     		//blarg
     		fuel = new ItemFuel(fuelID);
@@ -186,10 +210,6 @@ public class carbonization {
     		autocraftingBench = new BlockAutocraftingBench(autocraftingBenchID,Material.iron);
     		Item.itemsList[furnaceID] = new ItemBlockFurnaces(furnaceID-256,furnaceBlock);
     		
-    		//TODO: remember to disable on releases
-    		//testBlock = new TestBlock(structureID+200,Material.rock);
-    		//GameRegistry.registerBlock(testBlock, ItemTestBlock.class, "testBlock");
-    		
     		hhpulv.setContainerItem(hhpulv);
     		hhcomp.setContainerItem(hhcomp);
     		hhpure.setContainerItem(hhpure);
@@ -209,6 +229,7 @@ public class carbonization {
     		GameRegistry.registerTileEntity(TileEntityMultiblockFurnace.class, "TileEntityMultiblockFurnace");
     		GameRegistry.registerTileEntity(TileEntityStructureBlock.class, "TileEntityStructureBlock");
     		GameRegistry.registerTileEntity(TileEntityAutocraftingBench.class, "TileEntityAutocraftingBench");
+    		GameRegistry.registerTileEntity(TileEntityFuelConverter.class,"TileEntityFuelConverter");
     		
     		
     		GameRegistry.registerBlock(fuelBlock, ItemBlockFuels.class, "fuelBlock");
@@ -280,9 +301,14 @@ public class carbonization {
     		LanguageRegistry.addName(new ItemStack(furnaceBlock,1,0), "Iron Furnace");
     		LanguageRegistry.addName(new ItemStack(furnaceBlock,1,1), "Insulated Iron Furnace");
     		LanguageRegistry.addName(new ItemStack(furnaceBlock,1,2), "Insulated Steel Furnace");
-    		LanguageRegistry.addName(new ItemStack(autocraftingBench), "Autocrafting Bench");
+    		LanguageRegistry.addName(new ItemStack(autocraftingBench,1,0), "Autocrafting Bench");
+    		LanguageRegistry.addName(new ItemStack(autocraftingBench,1,1), "Fuel Conversion Bench");
     		//Multiblock controls
     		LanguageRegistry.addName(new ItemStack(FurnaceControl), "Furnace Control System");
+    		
+    		LanguageRegistry.instance().addStringLocalization("itemGroup.tabStructure", "en_US", "Carbonization Structure Blocks");
+    		LanguageRegistry.instance().addStringLocalization("itemGroup.tabMachine", "en_US", "Carbonization Blocks");
+    		LanguageRegistry.instance().addStringLocalization("itemGroup.tabItems", "en_US", "Carbonization Items");
     		
     		//Structure
     		addStructureLanguage();
@@ -298,6 +324,9 @@ public class carbonization {
     		LanguageRegistry.instance().addStringLocalization("tile.furnaceBlock.ironfurnace.name", "Iron Furnace");
     		LanguageRegistry.instance().addStringLocalization("tile.furnaceBlock.refinedironfurnace.name", "Insulated Iron Furnace");
     		LanguageRegistry.instance().addStringLocalization("tile.furnaceBlock.steelfurnace.name", "Insulated Steel Furnace");
+    		
+    		LanguageRegistry.instance().addStringLocalization("tile.autocraftingBench.autocraftingbench.name", "Autocrafting Bench");
+    		LanguageRegistry.instance().addStringLocalization("tile.autocraftingBench.fuelconverter.name", "Fuel Conversion Bench");
     		
     		prox.registerRenderThings();
 	}
@@ -337,6 +366,8 @@ public class carbonization {
 		MinecraftForge.setBlockHarvestLevel(fuelBlock, 3, "pickaxe", 1);
 		MinecraftForge.setBlockHarvestLevel(fuelBlock, 4, "pickaxe", 1);
 		MinecraftForge.setBlockHarvestLevel(fuelBlock, 5, "pickaxe", 1);
+		
+		
 	}
 	
 	@Mod.EventHandler
@@ -609,8 +640,10 @@ public class carbonization {
 		//Autocrafting Bench
 		for(int i = 0; i<19; i++)
 		{
-			CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(autocraftingBench,1), new Object[]
+			CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(autocraftingBench,1,0), new Object[]
 					{"SDS", "SCS", "SFS", 'S', new ItemStack(itemStructureBlock,1,2000+i), 'D', Item.diamond, 'C', Block.workbench, 'F', new ItemStack(furnaceBlock,1,2)}));
+			CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(autocraftingBench,1,1), new Object[]
+					{"SSS", "PUC", "SFS", 'S', new ItemStack(itemStructureBlock,1,2000+i), 'P', HHPulv, 'U', HHPure, 'C', HHComp, 'F', new ItemStack(furnaceBlock,1,2)}));
 		}
 	}
 	
@@ -808,14 +841,14 @@ public class carbonization {
 				for(int k = 0; k<19; k++)
 					CarbonizationRecipes.smelting().addInfoItem(new ItemStack(itemStructureBlock, 1, i*1000+j*100+k), 2);
 		
-		CarbonizationRecipes.smelting().addInfoItem(new ItemStack(autocraftingBench), 7);
-		CarbonizationRecipes.smelting().addInfoItem(new ItemStack(autocraftingBench), 8);
+		CarbonizationRecipes.smelting().addInfoItem(new ItemStack(autocraftingBench,1,0), 7);
+		CarbonizationRecipes.smelting().addInfoItem(new ItemStack(autocraftingBench,1,0), 8);
+		
+		CarbonizationRecipes.smelting().addInfoItem(new ItemStack(autocraftingBench,1,1), 10);
+		CarbonizationRecipes.smelting().addInfoItem(new ItemStack(autocraftingBench,1,1), 11);
 		
 		for(int i = 0; i < 3; i++)
 			CarbonizationRecipes.smelting().addInfoItem(new ItemStack(furnaceBlock, 1, i), 9);
-		
-		for(int i = 0; i<6; i++)
-			CarbonizationRecipes.smelting().addInfoItem(new ItemStack(fuel, 1, i), 0);
 		
 		for(int i = 0; i<4; i++)
 			CarbonizationRecipes.smelting().addInfoItem(new ItemStack(ingots, 1, i), 0);
@@ -823,21 +856,29 @@ public class carbonization {
 		for(int i = 0; i<20; i++)
 			CarbonizationRecipes.smelting().addInfoItem(new ItemStack(misc, 1, i), 0);
 		
-		for(int i = 0; i<9; i++)
-			CarbonizationRecipes.smelting().addInfoItem(new ItemStack(dust, 1, i), 0);
 		
 		for(int i = 0; i<6; i++)
 			CarbonizationRecipes.smelting().addInfoItem(new ItemStack(fuelBlock, 1, i), 0);
 		
-		CarbonizationRecipes.smelting().addInfoItem(new ItemStack(carbonization.hhpure), 0);
-		CarbonizationRecipes.smelting().addInfoItem(new ItemStack(carbonization.hhcomp), 0);
-		CarbonizationRecipes.smelting().addInfoItem(new ItemStack(carbonization.hhpulv), 0);
+		for(int j = 0; j < 3; j++)
+		{
+			CarbonizationRecipes.smelting().addInfoItem(new ItemStack(carbonization.hhpure), 12+j);
+			CarbonizationRecipes.smelting().addInfoItem(new ItemStack(carbonization.hhcomp), 12+j);
+			CarbonizationRecipes.smelting().addInfoItem(new ItemStack(carbonization.hhpulv), 12+j);
+			
+			for(int i = 0; i<9; i++)
+			{
+				if(i<6)
+					CarbonizationRecipes.smelting().addInfoItem(new ItemStack(fuel, 1, i), 12+j);
+				CarbonizationRecipes.smelting().addInfoItem(new ItemStack(dust, 1, i), 12+j);
+			}
+		}
 	}
 	
 	private void generateMultiblockFurnaceRecipes()
 	{
 		//Add in the ore slag relationships
-		CarbonizationRecipes.smelting().addOreSlag("ashSlag", new ItemStack(misc, 2, 6));
+		CarbonizationRecipes.smelting().addOreSlag("ashSlag", new ItemStack(misc, 1, 6));
 		CarbonizationRecipes.smelting().addOreSlag("stoneSlag", new ItemStack(Block.stone));
 		CarbonizationRecipes.smelting().addOreSlag("glassSlag", new ItemStack(Block.glass));
 		CarbonizationRecipes.smelting().addOreSlag("ironSlag", new ItemStack(Item.ingotIron));

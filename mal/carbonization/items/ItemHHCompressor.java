@@ -3,6 +3,7 @@ package mal.carbonization.items;
 import java.util.List;
 
 import mal.carbonization.ColorReference;
+import mal.carbonization.carbonization;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -17,7 +18,7 @@ public class ItemHHCompressor extends Item
 		this.setMaxDamage(999);
 		this.setMaxStackSize(1);
 		this.setUnlocalizedName("HHCompressor");
-		this.setCreativeTab(CreativeTabs.tabTools);
+		this.setCreativeTab(carbonization.tabItems);
 	}
 	
 	public void addInformation(ItemStack is, EntityPlayer ep, List list, boolean bool)

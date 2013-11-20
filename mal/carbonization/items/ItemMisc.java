@@ -5,6 +5,7 @@ import java.util.List;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import mal.carbonization.ColorReference;
+import mal.carbonization.carbonization;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -24,7 +25,7 @@ public class ItemMisc extends Item{
 		this.hasSubtypes = true;
 		this.setMaxDamage(0);
 		this.setUnlocalizedName("ItemMisc");
-		this.setCreativeTab(CreativeTabs.tabMaterials);
+		this.setCreativeTab(carbonization.tabItems);
 	}
 	
 	

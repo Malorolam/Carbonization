@@ -1,6 +1,7 @@
 package mal.carbonization.blocks;
 
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Level;
 
 import cpw.mods.fml.common.FMLLog;
@@ -9,6 +10,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import mal.carbonization.FurnaceTypes;
 import mal.carbonization.carbonization;
 import mal.carbonization.tileentity.TileEntityAutocraftingBench;
+import mal.carbonization.tileentity.TileEntityFuelConverter;
 import mal.carbonization.tileentity.TileEntityFurnaces;
 import mal.carbonization.tileentity.TileEntityStructureBlock;
 import net.minecraft.block.BlockContainer;
@@ -24,14 +26,14 @@ import net.minecraft.world.World;
 
 public class BlockAutocraftingBench extends BlockContainer {
 
-	private Icon[] iconArray = new Icon[3];
+	private Icon[] iconArray = new Icon[6];
 	
 	public BlockAutocraftingBench(int par1, Material par2Material) {
         super(par1, Material.ground);
-        this.setUnlocalizedName("AutocraftingTable");
+        this.setUnlocalizedName("autocraftingbench");
         this.setHardness(1.5f);
         this.setResistance(20f);
-        this.setCreativeTab(CreativeTabs.tabDecorations);
+        this.setCreativeTab(carbonization.tabMachine);
 	}
 
     @Override
@@ -41,6 +43,9 @@ public class BlockAutocraftingBench extends BlockContainer {
     	iconArray[0] = ir.registerIcon("carbonization:autocraftingBenchBottomTexture");
     	iconArray[1] = ir.registerIcon("carbonization:autocraftingBenchSideTexture");
     	iconArray[2] = ir.registerIcon("carbonization:autocraftingBenchTopTexture");
+    	iconArray[3] = ir.registerIcon("carbonization:fuelMachineBottomTexture");
+    	iconArray[4] = ir.registerIcon("carbonization:fuelMachineSideTexture");
+    	iconArray[5] = ir.registerIcon("carbonization:fuelMachineTopTexture");
     }
     
     @SideOnly(Side.CLIENT)
@@ -50,14 +55,18 @@ public class BlockAutocraftingBench extends BlockContainer {
      */
     public Icon getBlockTexture(IBlockAccess par1IBlockAccess, int x, int y, int z, int side)
     {	    	
+    	
+    	//Next, we need the metadata
+    	int metadata = par1IBlockAccess.getBlockMetadata(x, y, z);
+    	
     	switch(side)
     	{
     	case 0:
-    		return iconArray[0];
+    		return iconArray[metadata*3+0];
     	case 1:
-    		return iconArray[2];
+    		return iconArray[metadata*3+2];
     	default:
-    		return iconArray[1];
+    		return iconArray[metadata*3+1];
     	}
     }
     
@@ -66,6 +75,7 @@ public class BlockAutocraftingBench extends BlockContainer {
     public void getSubBlocks(int par1, CreativeTabs par2CreativeTabs, List par3List)
     {
 	    	par3List.add(new ItemStack(par1, 1, 0));
+	    	par3List.add(new ItemStack(par1, 1, 1));
     }
     
     /**
@@ -78,11 +88,11 @@ public class BlockAutocraftingBench extends BlockContainer {
     	switch(side)
     	{
     	case 0:
-    		return iconArray[0];
+    		return iconArray[metadata*3+0];
     	case 1:
-    		return iconArray[2];
+    		return iconArray[metadata*3+2];
     	default:
-    		return iconArray[1];
+    		return iconArray[metadata*3+1];
     	}
     }
     
@@ -99,16 +109,33 @@ public class BlockAutocraftingBench extends BlockContainer {
         else
         {
         	TileEntity var10 = world.getBlockTileEntity(x,y,z);
-        	if(!(var10 instanceof TileEntityAutocraftingBench) || var10 == null || par5EntityPlayer.isSneaking())
+        	if((!(var10 instanceof TileEntityAutocraftingBench) && !(var10 instanceof TileEntityFuelConverter)) || var10 == null || par5EntityPlayer.isSneaking())
             {
             	System.out.println("oh noes, the bench isn't a bench.");
             	return false;
             }
 
-            ((TileEntityAutocraftingBench) var10).activate(world, x, y, z, par5EntityPlayer);
+        	if(var10 instanceof TileEntityAutocraftingBench)
+        		((TileEntityAutocraftingBench) var10).activate(world, x, y, z, par5EntityPlayer);
+        	if(var10 instanceof TileEntityFuelConverter)
+        		((TileEntityFuelConverter) var10).activate(world, x, y, z, par5EntityPlayer);
             
             return true;
         }
+    }
+    
+	/**
+     * Determines the damage on the item the block drops. Used in cloth and wood.
+     */
+    public int damageDropped(int par1)
+    {
+		//System.out.println("Someone is asking for my damage dropped! " + par1);
+        return par1;
+    }
+    
+    public int quantityDropped(Random par1Random)
+    {
+        return 1;
     }
     
     /**
@@ -121,14 +148,29 @@ public class BlockAutocraftingBench extends BlockContainer {
     	TileEntity te = par1World.getBlockTileEntity(par2, par3, par4);
     	if(te instanceof TileEntityAutocraftingBench)
     		((TileEntityAutocraftingBench)te).dumpInventory();
+    	if(te instanceof TileEntityFuelConverter)
+    		((TileEntityFuelConverter)te).dumpInventory();
     	
         super.breakBlock(par1World, par2, par3, par4, par5, par6);
     }
     
+    @Override
+    public TileEntity createTileEntity(World world, int metadata)
+    {
+    	switch(metadata)
+    	{
+    	case 0:
+    		return new TileEntityAutocraftingBench();
+    	case 1:
+    		return new TileEntityFuelConverter();
+    	default:
+    		return null;
+    	}
+    }
 	@Override
 	public TileEntity createNewTileEntity(World world) {
 		// TODO Auto-generated method stub
-		return new TileEntityAutocraftingBench();
+		return null;
 	}
 
 }

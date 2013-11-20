@@ -3,11 +3,13 @@ package mal.carbonization;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 import mal.carbonization.gui.GuiAutocraftingBench;
+import mal.carbonization.gui.GuiFuelConverter;
 import mal.carbonization.gui.GuiFurnaces;
 import mal.carbonization.gui.GuiMultiblockFurnace;
 import mal.carbonization.gui.GuiMultiblockInit;
 import mal.carbonization.gui.GuiTest;
 import mal.carbonization.tileentity.TileEntityAutocraftingBench;
+import mal.carbonization.tileentity.TileEntityFuelConverter;
 import mal.carbonization.tileentity.TileEntityFurnaces;
 import mal.carbonization.tileentity.TileEntityMultiblockFurnace;
 import mal.carbonization.tileentity.TileEntityMultiblockInit;
@@ -56,6 +58,10 @@ public class ClientProxy extends CommonProxy {
         if(tileEntity instanceof TileEntityAutocraftingBench) {
         	//System.out.println("got to make the gui client side");
         	return new GuiAutocraftingBench(player.inventory, (TileEntityAutocraftingBench)tileEntity);
+        }
+        if(tileEntity instanceof TileEntityFuelConverter) {
+        	//System.out.println("got to make the gui client side");
+        	return new GuiFuelConverter(player.inventory, (TileEntityFuelConverter)tileEntity);
         }
         if(tileEntity instanceof TileEntityTest)
         	return new GuiTest((TileEntityTest)tileEntity, player);
