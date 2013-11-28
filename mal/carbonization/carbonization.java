@@ -6,7 +6,6 @@ import java.io.FileReader;
 import java.util.Random;
 import java.util.logging.Level;
 
-import ic2.api.item.*;
 import mal.carbonization.blocks.BlockAutocraftingBench;
 import mal.carbonization.blocks.BlockFuel;
 import mal.carbonization.blocks.BlockFurnaceControl;
@@ -68,10 +67,10 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 //import thermalexpansion.api.crafting.CraftingHelpers;
 //import thermalexpansion.api.crafting.CraftingManagers;
-import ic2.api.recipe.*;
-import ic2.core.IC2;
+import ic2.api.item.*;
+import ic2.api.recipe.RecipeInputItemStack;
 
-@Mod(modid="carbonization", name="Carbonization", version="0.8.7", dependencies = "required-after:Forge@[9.11,);required-after:FML@[6.4.30,)")
+@Mod(modid="carbonization", name="Carbonization", version="0.8.7.1", dependencies = "required-after:Forge@[9.11,);required-after:FML@[6.4.30,)")
 @NetworkMod(clientSideRequired=true, channels={"CarbonizationChn"}, packetHandler = PacketHandler.class)
 public class carbonization {
 
@@ -342,7 +341,6 @@ public class carbonization {
 	@Mod.EventHandler
 	public void load(FMLInitializationEvent event)
 	{	
-		
 		RenderingRegistry.registerBlockHandler(new StructureBlockRenderer());
 		prox.setCustomRenderers();
 		
@@ -387,8 +385,6 @@ public class carbonization {
 		boolean gt = false;
 		boolean ft = false;
 
-
-
 		//some mod checking 
 		if(Loader.isModLoaded("gregtech_addon"))
 		{
@@ -406,10 +402,7 @@ public class carbonization {
 
 		if(Loader.isModLoaded("IC2"))
 		{
-			if(IC2.getInstance().VERSION.contains("2.0"))
 				ic=true;
-			else
-				FMLLog.log(Level.WARNING, "IC2 version incompatable, IC2 Integration Disabled.");
 		}
 		
 		generateMash();
@@ -513,14 +506,14 @@ public class carbonization {
 				ic2.api.recipe.Recipes.macerator.addRecipe(new RecipeInputItemStack(new ItemStack(fuelBlock,1,4), 1), null, new ItemStack(dust,4,4));
 				ic2.api.recipe.Recipes.macerator.addRecipe(new RecipeInputItemStack(new ItemStack(fuelBlock,1,5), 1), null, new ItemStack(dust,4,5));
 				
-				ic2.api.recipe.Recipes.compressor.addRecipe(new RecipeInputItemStack(new ItemStack(dust,1,0),1), null, new ItemStack(Item.coal,1,0));
+				/*ic2.api.recipe.Recipes.compressor.addRecipe(new RecipeInputItemStack(new ItemStack(dust,1,0),1), null, new ItemStack(Item.coal,1,0));
 				ic2.api.recipe.Recipes.compressor.addRecipe(new RecipeInputItemStack(new ItemStack(dust,1,1),1), null, new ItemStack(fuel,1,0));
 				ic2.api.recipe.Recipes.compressor.addRecipe(new RecipeInputItemStack(new ItemStack(dust,1,2),1), null, new ItemStack(fuel,1,1));
 				ic2.api.recipe.Recipes.compressor.addRecipe(new RecipeInputItemStack(new ItemStack(dust,1,3),1), null, new ItemStack(fuel,1,2));
 				ic2.api.recipe.Recipes.compressor.addRecipe(new RecipeInputItemStack(new ItemStack(dust,1,4),1), null, new ItemStack(fuel,1,3));
 				ic2.api.recipe.Recipes.compressor.addRecipe(new RecipeInputItemStack(new ItemStack(dust,1,5),1), null, new ItemStack(Item.coal,1,1));
 				ic2.api.recipe.Recipes.compressor.addRecipe(new RecipeInputItemStack(new ItemStack(dust,1,6),1), null, new ItemStack(fuel,1,4));
-				ic2.api.recipe.Recipes.compressor.addRecipe(new RecipeInputItemStack(new ItemStack(dust,1,7),1), null, new ItemStack(fuel,1,5));
+				ic2.api.recipe.Recipes.compressor.addRecipe(new RecipeInputItemStack(new ItemStack(dust,1,7),1), null, new ItemStack(fuel,1,5));*/
 			}
 			catch(Exception e)
 			{
@@ -606,12 +599,20 @@ public class carbonization {
 		
 		if(ic)//IC2, so add in compressor recipes for the carbon chunk and alternate "cleansing" potion
 		{
-			ic2.api.recipe.Recipes.compressor.addRecipe(new RecipeInputItemStack(new ItemStack(dust, 1, 7), 2), null, new ItemStack(misc, 1, 13));
-			ic2.api.recipe.Recipes.compressor.addRecipe(new RecipeInputItemStack(new ItemStack(misc, 1, 13), 4), null, new ItemStack(misc, 1, 3));
-			ic2.api.recipe.Recipes.compressor.addRecipe(new RecipeInputItemStack(new ItemStack(misc, 1, 3), 8), null, new ItemStack(Item.diamond));
+			try
+			{
+				ic2.api.recipe.Recipes.compressor.addRecipe(new RecipeInputItemStack(new ItemStack(dust, 1, 7), 2), null, new ItemStack(misc, 1, 13));
+				ic2.api.recipe.Recipes.compressor.addRecipe(new RecipeInputItemStack(new ItemStack(misc, 1, 13), 4), null, new ItemStack(misc, 1, 3));
+				ic2.api.recipe.Recipes.compressor.addRecipe(new RecipeInputItemStack(new ItemStack(misc, 1, 3), 8), null, new ItemStack(Item.diamond));
 			
-			ic2.api.recipe.Recipes.compressor.addRecipe(new RecipeInputItemStack(new ItemStack(misc, 1, 12), 8), null, new ItemStack(misc, 1, 16));
-			ic2.api.recipe.Recipes.compressor.addRecipe(new RecipeInputItemStack(new ItemStack(misc, 1, 16), 3), null, new ItemStack(misc, 2, 17));
+				ic2.api.recipe.Recipes.compressor.addRecipe(new RecipeInputItemStack(new ItemStack(misc, 1, 12), 8), null, new ItemStack(misc, 1, 16));
+				ic2.api.recipe.Recipes.compressor.addRecipe(new RecipeInputItemStack(new ItemStack(misc, 1, 16), 3), null, new ItemStack(misc, 2, 17));
+			}
+			catch(Exception e)
+			{
+				FMLLog.log(Level.INFO, "Oh dear, something broke with IC2.  Prod Mal so he can fix it.");
+				e.printStackTrace();
+			}
 		}
 	}
 	
