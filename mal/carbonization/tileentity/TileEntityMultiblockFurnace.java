@@ -1058,7 +1058,10 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
   			//System.out.println("Slag type: " + s + " with value of: " + oreSlagInQueue.get(s));
   			if(oreSlagInQueue.get(s) >= carbonization.ORESLAGRATIO && hasOutputSpace(new ItemStack(CarbonizationRecipes.smelting().getOreSlagOutput(s).itemID, 1, CarbonizationRecipes.smelting().getOreSlagOutput(s).getItemDamage())) != -1)
   			{
-  				int value = CarbonizationRecipes.smelting().getOreSlagOutput(s).stackSize;
+  				int i = (int)Math.floor(oreSlagInQueue.get(s)/carbonization.ORESLAGRATIO);
+  				if(i>64)
+  					i=64;
+  				int value = CarbonizationRecipes.smelting().getOreSlagOutput(s).stackSize * i;
   				if(outputCounts.containsKey(s))
   				{
   					int ov = outputCounts.get(s);
@@ -1075,8 +1078,11 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
   		
   		for(String s: SlagChanged)
   		{
+				int i = (int)Math.floor(oreSlagInQueue.get(s)/carbonization.ORESLAGRATIO);
+				if(i>64)
+					i=64;
 				if(oreSlagInQueue.get(s) > carbonization.ORESLAGRATIO)
-  					oreSlagInQueue.put(s, oreSlagInQueue.get(s)-carbonization.ORESLAGRATIO);
+  					oreSlagInQueue.put(s, oreSlagInQueue.get(s)-carbonization.ORESLAGRATIO*i);
   				else
   					oreSlagInQueue.remove(s);
   		}

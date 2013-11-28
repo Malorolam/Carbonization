@@ -43,6 +43,8 @@ public class CarbonizationInfo {
 			return fuelInfo2();
 		case 14://fuel info page 3
 			return fuelInfo3();
+		case 15://recipe charm page 1
+			return recipeCharmInfo();
 		default:
 			return defaultInfo();
 		}
@@ -89,9 +91,9 @@ public class CarbonizationInfo {
 		list.add("The Furnace Control Block is the key block ");
 		list.add("to building and using an Industrial ");
 		list.add("Furnace.  This block, when placed in any ");
-		list.add("side of a tetragonal hollow structure made ");
-		list.add("of any furnace structure blocks for the ");
-		list.add("base and any standard structure blocks ");
+		list.add("side of a orthorhombic hollow structure ");
+		list.add("made of any furnace structure blocks for ");
+		list.add("the base and any standard structure blocks ");
 		list.add("for the walls and top will allow you to ");
 		list.add("initilize the structure and process a");
 		list.add("large number of items in a rather ");
@@ -184,7 +186,7 @@ public class CarbonizationInfo {
 		list.add("");
 		list.add("the cooldown, the more fuel is needed");
 		list.add("to craft.  Third, this fuel cost can");
-		list.add("be reduced by placing machine structure");
+		list.add("be reduced by placing furnace structure");
 		list.add("blocks in the upgrade slot, up to 64,");
 		list.add("using the average of the two tiers to");
 		list.add("determine the effectiveness.  Finally,");
@@ -340,6 +342,20 @@ public class CarbonizationInfo {
 		list.add("Anthracite = 2000");
 		list.add("Graphite = 333");
 		
+		return list;
+	}
+	
+	private static List<String> recipeCharmInfo()
+	{
+		List<String> list = new ArrayList<String>();
+		
+		list.add("Recipe Charm:");
+		list.add("");
+		list.add("This was created as a way to avoid");
+		list.add("recipe conflicts with other mods.");
+		list.add("As such it is only craftable when");
+		list.add("a mod that has a known conflict is ");
+		list.add("detected.");
 		return list;
 	}
 }

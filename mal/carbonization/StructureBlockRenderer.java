@@ -20,7 +20,7 @@ public class StructureBlockRenderer implements ISimpleBlockRenderingHandler {
 	public StructureBlockRenderer()
 	{
 		structureBlockRenderType = RenderingRegistry.getNextAvailableRenderId();
-		System.out.println("made new renderer");
+		//System.out.println("made new renderer");
 	}
 	@Override
 	public void renderInventoryBlock(Block block, int metadata, int modelID,
@@ -35,8 +35,8 @@ public class StructureBlockRenderer implements ISimpleBlockRenderingHandler {
         
 		Tessellator tessellator = Tessellator.instance;
         
-		int lightValue = Block.blocksList[Block.stone.blockID].getMixedBrightnessForBlock(world, x, y, z);
-		tessellator.setBrightness(lightValue);
+		//int lightValue = Block.blocksList[Block.stone.blockID].getMixedBrightnessForBlock(world, x, y, z);
+		//tessellator.setBrightness(lightValue);
 		tessellator.setColorOpaque_F(1.0F, 1.0F, 1.0F);
 
 		TileEntity te = world.getBlockTileEntity(x, y, z);

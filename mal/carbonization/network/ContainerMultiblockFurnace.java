@@ -3,6 +3,7 @@ package mal.carbonization.network;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import mal.carbonization.CarbonizationRecipes;
+import mal.carbonization.multiblockFurnaceSlot;
 import mal.carbonization.tileentity.TileEntityFurnaces;
 import mal.carbonization.tileentity.TileEntityMultiblockFurnace;
 import net.minecraft.entity.player.EntityPlayer;
@@ -38,7 +39,7 @@ public class ContainerMultiblockFurnace extends Container{
         for(i=0; i<3; i++)
         {
         	for(int j = 0; j < 3; j++)
-        		this.addSlotToContainer(new SlotFurnace(par1InventoryPlayer.player, furnace, i*3+j+9, 80+j*18, 17+i*18));
+        		this.addSlotToContainer(new multiblockFurnaceSlot(furnace, i*3+j+9, 80+j*18, 17+i*18));
         }
 
         //main inventory, so 18-44
@@ -152,14 +153,14 @@ public class ContainerMultiblockFurnace extends Container{
             	 */
                 if (CarbonizationRecipes.smelting().getMultiblockCookTime(var5) != -1)//has a multiblock recipe
                 {
-                    if (!this.mergeItemStack(var5, 0, 8, false))
+                    if (!this.mergeItemStack(var5, 0, 9, false))
                     {
                         return null;
                     }
                 }
                 else if (TileEntityMultiblockFurnace.getItemBurnTime(var5)>0)
                 {
-                    if (!this.mergeItemStack(var5, 0, 8, false))
+                    if (!this.mergeItemStack(var5, 0, 9, false))
                     {
                         return null;
                     }

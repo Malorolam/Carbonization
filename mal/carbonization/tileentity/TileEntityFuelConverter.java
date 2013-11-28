@@ -390,16 +390,16 @@ public class TileEntityFuelConverter extends TileEntity implements IInventory, n
 	//figure out all the values here
 	public void calculateProcessTime()
 	{
-		fuelMultiplyer = 1.6/(2*efficiencyUpgrade-0.01*speedUpgrade+1.6);
+		fuelMultiplyer = 1/(efficiencyUpgrade-0.01*speedUpgrade+1);
 		potentialMultiplyer = 3.2/(efficiencyUpgrade-0.01*speedUpgrade+3.2);
-		processTime = carbonization.MAXAUTOCRAFTTIME - (int) ((Math.pow(speedUpgrade,1.1)-0.5*efficiencyUpgrade)*(carbonization.MAXAUTOCRAFTTIME-carbonization.MINAUTOCRAFTTIME)/73.9);
+		processTime = carbonization.MAXAUTOCRAFTTIME - (int) ((Math.pow(speedUpgrade,1.2)-0.01*efficiencyUpgrade)*(carbonization.MAXAUTOCRAFTTIME-carbonization.MINAUTOCRAFTTIME)/47.3);
 		if(processTime < carbonization.MINAUTOCRAFTTIME)
 			processTime = carbonization.MINAUTOCRAFTTIME;
 	}
 	
 	public double getFuelUsage()
 	{
-		return carbonization.BASEAUTOCRAFTFUEL*(fuelMultiplyer);
+		return carbonization.BASEAUTOCRAFTFUEL*(fuelMultiplyer)*(1-((makeDust)?(1):(0))*0.25);
 	}
 
 	//add fuel

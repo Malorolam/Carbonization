@@ -18,7 +18,7 @@ import net.minecraft.world.World;
 
 public class ItemMisc extends Item{
 
-	private Icon[] iconArray = new Icon[20];
+	private Icon[] iconArray = new Icon[21];
 	
 	public ItemMisc(int par1) {
 		super(par1);
@@ -356,7 +356,7 @@ public class ItemMisc extends Item{
     {
         return EnumAction.drink;
     }
-
+	
     /**
      * Called whenever this item is equipped and the right mouse button is pressed. Args: itemStack, world, entityPlayer
      */

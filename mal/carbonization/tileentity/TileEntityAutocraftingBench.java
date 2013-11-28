@@ -127,7 +127,7 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
 		{
 			if(upgradeStacks[0].itemID == carbonization.itemStructureBlock.itemID)
 			{
-				if(upgradeStacks[0].getItemDamage() >= 2000)
+				if(upgradeStacks[0].getItemDamage() >= 1000 && upgradeStacks[0].getItemDamage() < 2000)
 				{
 					double[] d = ItemStructureBlock.getTier(upgradeStacks[0].getItemDamage());
 					upgradeTier = (d[0]+d[1])/2*Math.sqrt(upgradeStacks[0].stackSize);
@@ -391,7 +391,7 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
   			if(outputStacks[i] == null)
   				return i;
   			//see if the stack
-  			if((outputStacks[i].getItem() == input.getItem() && outputStacks[i].getItemDamage()== input.getItemDamage()) && outputStacks[i].stackSize < outputStacks[i].getMaxStackSize())
+  			if((outputStacks[i].getItem() == input.getItem() && outputStacks[i].getItemDamage()== input.getItemDamage()) && outputStacks[i].stackSize+input.stackSize <= outputStacks[i].getMaxStackSize())
   				return i;
   		}
   		return -1;
