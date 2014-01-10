@@ -4,13 +4,13 @@ import java.util.ArrayList;
 
 import org.lwjgl.opengl.GL11;
 
-import mal.carbonization.ColorReference;
 import mal.carbonization.network.ContainerAutocraftingBench;
 import mal.carbonization.network.ContainerFuelConverter;
 import mal.carbonization.network.ContainerFurnaces;
 import mal.carbonization.tileentity.TileEntityAutocraftingBench;
 import mal.carbonization.tileentity.TileEntityFuelConverter;
 import mal.carbonization.tileentity.TileEntityFurnaces;
+import mal.core.ColorReference;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -186,13 +186,12 @@ public class GuiFuelConverter extends GuiContainer {
 		}
 	}
 }
+
 /*******************************************************************************
- * Copyright (c) 2013 Malorolam.
- * 
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the GNU Public License v3.0
- * which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/gpl.html
- * 
- * 
- *********************************************************************************/
+* Copyright (c) 2014 Malorolam.
+* 
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the included license, which is also
+* available at http://carbonization.wikispaces.com/License
+* 
+*********************************************************************************/

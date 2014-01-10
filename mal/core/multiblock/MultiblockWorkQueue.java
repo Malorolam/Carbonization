@@ -1,4 +1,4 @@
-package mal.carbonization.multiblock;
+package mal.core.multiblock;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -365,3 +365,12 @@ public class MultiblockWorkQueue {
 			return queue.remove(job);
 	}
 }
+
+/*******************************************************************************
+* Copyright (c) 2014 Malorolam.
+* 
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the included license, which is also
+* available at http://carbonization.wikispaces.com/License
+* 
+*********************************************************************************/

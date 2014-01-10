@@ -4,6 +4,7 @@ import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import mal.api.IFuelContainer;
 import mal.carbonization.CarbonizationRecipes;
 import mal.carbonization.blocks.BlockFurnaces;
 import mal.carbonization.network.PacketHandler;
@@ -238,7 +239,7 @@ public class TileEntityFurnaces extends TileEntity implements IInventory, net.mi
         this.furnaceBurnTime = nbt.getShort("BurnTime");
         this.furnaceCookTime = nbt.getShort("CookTime");
         this.furnaceCookTimeMultiplyer = nbt.getDouble("CookTimeMultiplyer");
-        this.currentItemBurnTime = getItemBurnTime(this.furnaceItemStacks[1]);
+        this.currentItemBurnTime = checkItemBurnTime(this.furnaceItemStacks[1]);
         this.facing = nbt.getByte("facing");
         this.tier = nbt.getInteger("Tier");
     }
@@ -327,14 +328,14 @@ public class TileEntityFurnaces extends TileEntity implements IInventory, net.mi
         boolean var1 = this.furnaceBurnTime > 0;
         boolean var2 = false;
 
-        if (this.furnaceBurnTime > 0 && ((this.metadata > 0)?this.canSmelt():true))//don't use fuel if we have no work and are metadata 1-2
+        if (this.furnaceBurnTime > 0 && ((this.metadata > 0)?this.canSmeltSpecial():true))//don't use fuel if we have no work and are metadata 1-2
         {
             --this.furnaceBurnTime;
         }
 
         if (!this.worldObj.isRemote)
         {
-            if (this.furnaceBurnTime == 0 && this.canSmelt())
+            if (this.furnaceBurnTime == 0 && this.canSmeltSpecial())
             {
                 this.currentItemBurnTime = this.furnaceBurnTime = getItemBurnTime(this.furnaceItemStacks[1]);
 
@@ -342,7 +343,7 @@ public class TileEntityFurnaces extends TileEntity implements IInventory, net.mi
                 {
                     var2 = true;
 
-                    if (this.furnaceItemStacks[1] != null)
+                    if (this.furnaceItemStacks[1] != null && !(this.furnaceItemStacks[1].getItem() instanceof IFuelContainer))
                     {
                         --this.furnaceItemStacks[1].stackSize;
 
@@ -354,7 +355,7 @@ public class TileEntityFurnaces extends TileEntity implements IInventory, net.mi
                 }
             }
 
-            if (this.isBurning() && this.canSmelt())
+            if (this.isBurning() && this.canSmeltSpecial())
             {
                 ++this.furnaceCookTime;
 
@@ -399,7 +400,7 @@ public class TileEntityFurnaces extends TileEntity implements IInventory, net.mi
         {
             ItemStack var1 = FurnaceRecipes.smelting().getSmeltingResult(this.furnaceItemStacks[0]);
 
-            if(var1 != null)//prefer default recipes over special ones
+            if(var1 != null)
             {
             	if (this.furnaceItemStacks[2] == null) return true;
             	if (!this.furnaceItemStacks[2].isItemEqual(var1)) return false;
@@ -407,7 +408,7 @@ public class TileEntityFurnaces extends TileEntity implements IInventory, net.mi
             	return (result <= getInventoryStackLimit() && result <= var1.getMaxStackSize());
             }
             else
-            	return canSmeltSpecial();
+            	return false;
         }
     }
     
@@ -430,7 +431,7 @@ public class TileEntityFurnaces extends TileEntity implements IInventory, net.mi
 	        	return (result <= getInventoryStackLimit() && result <= var2.getMaxStackSize());
 	        }
 	        else
-	        	return false;
+	        	return canSmelt();
         }
     }
     
@@ -462,7 +463,7 @@ public class TileEntityFurnaces extends TileEntity implements IInventory, net.mi
      */
     public void smeltItem()
     {
-        if (this.canSmelt())
+        if (this.canSmeltSpecial())
         {
             ItemStack var1 = FurnaceRecipes.smelting().getSmeltingResult(this.furnaceItemStacks[0]);
         	ItemStack var2 = CarbonizationRecipes.smelting().getSmeltingResult(this.furnaceItemStacks[0]);
@@ -526,11 +527,87 @@ public class TileEntityFurnaces extends TileEntity implements IInventory, net.mi
      * Returns the number of ticks that the supplied fuel item will keep the furnace burning, or 0 if the item isn't
      * fuel
      */
-    public static int getItemBurnTime(ItemStack par0ItemStack)
+    public int getItemBurnTime(ItemStack par0ItemStack)
     {
         if (par0ItemStack == null)
         {
             return 0;
+        }
+        else if(par0ItemStack.getItem() instanceof IFuelContainer)
+        {
+        	//get the value
+        	int fuelValue = ((IFuelContainer)par0ItemStack.getItem()).getFuelValue(par0ItemStack);
+        	int value = (int) (1600);
+        	
+        	//if it's a number, reduce it by some amount, we're using standard coal or the value, whichever is smaller
+        	if(fuelValue == 0)
+        		return 0;
+        	else if(fuelValue >= value)
+        	{
+        		((IFuelContainer)par0ItemStack.getItem()).setFuel(par0ItemStack, -value, false);
+        		return value;
+        	}
+        	else
+        	{
+        		((IFuelContainer)par0ItemStack.getItem()).setFuel(par0ItemStack, 0, true);
+        		return fuelValue;
+        	}
+        }
+        else
+        {
+            int var1 = par0ItemStack.getItem().itemID;
+            Item var2 = par0ItemStack.getItem();
+
+            if (par0ItemStack.getItem() instanceof ItemBlock && Block.blocksList[var1] != null)
+            {
+                Block var3 = Block.blocksList[var1];
+
+                if (var3 == Block.woodSingleSlab)
+                {
+                    return 150;
+                }
+
+                if (var3.blockMaterial == Material.wood)
+                {
+                    return 300;
+                }
+            }
+
+            if (var2 instanceof ItemTool && ((ItemTool) var2).getToolMaterialName().equals("WOOD")) return 200;
+            if (var2 instanceof ItemSword && ((ItemSword) var2).getToolMaterialName().equals("WOOD")) return 200;
+            if (var2 instanceof ItemHoe && ((ItemHoe) var2).getMaterialName().equals("WOOD")) return 200;
+            if (var1 == Item.stick.itemID) return 100;
+            if (var1 == Item.coal.itemID) return 1600;
+            if (var1 == Item.bucketLava.itemID) return 20000;
+            if (var1 == Block.sapling.blockID) return 100;
+            if (var1 == Item.blazeRod.itemID) return 2400;
+            return GameRegistry.getFuelValue(par0ItemStack);
+        }
+    }
+    
+    public int checkItemBurnTime(ItemStack par0ItemStack)
+    {
+        if (par0ItemStack == null)
+        {
+            return 0;
+        }
+        else if(par0ItemStack.getItem() instanceof IFuelContainer)
+        {
+        	//get the value
+        	int fuelValue = ((IFuelContainer)par0ItemStack.getItem()).getFuelValue(par0ItemStack);
+        	int value = (int) (1600);
+        	
+        	//if it's a number, reduce it by some amount, we're using standard coal or the value, whichever is smaller
+        	if(fuelValue == 0)
+        		return 0;
+        	else if(fuelValue >= value)
+        	{
+        		return value;
+        	}
+        	else
+        	{
+        		return fuelValue;
+        	}
         }
         else
         {
@@ -567,9 +644,9 @@ public class TileEntityFurnaces extends TileEntity implements IInventory, net.mi
     /**
      * Return true if item is a fuel source (getItemBurnTime() > 0).
      */
-    public static boolean isItemFuel(ItemStack par0ItemStack)
+    public boolean isItemFuel(ItemStack par0ItemStack)
     {
-        return getItemBurnTime(par0ItemStack) > 0;
+        return checkItemBurnTime(par0ItemStack) > 0;
     }
     
     public void handlePacketData(int[] items)
@@ -637,13 +714,12 @@ public class TileEntityFurnaces extends TileEntity implements IInventory, net.mi
         return j != 0 || i != 1 || itemstack.itemID == Item.bucketEmpty.itemID;
 	}
 }
+
 /*******************************************************************************
-* Copyright (c) 2013 Malorolam.
+* Copyright (c) 2014 Malorolam.
 * 
 * All rights reserved. This program and the accompanying materials
-* are made available under the terms of the GNU Public License v3.0
-* which accompanies this distribution, and is available at
-* http://www.gnu.org/licenses/gpl.html
-* 
+* are made available under the terms of the included license, which is also
+* available at http://carbonization.wikispaces.com/License
 * 
 *********************************************************************************/

@@ -14,12 +14,12 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
+import mal.api.IFuelContainer;
 import mal.carbonization.CarbonizationRecipes;
-import mal.carbonization.ColorReference;
-import mal.carbonization.ITileEntityMultiblock;
 import mal.carbonization.carbonization;
-import mal.carbonization.multiblock.*;
 import mal.carbonization.network.PacketHandler;
+import mal.core.ColorReference;
+import mal.core.multiblock.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.item.EntityItem;
@@ -409,12 +409,13 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
 	 * Will take all the inventory and save it to a NBT array to be loaded later.
 	 * Unused right now, doesn't work right
 	 */
-/*	public NBTTagCompound saveInventory()
+	public NBTTagCompound saveInventory()
 	{
 		NBTTagCompound nbt = new NBTTagCompound();
+		
 		NBTTagList input = new NBTTagList();
 
-		for (int i = 0; i < this.inputStacks.length; i++)
+		for (int i = 0; i < this.inputStacks.length; ++i)
 		{
 			if (this.inputStacks[i] != null)
 			{
@@ -429,14 +430,14 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
 			
 		NBTTagList output = new NBTTagList();
 
-    	for (int i = 0; i < this.outputStacks.length; i++)
+    	for (int i = 0; i < this.outputStacks.length; ++i)
     	{
     		if (this.outputStacks[i] != null)
     		{
     			NBTTagCompound var4 = new NBTTagCompound();
     			var4.setByte("Slot", (byte)i);
     			this.outputStacks[i].writeToNBT(var4);
-    			input.appendTag(var4);
+    			output.appendTag(var4);
     		}
     	}
 
@@ -456,27 +457,24 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
 			nbt.setTag("Jobs", list);
 		}
 		
-		NBTTagList slaglist = new NBTTagList();
+/*		NBTTagList slaglist = new NBTTagList();
 		for(String s: this.oreSlagInQueue.keySet())
 		{
 			NBTTagCompound slag = new NBTTagCompound();
 			slag.setString("SlagType", s);
-			slag.setInteger(s, oreSlagInQueue.get(s));
+			slag.setInteger("Value", oreSlagInQueue.get(s));
 			slaglist.appendTag(slag);
 		}
-		nbt.setTag("Slag", slaglist);
-		
-		nbt.setInteger("fuelTime", fuelStack);
+		nbt.setTag("Slag", slaglist);*/
         
         return nbt;
 	}
 	
 	
-	 * Will load up the inventory data
+	 //Will load up the inventory data
 	 
 	public void loadInventory(NBTTagCompound nbt)
 	{
-		System.out.println("loading inventory");
 		NBTTagList input = nbt.getTagList("inputItems");
 		for (int i = 0; i < input.tagCount(); ++i)
         {
@@ -500,7 +498,7 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
                 this.outputStacks[var5] = ItemStack.loadItemStackFromNBT(var4);
             }
         }
-
+		
 		NBTTagList list = nbt.getTagList("Jobs");
 		for(int i = 0; i<list.tagCount(); i++)
 		{
@@ -511,18 +509,16 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
 			//System.out.println("Rebuilt item: " + item.input.getDisplayName() + " (" + item.cookTime + "/" + item.maxCookTime + ")");
 		}
 		
-		NBTTagList slaglist = nbt.getTagList("Slag");
+/*		NBTTagList slaglist = nbt.getTagList("Slag");
 		if(slaglist.tagCount() > 0)
-			for(int j = 0; j<list.tagCount(); j++)
+			for(int j = 0; j<slaglist.tagCount(); j++)
 			{
 				NBTTagCompound tag = (NBTTagCompound)slaglist.tagAt(j);
 				String s = tag.getString("SlagType");
-				int value = tag.getInteger(s);
+				int value = tag.getInteger("Value");
 				this.addSlagToMap(s, value);
-			}
-		
-		this.fuelStack = nbt.getInteger("fuelTime");
-	}*/
+			}*/
+	}
 
 	@Override
 	public void initilize(Object[] params) {
@@ -546,7 +542,7 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
 		slagCapacity = oreCapacity*1000;
 		maxFuelCapacity = xsize*zsize*1500;
 		
-		slagDistribution = (int) Math.floor(300+(componentTiers[0]+componentTiers[1])*45);
+		slagDistribution = (int) Math.floor(300+(componentTiers[0]+componentTiers[1])*50);
 		double lv = Math.pow(xsize*ysize*zsize, 0.6);
 		fuelTimeModifier = (float) (1.6/Math.pow(componentTiers[0]-0.15*componentTiers[1]+1,0.8)*Math.log10(lv));
 		
@@ -620,7 +616,7 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
 		}
 		
 		//System.out.println("Jobs in Queue: " + this.numQueueJobs + ": " + worldObj.isRemote);
-		if(this.numQueueJobs == 0)
+		if(this.numQueueJobs <= 0)
 		{
 			this.grossCookTime = 0;
 			this.grossMaxCookTime = 0;
@@ -830,12 +826,13 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
 	{
 		if(item == null)
 			return false;
-		int time = getItemBurnTime(item);
-		if(time <= 0)
-			return false;
-		
+		int time = checkItemBurnTime(item);
 		if(getFuelStack()+time<=maxFuelCapacity)
 		{
+			time = getItemBurnTime(item);
+			if(time <= 0)
+				return false;
+		
 			setFuelStack(getFuelStack() + time);
 			return true;
 		}
@@ -847,11 +844,89 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
      * Returns the number of ticks that the supplied fuel item will keep the furnace burning, or 0 if the item isn't
      * fuel
      */
-    public static int getItemBurnTime(ItemStack par0ItemStack)
+    public int getItemBurnTime(ItemStack par0ItemStack)
     {
         if (par0ItemStack == null)
         {
             return 0;
+        }
+        else if(par0ItemStack.getItem() instanceof IFuelContainer)
+        {
+        	//get the value
+        	int fuelValue = ((IFuelContainer)par0ItemStack.getItem()).getFuelValue(par0ItemStack);
+        	int value = (int) (maxFuelCapacity-fuelStack);
+        	
+        	//if it's a number, reduce it by some amount, we're using standard coal or the value, whichever is smaller
+        	if(fuelValue == 0)
+        		return 0;
+        	else if(fuelValue >= value)
+        	{
+        		((IFuelContainer)par0ItemStack.getItem()).setFuel(par0ItemStack, -value, false);
+        		return value;
+        	}
+        	else
+        	{
+        		((IFuelContainer)par0ItemStack.getItem()).setFuel(par0ItemStack, 0, true);
+        		return fuelValue;
+        	}
+        }
+        else
+        {
+            int var1 = par0ItemStack.getItem().itemID;
+            Item var2 = par0ItemStack.getItem();
+
+            if (par0ItemStack.getItem() instanceof ItemBlock && Block.blocksList[var1] != null)
+            {
+                Block var3 = Block.blocksList[var1];
+
+                if (var3 == Block.woodSingleSlab)
+                {
+                    return 150;
+                }
+
+                if (var3.blockMaterial == Material.wood)
+                {
+                    return 300;
+                }
+                
+                if (var3 == Block.coalBlock)
+                {
+                    return 16000;
+                }
+            }
+
+            if (var1 == Item.stick.itemID) return 100;
+            if (var1 == Item.coal.itemID) return 1600;
+            if (var1 == Item.bucketLava.itemID) return 20000;
+            if (var1 == Block.sapling.blockID) return 100;
+            if (var1 == Item.blazeRod.itemID) return 2400;
+            return GameRegistry.getFuelValue(par0ItemStack);
+        }
+    }
+    
+    public int checkItemBurnTime(ItemStack par0ItemStack)
+    {
+        if (par0ItemStack == null)
+        {
+            return 0;
+        }
+        else if(par0ItemStack.getItem() instanceof IFuelContainer)
+        {
+        	//get the value
+        	int fuelValue = ((IFuelContainer)par0ItemStack.getItem()).getFuelValue(par0ItemStack);
+        	int value = (int) (maxFuelCapacity-fuelStack);
+        	
+        	//if it's a number, reduce it by some amount, we're using standard coal or the value, whichever is smaller
+        	if(fuelValue == 0)
+        		return 0;
+        	else if(fuelValue >= value)
+        	{
+        		return value;
+        	}
+        	else
+        	{
+        		return fuelValue;
+        	}
         }
         else
         {
@@ -952,14 +1027,17 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
 	    			action++;
 	    		}
     		}
-    		else if(getItemBurnTime(inputStacks[i])>0)//it's a bit of fuel
+    		else if(checkItemBurnTime(inputStacks[i])>0)//it's a bit of fuel
     		{
     			if(addFuel(inputStacks[i]))
     			{
-    				if(inputStacks[i].stackSize>1)
-    					inputStacks[i].stackSize -= 1;
-    				else
-    					inputStacks[i] = null;
+    				if(!(inputStacks[i].getItem() instanceof IFuelContainer))
+    				{
+    					if(inputStacks[i].stackSize>1)
+    						inputStacks[i].stackSize -= 1;
+    					else
+    						inputStacks[i] = null;
+    				}
     				action++;
     			}
     			else if(passFuel)
@@ -970,7 +1048,15 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
     		}
     		else//we don't know what to do, so just send the item to the output and let that deal with it
     		{
-    			if(insertOutputItem(inputStacks[i].copy(), i))
+    			if(inputStacks[i].getItem() instanceof IFuelContainer)
+    			{
+    				if(((IFuelContainer)inputStacks[i].getItem()).getFuelValue(inputStacks[i])<=0)
+    				{
+    	    			if(insertOutputItem(inputStacks[i].copy(), i))
+    	    				action++;
+    				}
+    			}
+    			else if(insertOutputItem(inputStacks[i].copy(), i))
     				action++;
     		}
     	}
@@ -1538,13 +1624,12 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
 	}
 
 }
+
 /*******************************************************************************
-* Copyright (c) 2013 Malorolam.
+* Copyright (c) 2014 Malorolam.
 * 
 * All rights reserved. This program and the accompanying materials
-* are made available under the terms of the GNU Public License v3.0
-* which accompanies this distribution, and is available at
-* http://www.gnu.org/licenses/gpl.html
-* 
+* are made available under the terms of the included license, which is also
+* available at http://carbonization.wikispaces.com/License
 * 
 *********************************************************************************/

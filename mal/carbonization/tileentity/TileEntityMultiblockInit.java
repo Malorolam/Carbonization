@@ -5,10 +5,10 @@ import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import mal.carbonization.carbonization;
-import mal.carbonization.multiblock.MultiBlockInstantiator;
-import mal.carbonization.multiblock.MultiBlockMatcher;
-import mal.carbonization.multiblock.Multiblock;
 import mal.carbonization.network.PacketHandler;
+import mal.core.multiblock.MultiBlockInstantiator;
+import mal.core.multiblock.MultiBlockMatcher;
+import mal.core.multiblock.Multiblock;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -190,13 +190,12 @@ public class TileEntityMultiblockInit extends TileEntity {
         return entityplayer.getDistanceSq((double) xCoord + 0.5D, (double) yCoord + 0.5D, (double) zCoord + 0.5D) <= 64D;
     }
 }
+
 /*******************************************************************************
-* Copyright (c) 2013 Malorolam.
+* Copyright (c) 2014 Malorolam.
 * 
 * All rights reserved. This program and the accompanying materials
-* are made available under the terms of the GNU Public License v3.0
-* which accompanies this distribution, and is available at
-* http://www.gnu.org/licenses/gpl.html
-* 
+* are made available under the terms of the included license, which is also
+* available at http://carbonization.wikispaces.com/License
 * 
 *********************************************************************************/

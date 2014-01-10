@@ -12,13 +12,13 @@ import mal.carbonization.blocks.BlockFurnaceControl;
 import mal.carbonization.blocks.BlockFurnaces;
 import mal.carbonization.blocks.BlockMultiblockFurnaceControl;
 import mal.carbonization.blocks.BlockStructureBlock;
-import mal.carbonization.blocks.TestBlock;
 import mal.carbonization.items.ItemBlockAutocraftingBench;
 import mal.carbonization.items.ItemBlockFuels;
 import mal.carbonization.items.ItemBlockFurnaces;
 import mal.carbonization.items.ItemBlockMultiblockFurnaceControl;
 import mal.carbonization.items.ItemDust;
 import mal.carbonization.items.ItemFuel;
+import mal.carbonization.items.ItemFuelCell;
 import mal.carbonization.items.ItemHHCompressor;
 import mal.carbonization.items.ItemHHPulverizer;
 import mal.carbonization.items.ItemHHPurifyer;
@@ -26,15 +26,8 @@ import mal.carbonization.items.ItemIngots;
 import mal.carbonization.items.ItemMisc;
 import mal.carbonization.items.ItemRecipeCharm;
 import mal.carbonization.items.ItemStructureBlock;
-import mal.carbonization.items.ItemTestBlock;
 import mal.carbonization.network.PacketHandler;
-import mal.carbonization.tileentity.TileEntityAutocraftingBench;
-import mal.carbonization.tileentity.TileEntityFuelConverter;
-import mal.carbonization.tileentity.TileEntityFurnaces;
-import mal.carbonization.tileentity.TileEntityMultiblockFurnace;
-import mal.carbonization.tileentity.TileEntityMultiblockInit;
-import mal.carbonization.tileentity.TileEntityStructureBlock;
-import mal.carbonization.tileentity.TileEntityTest;
+import mal.carbonization.tileentity.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
@@ -70,7 +63,7 @@ import cpw.mods.fml.common.registry.LanguageRegistry;
 import ic2.api.item.*;
 import ic2.api.recipe.RecipeInputItemStack;
 
-@Mod(modid="carbonization", name="Carbonization", version="0.8.7.1", dependencies = "required-after:Forge@[9.11,);required-after:FML@[6.4.30,)")
+@Mod(modid="carbonization", name="Carbonization", version="0.9.0.0", dependencies = "required-after:Forge@[9.11,);required-after:FML@[6.4.30,)")
 @NetworkMod(clientSideRequired=true, channels={"CarbonizationChn"}, packetHandler = PacketHandler.class)
 public class carbonization {
 
@@ -94,6 +87,7 @@ public class carbonization {
 	public static ItemStructureBlock itemStructureBlock;
 	public static BlockAutocraftingBench autocraftingBench;
 	public static ItemRecipeCharm recipeCharm;
+	public static ItemFuelCell fuelCell;
 	//public static TestBlock testBlock;
 	
 	int fuelID=9540;
@@ -112,6 +106,7 @@ public class carbonization {
 	int structureItemID = 9547;
 	int autocraftingBenchID = 1563;
 	int recipeCharmID = 9548;
+	int fuelCellID = 9549;
 	
 	//Difficulty modifier, the higher the number, the more time the metals take to bake
 	private int difficultyMod = 10;
@@ -152,6 +147,7 @@ public class carbonization {
     		ingotID = config.getItem("Ingot ID", 9546).getInt();
     		structureItemID = config.getItem("Structure Block ID", 9547).getInt();
     		recipeCharmID = config.getItem("Recipe Charm ID", 9548).getInt();
+    		fuelCellID = config.getItem("Fuel Cell ID", 9549).getInt();
     		blockID = config.getBlock("Block ID", 1560).getInt();
     		furnaceID = config.getBlock("Furnace ID", 1561).getInt();
     		furnaceID2 = config.getBlock("Active Furnace ID", 1562).getInt();
@@ -207,6 +203,7 @@ public class carbonization {
     		recipeCharm = new ItemRecipeCharm(recipeCharmID);
     		RecipeCharm = new ItemStack(recipeCharm,1);
     		itemStructureBlock = new ItemStructureBlock(structureItemID);
+    		fuelCell = new ItemFuelCell(fuelCellID);
     		fuelBlock = new BlockFuel(blockID,0,Material.rock).setStepSound(Block.soundStoneFootstep).setHardness(3F).setResistance(1.0F);
     		furnaceBlock = new BlockFurnaces(furnaceID,false);
     		furnaceBlockActive = new BlockFurnaces(furnaceID2, true);
@@ -229,19 +226,20 @@ public class carbonization {
     		
     		
     		GameRegistry.registerTileEntity(TileEntityFurnaces.class, "TileEntityFurnaces");
-    		GameRegistry.registerTileEntity(TileEntityTest.class, "TileEntityTest");
     		GameRegistry.registerTileEntity(TileEntityMultiblockInit.class, "TileEntityMultiblockInit");
     	
     		GameRegistry.registerTileEntity(TileEntityMultiblockFurnace.class, "TileEntityMultiblockFurnace");
     		GameRegistry.registerTileEntity(TileEntityStructureBlock.class, "TileEntityStructureBlock");
     		GameRegistry.registerTileEntity(TileEntityAutocraftingBench.class, "TileEntityAutocraftingBench");
     		GameRegistry.registerTileEntity(TileEntityFuelConverter.class,"TileEntityFuelConverter");
+    		GameRegistry.registerTileEntity(TileEntityFuelCellFiller.class,"TileEntityFuelCellFiller");
     		
     		
     		GameRegistry.registerBlock(fuelBlock, ItemBlockFuels.class, "fuelBlock");
     		GameRegistry.registerBlock(FurnaceControl, ItemBlockMultiblockFurnaceControl.class, "furnacecontrol");
     		GameRegistry.registerBlock(autocraftingBench, ItemBlockAutocraftingBench.class, "autocraftingbench");
     		GameRegistry.registerItem(itemStructureBlock, "itemStructureBlock");
+    		GameRegistry.registerItem(fuelCell, "fuelCell");
     		
     		//Names
     		//Fuels
@@ -303,6 +301,7 @@ public class carbonization {
     		LanguageRegistry.addName(new ItemStack(misc, 1, 18), "Coarse Threading");
     		LanguageRegistry.addName(new ItemStack(misc, 1, 19), "Fine Threading");
     		LanguageRegistry.addName(RecipeCharm, "Recipe Charm");
+    		LanguageRegistry.addName(fuelCell, "Fuel Cell");
     		
     		//Machines
     		LanguageRegistry.addName(new ItemStack(furnaceBlock,1,0), "Iron Furnace");
@@ -310,6 +309,7 @@ public class carbonization {
     		LanguageRegistry.addName(new ItemStack(furnaceBlock,1,2), "Insulated Steel Furnace");
     		LanguageRegistry.addName(new ItemStack(autocraftingBench,1,0), "Autocrafting Bench");
     		LanguageRegistry.addName(new ItemStack(autocraftingBench,1,1), "Fuel Conversion Bench");
+    		LanguageRegistry.addName(new ItemStack(autocraftingBench,1,2), "Fuel Cell Filler");
     		//Multiblock controls
     		LanguageRegistry.addName(new ItemStack(FurnaceControl), "Furnace Control System");
     		
@@ -499,21 +499,21 @@ public class carbonization {
 		if(ic)//ic2 so make the recipes for that too
 		{
 			try {
-				ic2.api.recipe.Recipes.macerator.addRecipe(new RecipeInputItemStack(new ItemStack(fuelBlock,1,0), 1), null, new ItemStack(dust,4,0));
-				ic2.api.recipe.Recipes.macerator.addRecipe(new RecipeInputItemStack(new ItemStack(fuelBlock,1,1), 1), null, new ItemStack(dust,4,1));
-				ic2.api.recipe.Recipes.macerator.addRecipe(new RecipeInputItemStack(new ItemStack(fuelBlock,1,2), 1), null, new ItemStack(dust,4,2));
-				ic2.api.recipe.Recipes.macerator.addRecipe(new RecipeInputItemStack(new ItemStack(fuelBlock,1,3), 1), null, new ItemStack(dust,4,3));
-				ic2.api.recipe.Recipes.macerator.addRecipe(new RecipeInputItemStack(new ItemStack(fuelBlock,1,4), 1), null, new ItemStack(dust,4,4));
-				ic2.api.recipe.Recipes.macerator.addRecipe(new RecipeInputItemStack(new ItemStack(fuelBlock,1,5), 1), null, new ItemStack(dust,4,5));
+				ic2.api.recipe.Recipes.macerator.addRecipe(new RecipeInputItemStack(new ItemStack(fuelBlock,1,0), 1), null, new ItemStack(dust,4,1));
+				ic2.api.recipe.Recipes.macerator.addRecipe(new RecipeInputItemStack(new ItemStack(fuelBlock,1,1), 1), null, new ItemStack(dust,4,2));
+				ic2.api.recipe.Recipes.macerator.addRecipe(new RecipeInputItemStack(new ItemStack(fuelBlock,1,2), 1), null, new ItemStack(dust,4,3));
+				ic2.api.recipe.Recipes.macerator.addRecipe(new RecipeInputItemStack(new ItemStack(fuelBlock,1,3), 1), null, new ItemStack(dust,4,4));
+				ic2.api.recipe.Recipes.macerator.addRecipe(new RecipeInputItemStack(new ItemStack(fuelBlock,1,4), 1), null, new ItemStack(dust,4,6));
+				ic2.api.recipe.Recipes.macerator.addRecipe(new RecipeInputItemStack(new ItemStack(fuelBlock,1,5), 1), null, new ItemStack(dust,4,7));
 				
-				/*ic2.api.recipe.Recipes.compressor.addRecipe(new RecipeInputItemStack(new ItemStack(dust,1,0),1), null, new ItemStack(Item.coal,1,0));
+				ic2.api.recipe.Recipes.compressor.addRecipe(new RecipeInputItemStack(new ItemStack(dust,1,0),1), null, new ItemStack(Item.coal,1,0));
 				ic2.api.recipe.Recipes.compressor.addRecipe(new RecipeInputItemStack(new ItemStack(dust,1,1),1), null, new ItemStack(fuel,1,0));
 				ic2.api.recipe.Recipes.compressor.addRecipe(new RecipeInputItemStack(new ItemStack(dust,1,2),1), null, new ItemStack(fuel,1,1));
 				ic2.api.recipe.Recipes.compressor.addRecipe(new RecipeInputItemStack(new ItemStack(dust,1,3),1), null, new ItemStack(fuel,1,2));
 				ic2.api.recipe.Recipes.compressor.addRecipe(new RecipeInputItemStack(new ItemStack(dust,1,4),1), null, new ItemStack(fuel,1,3));
 				ic2.api.recipe.Recipes.compressor.addRecipe(new RecipeInputItemStack(new ItemStack(dust,1,5),1), null, new ItemStack(Item.coal,1,1));
 				ic2.api.recipe.Recipes.compressor.addRecipe(new RecipeInputItemStack(new ItemStack(dust,1,6),1), null, new ItemStack(fuel,1,4));
-				ic2.api.recipe.Recipes.compressor.addRecipe(new RecipeInputItemStack(new ItemStack(dust,1,7),1), null, new ItemStack(fuel,1,5));*/
+				ic2.api.recipe.Recipes.compressor.addRecipe(new RecipeInputItemStack(new ItemStack(dust,1,7),1), null, new ItemStack(fuel,1,5));
 			}
 			catch(Exception e)
 			{
@@ -575,6 +575,8 @@ public class carbonization {
 		GameRegistry.addShapelessRecipe(new ItemStack(misc,1,16), new Object[]{HHComp, new ItemStack(misc, 1, 12), new ItemStack(misc, 1, 12), 
 			new ItemStack(misc, 1, 12), new ItemStack(misc, 1, 12), new ItemStack(misc, 1, 12), new ItemStack(misc, 1, 12), new ItemStack(misc, 1, 12), new ItemStack(misc, 1, 12)});
 		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(misc,2,17), new Object[]{"GGG", 'G', new ItemStack(misc,1,16)}));
+		
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(fuelCell,1,0), new Object[]{" S ", "SCS", " S ", 'S', "ingotSteel", 'C', new ItemStack(Item.coal,1,0)}));
 		
 		
 		
@@ -651,6 +653,8 @@ public class carbonization {
 					{"SDS", "SCS", "SFS", 'S', new ItemStack(itemStructureBlock,1,2000+i), 'D', Item.diamond, 'C', Block.workbench, 'F', new ItemStack(furnaceBlock,1,2)}));
 			CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(autocraftingBench,1,1), new Object[]
 					{"SSS", "PUC", "SFS", 'S', new ItemStack(itemStructureBlock,1,2000+i), 'P', HHPulv, 'U', HHPure, 'C', HHComp, 'F', new ItemStack(furnaceBlock,1,2)}));
+			CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(autocraftingBench,1,2), new Object[]
+					{"SSS", "PUP", "SDS", 'S', new ItemStack(itemStructureBlock,1,i), 'P', new ItemStack(itemStructureBlock,1,2000+i), 'U', Item.diamond, 'D', new ItemStack(fuelCell)}));
 		}
 	}
 	
@@ -660,6 +664,7 @@ public class carbonization {
 		
 		//basic structure blocks, basic recipes
 		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(itemStructureBlock,5,0), new Object[]{"x x", " y ", "x x", 'x', Block.ice, 'y', Block.ice}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(itemStructureBlock,1,0), new Object[]{"x x", " y ", "x x", 'x', Item.snowball, 'y', Block.ice}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(Block.ice), new Object[]{new ItemStack(itemStructureBlock,1,0)}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(itemStructureBlock,5,1), new Object[]{"x x", " y ", "x x", 'x', Block.planks, 'y', Block.planks}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(Block.planks), new Object[]{new ItemStack(itemStructureBlock,1,1)}));
@@ -857,6 +862,10 @@ public class carbonization {
 		CarbonizationRecipes.smelting().addInfoItem(new ItemStack(autocraftingBench,1,1), 10);
 		CarbonizationRecipes.smelting().addInfoItem(new ItemStack(autocraftingBench,1,1), 11);
 		
+		CarbonizationRecipes.smelting().addInfoItem(new ItemStack(autocraftingBench,1,2), 17);
+		
+		CarbonizationRecipes.smelting().addInfoItem(new ItemStack(fuelCell,1), 16);
+		
 		for(int i = 0; i < 3; i++)
 			CarbonizationRecipes.smelting().addInfoItem(new ItemStack(furnaceBlock, 1, i), 9);
 		
@@ -1004,13 +1013,12 @@ public class carbonization {
 
 	}
 }
+
 /*******************************************************************************
-* Copyright (c) 2013 Malorolam.
+* Copyright (c) 2014 Malorolam.
 * 
 * All rights reserved. This program and the accompanying materials
-* are made available under the terms of the GNU Public License v3.0
-* which accompanies this distribution, and is available at
-* http://www.gnu.org/licenses/gpl.html
-* 
+* are made available under the terms of the included license, which is also
+* available at http://carbonization.wikispaces.com/License
 * 
 *********************************************************************************/

@@ -1,8 +1,7 @@
 package mal.carbonization.network;
 
 import mal.carbonization.tileentity.TileEntityAutocraftingBench;
-import mal.carbonization.tileentity.TileEntityFuelConverter;
-import mal.carbonization.tileentity.TileEntityFurnaces;
+import mal.carbonization.tileentity.TileEntityFuelCellFiller;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
@@ -11,48 +10,45 @@ import net.minecraft.inventory.InventoryCraftResult;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.inventory.Slot;
 import net.minecraft.inventory.SlotCrafting;
-import net.minecraft.inventory.SlotFurnace;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
-import net.minecraft.item.crafting.FurnaceRecipes;
-import net.minecraft.tileentity.TileEntityFurnace;
 
-public class ContainerFuelConverter extends Container {
+public class ContainerFuelCellFiller extends Container {
 
-	private TileEntityFuelConverter bench;
+	private TileEntityFuelCellFiller bench;
+	
+    public InventoryCrafting craftMatrix = new InventoryCrafting(this, 3, 3);
+    public IInventory craftResult = new InventoryCraftResult();
     
     private boolean populating = false;
 	
-	public ContainerFuelConverter(InventoryPlayer par1InventoryPlayer, TileEntityFuelConverter par2)
+	public ContainerFuelCellFiller(InventoryPlayer par1InventoryPlayer, TileEntityFuelCellFiller par2)
 	{
 		bench = par2;
 		
 		//input
-		for(int i = 0; i<4; i++)
-			for(int j = 0; j<3; j++)
-				this.addSlotToContainer(new Slot(bench, i+j*4, 8+18*i, 80+18*j));
+		this.addSlotToContainer(new Slot(bench, 0, 39, 52));
+		for(int i = 0; i<3; i++)
+			this.addSlotToContainer(new Slot(bench, i+1, 21, 52-18*i));
+		
 		//output
-		for(int i = 0; i<4; i++)
-			for(int j = 0; j<3; j++)
-				this.addSlotToContainer(new Slot(bench, 12+i+j*4, 98+18*i, 80+18*j));
+		this.addSlotToContainer(new Slot(bench, 4, 99, 53));
 		
 		//upgrade
-		this.addSlotToContainer(new Slot(bench, 24, 134, 11));
-		this.addSlotToContainer(new Slot(bench, 25, 134, 29));
-		//fuel
-		this.addSlotToContainer(new Slot(bench, 26, 134, 47));
+		for(int i = 0; i < 3; i++)
+			this.addSlotToContainer(new Slot(bench, 5+i, 145, 16+18*i));
 		
 		for (int i = 0; i < 3; ++i)
         {
             for (int j = 0; j < 9; ++j)
             {
-                this.addSlotToContainer(new Slot(par1InventoryPlayer, j + i * 9 + 9, 8 + j * 18, 139 + i * 18));
+                this.addSlotToContainer(new Slot(par1InventoryPlayer, j + i * 9 + 9, 8 + j * 18, 84 + i * 18));
             }
         }
 
         for (int i = 0; i < 9; ++i)
         {
-            this.addSlotToContainer(new Slot(par1InventoryPlayer, i, 8 + i * 18, 196));
+            this.addSlotToContainer(new Slot(par1InventoryPlayer, i, 8 + i * 18, 142));
         }
 	}
 	@Override
@@ -75,9 +71,9 @@ public class ContainerFuelConverter extends Container {
             ItemStack var5 = var4.getStack();
             var3 = var5.copy();
 
-            if(slot>=0 && slot <12)//input
+            if(slot>=0 && slot <4)//input
             {
-            	if (!this.mergeItemStack(var5, 35, 63, true))
+            	if (!this.mergeItemStack(var5, 8, 44, true))
                 {
                     return null;
                 }
@@ -85,40 +81,39 @@ public class ContainerFuelConverter extends Container {
                 var4.onSlotChange(var5, var3);
 
             }
-            else if(slot>=12 && slot <24)//output
+            else if(slot>=4 && slot <5)//output
             {
-            	if (!this.mergeItemStack(var5, 35, 63, true))
-                {
-                    return null;
-                }
-
-                var4.onSlotChange(var5, var3);
-
-            }
-            else if (slot >= 24 && slot < 27)//upgrade
-            {
-                if (!this.mergeItemStack(var5, 35, 63, true))
+            	if (!this.mergeItemStack(var5, 8, 44, true))
                 {
                     return null;
                 }
 
                 var4.onSlotChange(var5, var3);
             }
-            else if (slot > 26)//inventory
+            else if (slot >=5 && slot < 8)//upgrade
             {
-                if (slot > 26 && slot < 53)
+            	if (!this.mergeItemStack(var5, 8, 44, true))
                 {
-                    if (!this.mergeItemStack(var5, 0, 12, false))
-                    {
-                        return null;
-                    }
+                    return null;
                 }
-                else if (!this.mergeItemStack(var5, 27, 53, false))
+
+                var4.onSlotChange(var5, var3);
+            }
+            else if (slot >= 8 && bench.canInsertItem(0, var5, 0))//inventory
+            {
+            	if (!this.mergeItemStack(var5, 0, 4, false))
+            	{
+            		return null;
+            	}
+            }
+            else if (slot < 35)
+            {
+            	if (!this.mergeItemStack(var5, 35, 44, false))
                 {
                     return null;
                 }
             }
-            else if (!this.mergeItemStack(var5, 36, 63, false))
+            else if (!this.mergeItemStack(var5, 8, 44, false))
             {
                 return null;
             }

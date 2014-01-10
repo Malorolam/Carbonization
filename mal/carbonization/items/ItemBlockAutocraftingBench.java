@@ -5,7 +5,7 @@ import java.util.Random;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import mal.carbonization.ColorReference;
+import mal.core.ColorReference;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
@@ -33,6 +33,11 @@ public class ItemBlockAutocraftingBench extends ItemBlock {
 			list.add(setTooltipData("This machine allows for fuel", ColorReference.LIGHTRED));
 			list.add(setTooltipData("to be converted without", ColorReference.LIGHTRED));
 			list.add(setTooltipData("your input", ColorReference.LIGHTRED));
+			break;
+		case 2:
+			list.add(setTooltipData("This machine allows for fuel", ColorReference.LIGHTRED));
+			list.add(setTooltipData("to be compressed into a", ColorReference.LIGHTRED));
+			list.add(setTooltipData("fuel cell", ColorReference.LIGHTRED));
 			break;
 		default:
 			list.add(setTooltipData("This isn't even a workbench!",ColorReference.DARKRED));
@@ -82,13 +87,12 @@ public class ItemBlockAutocraftingBench extends ItemBlock {
 	}
 
 }
+
 /*******************************************************************************
-* Copyright (c) 2013 Malorolam.
+* Copyright (c) 2014 Malorolam.
 * 
 * All rights reserved. This program and the accompanying materials
-* are made available under the terms of the GNU Public License v3.0
-* which accompanies this distribution, and is available at
-* http://www.gnu.org/licenses/gpl.html
-* 
+* are made available under the terms of the included license, which is also
+* available at http://carbonization.wikispaces.com/License
 * 
 *********************************************************************************/

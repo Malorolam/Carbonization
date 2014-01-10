@@ -1,4 +1,4 @@
-package mal.carbonization.multiblock;
+package mal.core.multiblock;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -69,3 +69,12 @@ public class MultiblockWorkQueueItem {
 		}
 	}
 }
+
+/*******************************************************************************
+* Copyright (c) 2014 Malorolam.
+* 
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the included license, which is also
+* available at http://carbonization.wikispaces.com/License
+* 
+*********************************************************************************/

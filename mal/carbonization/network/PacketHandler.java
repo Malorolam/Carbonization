@@ -10,6 +10,7 @@ import com.google.common.io.ByteStreams;
 
 import mal.carbonization.tileentity.*;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.Packet250CustomPayload;
@@ -105,14 +106,6 @@ public class PacketHandler implements IPacketHandler {
 					
 					boolean passFuel = data.readBoolean();
 					
-					int itemSize = data.readInt();
-					
-					int[] items = new int[itemSize];
-					for(int i = 0; i < itemSize; i++)
-					{
-						items[i] = data.readInt();
-					}
-					
 					int mapSize = data.readInt();
 					HashMap<String, Integer> oreSlagInQueue = new HashMap<String, Integer>();
 					for(int j = 0; j<mapSize; j++)
@@ -121,6 +114,10 @@ public class PacketHandler implements IPacketHandler {
 						int slagValues = data.readInt();
 						oreSlagInQueue.put(slagTypes, slagValues);
 					}
+					short short1 = data.readShort();
+					byte[] abyte = new byte[short1];
+					data.readFully(abyte);
+					
 					
 					TileEntityMultiblockFurnace fte = (TileEntityMultiblockFurnace)te;
 					fte.xsize = xsize;
@@ -130,12 +127,12 @@ public class PacketHandler implements IPacketHandler {
 					fte.componentTiers = comptT;
 					fte.passFuel = passFuel;
 					fte.calculateData();
-					fte.recoverIntList(items);
 					fte.slagTank = slagVolume;
 					fte.setFuelStack(fuelTime);
 					//System.out.println("In: " + grossCookTime + "/" + grossMaxCookTime + " Remote: " + fte.worldObj.isRemote);
 					fte.setGrossCookTime(grossCookTime);
 					fte.setGrossMaxCookTime(grossMaxCookTime);
+					fte.loadInventory(CompressedStreamTools.decompress(abyte));
 					fte.setOreMap(oreSlagInQueue);
 					
 				}
@@ -147,13 +144,9 @@ public class PacketHandler implements IPacketHandler {
 					int process = data.readInt();
 					int cooldown = data.readInt();
 					
-					int itemSize = data.readInt();
-					
-					int[] items = new int[itemSize];
-					for(int i = 0; i < itemSize; i++)
-					{
-						items[i] = data.readInt();
-					}
+					short short1 = data.readShort();
+					byte[] abyte = new byte[short1];
+					data.readFully(abyte);
 					
 					TileEntityAutocraftingBench ate = (TileEntityAutocraftingBench) te;
 					ate.updating = true;
@@ -163,7 +156,7 @@ public class PacketHandler implements IPacketHandler {
 					ate.upgradeTier = upgrade;
 					ate.processTime = process;
 					ate.craftingCooldown = cooldown;
-					ate.recoverIntList(items);
+					ate.loadInventory(CompressedStreamTools.decompress(abyte));
 					ate.updating = false;
 				}
 				else if(te instanceof TileEntityFuelConverter)
@@ -177,13 +170,9 @@ public class PacketHandler implements IPacketHandler {
 					int cooldown = data.readInt();
 					int currentIndex = data.readInt();
 					
-					int itemSize = data.readInt();
-					
-					int[] items = new int[itemSize];
-					for(int i = 0; i < itemSize; i++)
-					{
-						items[i] = data.readInt();
-					}
+					short short1 = data.readShort();
+					byte[] abyte = new byte[short1];
+					data.readFully(abyte);
 					
 					TileEntityFuelConverter ate = (TileEntityFuelConverter) te;
 					
@@ -195,6 +184,25 @@ public class PacketHandler implements IPacketHandler {
 					ate.craftingCooldown = cooldown;
 					ate.makeDust = makeDust;
 					ate.currentIndex = currentIndex;
+					ate.loadInventory(CompressedStreamTools.decompress(abyte));
+					ate.calculateProcessTime();
+				}
+				else if(te instanceof TileEntityFuelCellFiller)
+				{
+					int craftingcooldown = data.readInt();
+					int processtime = data.readInt();
+					double speedupgrade = data.readDouble();
+					int itemSize = data.readInt();
+					int[] items = new int[itemSize];
+					for(int i = 0; i < itemSize; i++)
+					{
+						items[i] = data.readInt();
+					}
+					
+					TileEntityFuelCellFiller ate = (TileEntityFuelCellFiller) te;
+					ate.craftingCooldown = craftingcooldown;
+					ate.processTime = processtime;
+					ate.speedUpgrade = speedupgrade;
 					ate.recoverIntList(items);
 					ate.calculateProcessTime();
 				}
@@ -305,8 +313,8 @@ public class PacketHandler implements IPacketHandler {
 			boolean passFuel = fte.passFuel;
 			//System.out.println(passFuel);
 			
-			int[] items = fte.buildIntList();
-			int itemSize = items.length;
+/*			int[] items = fte.buildIntList();
+			int itemSize = items.length;*/
 			
 			String[] slagTypes = new String[fte.getOreMap().keySet().size()];
 			for(int i = 0; i < slagTypes.length; i++)
@@ -335,12 +343,6 @@ public class PacketHandler implements IPacketHandler {
 				dos.writeInt(grossCookTime);
 				dos.writeInt(grossMaxCookTime);
 				dos.writeBoolean(passFuel);
-				dos.writeInt(itemSize);
-				
-				for(int i = 0; i < itemSize; i++)
-				{
-					dos.writeInt(items[i]);
-				}
 				
 				dos.writeInt(slagTypes.length);
 				for(int j = 0; j<slagTypes.length; j++)
@@ -348,6 +350,10 @@ public class PacketHandler implements IPacketHandler {
 					dos.writeUTF(slagTypes[j]);
 					dos.writeInt(slagValues[j]);
 				}
+				byte[] abyte = CompressedStreamTools.compress(fte.saveInventory());
+				dos.writeShort((short)abyte.length);
+				dos.write(abyte);
+				
 			}
 			catch (IOException e)
 			{
@@ -363,10 +369,6 @@ public class PacketHandler implements IPacketHandler {
 			double upgrade = ate.upgradeTier;
 			int process = ate.processTime;
 			int cooldown = ate.craftingCooldown;
-		
-			
-			int[] items = ate.buildIntList();
-			int itemSize = items.length;
 			
 			try
 			{
@@ -375,12 +377,9 @@ public class PacketHandler implements IPacketHandler {
 				dos.writeDouble(upgrade);
 				dos.writeInt(process);
 				dos.writeInt(cooldown);
-				dos.writeInt(itemSize);
-				
-				for(int i = 0; i < itemSize; i++)
-				{
-					dos.writeInt(items[i]);
-				}
+				byte[] abyte = CompressedStreamTools.compress(ate.saveInventory());
+				dos.writeShort((short)abyte.length);
+				dos.write(abyte);
 			}
 			catch(IOException e)
 			{
@@ -400,10 +399,6 @@ public class PacketHandler implements IPacketHandler {
 			int cooldown = ate.craftingCooldown;
 			boolean makeDust = ate.makeDust;
 			int currentIndex = ate.currentIndex;
-		
-			
-			int[] items = ate.buildIntList();
-			int itemSize = items.length;
 			
 			try
 			{
@@ -415,16 +410,39 @@ public class PacketHandler implements IPacketHandler {
 				dos.writeInt(process);
 				dos.writeInt(cooldown);
 				dos.writeInt(currentIndex);
-				dos.writeInt(itemSize);
+				byte[] abyte = CompressedStreamTools.compress(ate.saveInventory());
+				dos.writeShort((short)abyte.length);
+				dos.write(abyte);
+			}
+			catch(IOException e)
+			{
+				System.out.println("RAAWR");
+			}
+		}
+		else if(te instanceof TileEntityFuelCellFiller)
+		{
+			TileEntityFuelCellFiller ate = (TileEntityFuelCellFiller) te;
+			int craftingcooldown = ate.craftingCooldown;
+			int processtime = ate.processTime;
+			double speedupgrade = ate.speedUpgrade;
+			int[] items = ate.buildIntList();
+			int itemsize = items.length;
+			
+			try
+			{
+				dos.writeInt(craftingcooldown);
+				dos.writeInt(processtime);
+				dos.writeDouble(speedupgrade);
+				dos.writeInt(itemsize);
 				
-				for(int i = 0; i < itemSize; i++)
+				for(int i = 0; i < itemsize; i++)
 				{
 					dos.writeInt(items[i]);
 				}
 			}
 			catch(IOException e)
 			{
-				System.out.println("RAAWR");
+				System.out.println("RAWR.RAR");
 			}
 		}
 		else
@@ -446,13 +464,12 @@ public class PacketHandler implements IPacketHandler {
 		return pak;
 	}
 }
+
 /*******************************************************************************
-* Copyright (c) 2013 Malorolam.
+* Copyright (c) 2014 Malorolam.
 * 
 * All rights reserved. This program and the accompanying materials
-* are made available under the terms of the GNU Public License v3.0
-* which accompanies this distribution, and is available at
-* http://www.gnu.org/licenses/gpl.html
-* 
+* are made available under the terms of the included license, which is also
+* available at http://carbonization.wikispaces.com/License
 * 
 *********************************************************************************/

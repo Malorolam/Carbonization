@@ -45,6 +45,10 @@ public class CarbonizationInfo {
 			return fuelInfo3();
 		case 15://recipe charm page 1
 			return recipeCharmInfo();
+		case 16://fuel cell page 1
+			return fuelCellInfo();
+		case 17://fuel cell filler page 1
+			return fuelCellBenchInfo();
 		default:
 			return defaultInfo();
 		}
@@ -358,14 +362,46 @@ public class CarbonizationInfo {
 		list.add("detected.");
 		return list;
 	}
+	
+	private static List<String> fuelCellInfo()
+	{
+		List<String> list = new ArrayList<String>();
+		
+		list.add("Fuel Cell:");
+		list.add("");
+		list.add("This item allows you to store a");
+		list.add("large amount of fuel time in a");
+		list.add("single item for use in other");
+		list.add("machines.  Once fuel is converted");
+		list.add("it cannot be converted back to");
+		list.add("solid form.");
+		
+		return list;
+	}
+	
+	private static List<String> fuelCellBenchInfo()
+	{
+		List<String> list = new ArrayList<String>();
+		
+		list.add("Fuel Cell Filler:");
+		list.add("");
+		list.add("This machine allows you to fill");
+		list.add("a fuel cell, placed in the large");
+		list.add("inventory slot with fuel placed");
+		list.add("in the slots to the left.  The");
+		list.add("machine can be sped up by placing");
+		list.add("structure blocks in the upgrade");
+		list.add("slots on the right.");
+		
+		return list;
+	}
 }
+
 /*******************************************************************************
-* Copyright (c) 2013 Malorolam.
+* Copyright (c) 2014 Malorolam.
 * 
 * All rights reserved. This program and the accompanying materials
-* are made available under the terms of the GNU Public License v3.0
-* which accompanies this distribution, and is available at
-* http://www.gnu.org/licenses/gpl.html
-* 
+* are made available under the terms of the included license, which is also
+* available at http://carbonization.wikispaces.com/License
 * 
 *********************************************************************************/

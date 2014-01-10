@@ -1,0 +1,48 @@
+Carbonization License:
+-Version 1, applied 10 January 2014 
+
+Terms and Conditions:
+0: Definitions
+-Mod refers to Carbonization, a piece of software that interfaces with the Minecraft client to extend, add, change, or remove original capabilities.
+-Owner refers to the original author(s) of the mod, which at this time is the user under the Minecraft id Malorolam.  Under the copyright terms accepted when purchasing Minecraft (http://www.minecraft.net/copyright.jsp) the owner has full rights over their mod despite use of Mojang code.
+-User refers to the end user of the mod, i.e., the person installing the mod.
+-Features refer to any mechanics or in-game feature (items, blocks, enchantments, entities, etc.) added or modified by the mod.  Graphical artifacts (item/block textures, guis, sounds, etc.) are not considered features.
+
+1: General
+-Usage of the mod, either in .jar or source code form constitutes a complete and unconditional agreement with the following terms.
+
+2: Liability
+-Carbonization is provided "as is" with no warranties, implied or otherwise.  The owner of the mod takes no responsibility for and damages incurred from the use of the mod.  Carbonization alters fundamental parts of the Minecraft game, and parts of Minecraft may not work with the mod installed.  All damages caused from the use or misuse of the mod falls on the user. 
+
+3: Use
+-Use of the mod to be installed, manually or automatically, is given to the user without restriction.
+ 
+4: Redistribution
+-The mod MAY NOT be publicly re-uploaded or mirrored by anyone other then the owner.  All public links to the mod must link to an official webpage or forum post, not directly to the download.  Any unauthorized links that bypass an official page will be discovered and forced to be deleted.  ANY attempt to generate revenue off the mod (selling either original or modified versions, adfly/other advertising sites, restricting content to players to coerce donations, etc.) are strictly forbidden and the owner may claim damages or take other action to rectify the situation.   
+
+5: Derivative Works
+-The mod is provided freely in both .jar and source code versions for private use, for the primary purpose of the improvement of the Minecraft community as a whole.  Public distribution of modified versions of the mod requires advance written permission from the owner and may be subject to additional terms.  Distribution of the source code, modified or otherwise, is prohibited by anyone except the owner, except in the case of an approved derivative work.
+-Using the source code from the mod for the purposes of interfacing other Minecraft modifications to this mod is permitted without any permission provided that the interfacing does not remove or restrict features of the mod.  
+ 
+6: Addons and Modifications
+-Addons and modifications that remove or restrict features of the mod are strictly forbidden without express permission from the owner.  
+-Addons that simply add new features without modifying existing ones are permitted without permission, although the owner may rescind this permission if the addon is deemed damaging to the mod.
+
+
+Modpack Permissions:
+0: Definitions
+-Modpacks refer to a collection of mods assembled for simplifying the creation and maintenance of a modded Minecraft environment for some number of users.  They are defined in three categories:
+--Private, where the pack is only available for an individual or a small group of pre-defined individuals (i.e., just for you and your buddies)
+--Semi-Private, where the pack is made available to a specific number of users that is not pre-defined but is restricted (i.e. a private server)
+--Public, where the pack is available to any individual, regardless of existing connection to the creator of the pack (i.e. a public server or launcher such as FTB)
+
+1: Use
+-Private, or personal-use packs may be created and used without any permission required.  Public redistribution is forbidden without prior permission.
+-Semi-Private, or private server packs can be created and used without express permission, although notification is strongly recommended.  Public redistribution is forbidden without prior permission.
+-Public packs REQUIRE express permission from the owner.  Until such permission is given in written form from the owner, permission is denied.  Releasing a public pack without this permission will be considered a direct attack on the owner's intellectual property and the pack will be taken down. 
+
+2: Usage Terms
+Approved modpacks must follow the terms detailed below.  Failure to do so will result in any permission, explicit or assumed, rescinded and the pack will be dealt with accordingly.
+-1: The pack must not be allowed to be publicly redistributed or reuploaded, in either individual parts or as a whole, by anyone other then an owner of the pack.
+-2: The pack must not contain any modification or mechanic that restricts or removes any feature of the mod, either accidental or intentional.  
+-3: The pack may not be only available through an income generation method, either directly from purchase or donation or indirectly by an ad revenue service.

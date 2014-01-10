@@ -1,11 +1,10 @@
-package mal.carbonization.multiblock;
+package mal.core.multiblock;
 
 import java.util.logging.Level;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.relauncher.Side;
-import mal.carbonization.ITileEntityMultiblock;
 import mal.carbonization.carbonization;
 import mal.carbonization.tileentity.TileEntityMultiblockFurnace;
 import mal.carbonization.tileentity.TileEntityMultiblockInit;
@@ -15,7 +14,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
 //Used to calculate and create the multiblock
-//Totally doesn't work right...
 public class MultiBlockInstantiator {
 	
 	public MultiBlockInstantiator()
@@ -386,13 +384,12 @@ public class MultiBlockInstantiator {
 		return true;
 	}
 }
+
 /*******************************************************************************
-* Copyright (c) 2013 Malorolam.
+* Copyright (c) 2014 Malorolam.
 * 
 * All rights reserved. This program and the accompanying materials
-* are made available under the terms of the GNU Public License v3.0
-* which accompanies this distribution, and is available at
-* http://www.gnu.org/licenses/gpl.html
-* 
+* are made available under the terms of the included license, which is also
+* available at http://carbonization.wikispaces.com/License
 * 
 *********************************************************************************/

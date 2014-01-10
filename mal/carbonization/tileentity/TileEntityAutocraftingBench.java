@@ -8,11 +8,12 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
+import mal.api.IFuelContainer;
 import mal.carbonization.CarbonizationRecipes;
 import mal.carbonization.carbonization;
 import mal.carbonization.items.ItemStructureBlock;
-import mal.carbonization.multiblock.MultiblockWorkQueueItem;
 import mal.carbonization.network.PacketHandler;
+import mal.core.multiblock.MultiblockWorkQueueItem;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.item.EntityItem;
@@ -20,7 +21,10 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemHoe;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemSword;
+import net.minecraft.item.ItemTool;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.packet.Packet;
@@ -144,17 +148,17 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
 		
 		if(upgradeStacks[1] != null)
 		{
-			if(getItemBurnTime(upgradeStacks[1])>0)//it's a bit of fuel
+			if(addFuel(upgradeStacks[1]))
 			{
-				if(addFuel(upgradeStacks[1]))
+				if(!(upgradeStacks[1].getItem() instanceof IFuelContainer))
 				{
 					if(upgradeStacks[1].stackSize>1)
 						upgradeStacks[1].stackSize -= 1;
 					else
 						upgradeStacks[1] = null;
-					
-					action = true;
 				}
+					
+				action = true;
 			}
 		}
 		return action;
@@ -327,6 +331,102 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
     	return action;
     }
     
+	/*
+	 * Will take all the inventory and save it to a NBT array to be loaded later.
+	 * Unused right now, doesn't work right
+	 */
+	public NBTTagCompound saveInventory()
+	{
+		NBTTagCompound nbt = new NBTTagCompound();
+		
+		NBTTagList input = new NBTTagList();
+
+		for (int i = 0; i < this.inputStacks.length; ++i)
+		{
+			if (this.inputStacks[i] != null)
+			{
+				NBTTagCompound var4 = new NBTTagCompound();
+				var4.setByte("Slot", (byte)i);
+				this.inputStacks[i].writeToNBT(var4);
+				input.appendTag(var4);
+			}
+		}
+			
+		nbt.setTag("inputItems", input);
+			
+		NBTTagList output = new NBTTagList();
+
+    	for (int i = 0; i < this.outputStacks.length; ++i)
+    	{
+    		if (this.outputStacks[i] != null)
+    		{
+    			NBTTagCompound var4 = new NBTTagCompound();
+    			var4.setByte("Slot", (byte)i);
+    			this.outputStacks[i].writeToNBT(var4);
+    			output.appendTag(var4);
+    		}
+    	}
+
+        nbt.setTag("outputItems", output);
+        
+        NBTTagList upgrade = new NBTTagList();
+		for(int i = 0; i < upgradeStacks.length; i++)
+		{
+			if(this.upgradeStacks[i] != null)
+			{
+				NBTTagCompound var4 = new NBTTagCompound();
+				var4.setByte("Slot", (byte)i);
+				this.upgradeStacks[i].writeToNBT(var4);
+				output.appendTag(var4);
+			}
+		}
+		nbt.setTag("Upgrade", upgrade);
+        
+        return nbt;
+	}
+	
+	
+	 //Will load up the inventory data
+	 
+	public void loadInventory(NBTTagCompound nbt)
+	{
+		NBTTagList input = nbt.getTagList("inputItems");
+		for (int i = 0; i < input.tagCount(); ++i)
+        {
+            NBTTagCompound var4 = (NBTTagCompound)input.tagAt(i);
+            byte var5 = var4.getByte("Slot");
+
+            if (var5 >= 0 && var5 < this.inputStacks.length)
+            {
+                this.inputStacks[var5] = ItemStack.loadItemStackFromNBT(var4);
+            }
+        }
+		
+		NBTTagList output = nbt.getTagList("outputItems");
+		for (int i = 0; i < output.tagCount(); ++i)
+        {
+            NBTTagCompound var4 = (NBTTagCompound)output.tagAt(i);
+            byte var5 = var4.getByte("Slot");
+
+            if (var5 >= 0 && var5 < this.outputStacks.length)
+            {
+                this.outputStacks[var5] = ItemStack.loadItemStackFromNBT(var4);
+            }
+        }
+		
+		NBTTagList list = nbt.getTagList("Upgrade");
+		for(int i = 0; i<list.tagCount(); i++)
+		{
+            NBTTagCompound var4 = (NBTTagCompound)list.tagAt(i);
+            byte var5 = var4.getByte("Slot");
+
+            if (var5 >= 0 && var5 < this.upgradeStacks.length)
+            {
+                this.upgradeStacks[var5] = ItemStack.loadItemStackFromNBT(var4);
+            }
+		}
+	}
+	
     private boolean canCraft() {
 		if(craftingCooldown > 0 || fuelTank < getFuelUsage())
 			return false;
@@ -510,11 +610,32 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
      * Returns the number of ticks that the supplied fuel item will keep the furnace burning, or 0 if the item isn't
      * fuel
      */
-    public static int getItemBurnTime(ItemStack par0ItemStack)
+    public int getItemBurnTime(ItemStack par0ItemStack)
     {
         if (par0ItemStack == null)
         {
             return 0;
+        }
+        else if(par0ItemStack.getItem() instanceof IFuelContainer)
+        {
+        	//get the value
+        	int fuelValue = ((IFuelContainer)par0ItemStack.getItem()).getFuelValue(par0ItemStack);
+        	int value = (int) (maxFuelCapacity-fuelTank);
+        	System.out.println("fuelvalue: " + fuelValue + " value: " + value);
+        	
+        	//if it's a number, reduce it by some amount, we're using standard coal or the value, whichever is smaller
+        	if(fuelValue == 0)
+        		return 0;
+        	else if(fuelValue >= value)
+        	{
+        		((IFuelContainer)par0ItemStack.getItem()).setFuel(par0ItemStack, -value, false);
+        		return value;
+        	}
+        	else
+        	{
+        		((IFuelContainer)par0ItemStack.getItem()).setFuel(par0ItemStack, 0, true);
+        		return fuelValue;
+        	}
         }
         else
         {
@@ -549,6 +670,63 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
             return GameRegistry.getFuelValue(par0ItemStack);
         }
     }
+    
+    public int checkItemBurnTime(ItemStack par0ItemStack)
+    {
+        if (par0ItemStack == null)
+        {
+            return 0;
+        }
+        else if(par0ItemStack.getItem() instanceof IFuelContainer)
+        {
+        	//get the value
+        	int fuelValue = ((IFuelContainer)par0ItemStack.getItem()).getFuelValue(par0ItemStack);
+        	int value = (int) (maxFuelCapacity-fuelTank);
+        	
+        	//if it's a number, reduce it by some amount, we're using standard coal or the value, whichever is smaller
+        	if(fuelValue == 0)
+        		return 0;
+        	else if(fuelValue >= value)
+        	{
+        		return value;
+        	}
+        	else
+        	{
+        		return fuelValue;
+        	}
+        }
+        else
+        {
+            int var1 = par0ItemStack.getItem().itemID;
+            Item var2 = par0ItemStack.getItem();
+
+            if (par0ItemStack.getItem() instanceof ItemBlock && Block.blocksList[var1] != null)
+            {
+                Block var3 = Block.blocksList[var1];
+
+                if (var3 == Block.woodSingleSlab)
+                {
+                    return 150;
+                }
+
+                if (var3.blockMaterial == Material.wood)
+                {
+                    return 300;
+                }
+            }
+
+            if (var2 instanceof ItemTool && ((ItemTool) var2).getToolMaterialName().equals("WOOD")) return 200;
+            if (var2 instanceof ItemSword && ((ItemSword) var2).getToolMaterialName().equals("WOOD")) return 200;
+            if (var2 instanceof ItemHoe && ((ItemHoe) var2).getMaterialName().equals("WOOD")) return 200;
+            if (var1 == Item.stick.itemID) return 100;
+            if (var1 == Item.coal.itemID) return 1600;
+            if (var1 == Item.bucketLava.itemID) return 20000;
+            if (var1 == Block.sapling.blockID) return 100;
+            if (var1 == Item.blazeRod.itemID) return 2400;
+            return GameRegistry.getFuelValue(par0ItemStack);
+        }
+    }
+
     
 	public int getFuelUsagePercent()
 	{
@@ -1321,7 +1499,6 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
 
 	@Override
 	public boolean isInvNameLocalized() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -1348,7 +1525,7 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
 		if(slot<inputStacks.length)
 			return true;
 		if(slot == 35)
-			if(getItemBurnTime(itemstack) > 0)
+			if(checkItemBurnTime(itemstack) > 0)
 				return true;
 		return false;
 	}
@@ -1369,13 +1546,11 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
 
 	@Override
 	public void openChest() {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void closeChest() {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -1412,13 +1587,12 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
 	}
 
 }
+
 /*******************************************************************************
- * Copyright (c) 2013 Malorolam.
- * 
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the GNU Public License v3.0
- * which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/gpl.html
- * 
- * 
- *********************************************************************************/
+* Copyright (c) 2014 Malorolam.
+* 
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the included license, which is also
+* available at http://carbonization.wikispaces.com/License
+* 
+*********************************************************************************/

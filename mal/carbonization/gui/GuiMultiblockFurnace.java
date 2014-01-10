@@ -7,9 +7,9 @@ import org.lwjgl.opengl.GL11;
 
 import cpw.mods.fml.common.network.PacketDispatcher;
 
-import mal.carbonization.ColorReference;
 import mal.carbonization.network.ContainerMultiblockFurnace;
 import mal.carbonization.tileentity.TileEntityMultiblockFurnace;
+import mal.core.ColorReference;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -154,3 +154,12 @@ public class GuiMultiblockFurnace extends GuiContainer{
 	}
 
 }
+
+/*******************************************************************************
+* Copyright (c) 2014 Malorolam.
+* 
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the included license, which is also
+* available at http://carbonization.wikispaces.com/License
+* 
+*********************************************************************************/

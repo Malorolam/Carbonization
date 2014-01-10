@@ -10,6 +10,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import mal.carbonization.FurnaceTypes;
 import mal.carbonization.carbonization;
 import mal.carbonization.tileentity.TileEntityAutocraftingBench;
+import mal.carbonization.tileentity.TileEntityFuelCellFiller;
 import mal.carbonization.tileentity.TileEntityFuelConverter;
 import mal.carbonization.tileentity.TileEntityFurnaces;
 import mal.carbonization.tileentity.TileEntityStructureBlock;
@@ -26,7 +27,7 @@ import net.minecraft.world.World;
 
 public class BlockAutocraftingBench extends BlockContainer {
 
-	private Icon[] iconArray = new Icon[6];
+	private Icon[] iconArray = new Icon[9];
 	
 	public BlockAutocraftingBench(int par1, Material par2Material) {
         super(par1, Material.ground);
@@ -46,6 +47,9 @@ public class BlockAutocraftingBench extends BlockContainer {
     	iconArray[3] = ir.registerIcon("carbonization:fuelMachineBottomTexture");
     	iconArray[4] = ir.registerIcon("carbonization:fuelMachineSideTexture");
     	iconArray[5] = ir.registerIcon("carbonization:fuelMachineTopTexture");
+    	iconArray[6] = ir.registerIcon("carbonization:fuelMachineBottomTexture");
+    	iconArray[7] = ir.registerIcon("carbonization:cellFillerSideTexture");
+    	iconArray[8] = ir.registerIcon("carbonization:cellFillerTopTexture");
     }
     
     @SideOnly(Side.CLIENT)
@@ -76,6 +80,7 @@ public class BlockAutocraftingBench extends BlockContainer {
     {
 	    	par3List.add(new ItemStack(par1, 1, 0));
 	    	par3List.add(new ItemStack(par1, 1, 1));
+	    	par3List.add(new ItemStack(par1, 1, 2));
     }
     
     /**
@@ -109,9 +114,8 @@ public class BlockAutocraftingBench extends BlockContainer {
         else
         {
         	TileEntity var10 = world.getBlockTileEntity(x,y,z);
-        	if((!(var10 instanceof TileEntityAutocraftingBench) && !(var10 instanceof TileEntityFuelConverter)) || var10 == null || par5EntityPlayer.isSneaking())
+        	if((!(var10 instanceof TileEntityAutocraftingBench) && !(var10 instanceof TileEntityFuelConverter) && !(var10 instanceof TileEntityFuelCellFiller)) || var10 == null || par5EntityPlayer.isSneaking())
             {
-            	System.out.println("oh noes, the bench isn't a bench.");
             	return false;
             }
 
@@ -119,6 +123,8 @@ public class BlockAutocraftingBench extends BlockContainer {
         		((TileEntityAutocraftingBench) var10).activate(world, x, y, z, par5EntityPlayer);
         	if(var10 instanceof TileEntityFuelConverter)
         		((TileEntityFuelConverter) var10).activate(world, x, y, z, par5EntityPlayer);
+        	if(var10 instanceof TileEntityFuelCellFiller)
+        		((TileEntityFuelCellFiller)var10).activate(world,x,y,z,par5EntityPlayer);
             
             return true;
         }
@@ -150,6 +156,8 @@ public class BlockAutocraftingBench extends BlockContainer {
     		((TileEntityAutocraftingBench)te).dumpInventory();
     	if(te instanceof TileEntityFuelConverter)
     		((TileEntityFuelConverter)te).dumpInventory();
+    	if(te instanceof TileEntityFuelCellFiller)
+    		((TileEntityFuelCellFiller)te).dumpInventory();
     	
         super.breakBlock(par1World, par2, par3, par4, par5, par6);
     }
@@ -163,7 +171,10 @@ public class BlockAutocraftingBench extends BlockContainer {
     		return new TileEntityAutocraftingBench();
     	case 1:
     		return new TileEntityFuelConverter();
+    	case 2:
+        	return new TileEntityFuelCellFiller();
     	default:
+    		System.out.println("metadata is " + metadata);
     		return null;
     	}
     }
@@ -174,13 +185,12 @@ public class BlockAutocraftingBench extends BlockContainer {
 	}
 
 }
+
 /*******************************************************************************
-* Copyright (c) 2013 Malorolam.
+* Copyright (c) 2014 Malorolam.
 * 
 * All rights reserved. This program and the accompanying materials
-* are made available under the terms of the GNU Public License v3.0
-* which accompanies this distribution, and is available at
-* http://www.gnu.org/licenses/gpl.html
-* 
+* are made available under the terms of the included license, which is also
+* available at http://carbonization.wikispaces.com/License
 * 
 *********************************************************************************/
