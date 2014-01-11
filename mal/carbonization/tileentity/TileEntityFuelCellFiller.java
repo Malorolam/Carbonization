@@ -565,7 +565,7 @@ public class TileEntityFuelCellFiller extends TileEntity implements IInventory, 
 
 	@Override
 	public boolean canExtractItem(int i, ItemStack itemstack, int j) {
-		return (i>inputStacks.length && i<getSizeInventory()-upgradeStacks.length);
+		return (i>=inputStacks.length && i<getSizeInventory()-upgradeStacks.length);
 	}
 
 	@Override

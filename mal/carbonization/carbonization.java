@@ -63,7 +63,7 @@ import cpw.mods.fml.common.registry.LanguageRegistry;
 import ic2.api.item.*;
 import ic2.api.recipe.RecipeInputItemStack;
 
-@Mod(modid="carbonization", name="Carbonization", version="0.9.0.0", dependencies = "required-after:Forge@[9.11,);required-after:FML@[6.4.30,)")
+@Mod(modid="carbonization", name="Carbonization", version="0.9.0.1", dependencies = "required-after:Forge@[9.11,);required-after:FML@[6.4.30,)")
 @NetworkMod(clientSideRequired=true, channels={"CarbonizationChn"}, packetHandler = PacketHandler.class)
 public class carbonization {
 
@@ -413,6 +413,9 @@ public class carbonization {
 		generateStructure(ft);
 		generateMultiblockFurnaceRecipes();
 		generateCarbonizationInfo();
+		
+		//TODO: Attempt to "fix" the OD bug from IC2 by adding IngotIron again
+		OreDictionary.registerOre("IngotIron", Item.ingotIron);
 	}
 	
 	private void generateMash()
@@ -440,12 +443,8 @@ public class carbonization {
 	
 	private void generateSmithing(boolean ic)
 	{
-		//we have ic2, so use their iron instead
-		if(!ic)
-		{
-			//iron into refined iron
-			FurnaceRecipes.smelting().addSmelting(new ItemStack(Item.ingotIron).itemID, new ItemStack(ingots,1,0), 5);
-		}
+		//iron into refined iron
+		FurnaceRecipes.smelting().addSmelting(new ItemStack(Item.ingotIron).itemID, new ItemStack(ingots,1,0), 5);
 
 		//refined iron into pig iron
 		CarbonizationRecipes.smelting().addSmelting("ingotRefinedIron", new ItemStack(ingots,1,1), 5, (50*difficultyMod), 1);
@@ -464,6 +463,8 @@ public class carbonization {
 		FurnaceRecipes.smelting().addSmelting(new ItemStack(fuelBlock).itemID, 3, new ItemStack(fuel,1,3), 5);
 		FurnaceRecipes.smelting().addSmelting(new ItemStack(fuelBlock).itemID, 4, new ItemStack(fuel,1,4), 5);
 		FurnaceRecipes.smelting().addSmelting(new ItemStack(fuelBlock).itemID, 5, new ItemStack(fuel,1,5), 5);
+		
+		
 	}
 	
 	private void generateConversions(boolean ic, boolean te)
@@ -603,7 +604,7 @@ public class carbonization {
 		{
 			try
 			{
-				ic2.api.recipe.Recipes.compressor.addRecipe(new RecipeInputItemStack(new ItemStack(dust, 1, 7), 2), null, new ItemStack(misc, 1, 13));
+				//ic2.api.recipe.Recipes.compressor.addRecipe(new RecipeInputItemStack(new ItemStack(dust, 1, 7), 2), null, new ItemStack(misc, 1, 13));
 				ic2.api.recipe.Recipes.compressor.addRecipe(new RecipeInputItemStack(new ItemStack(misc, 1, 13), 4), null, new ItemStack(misc, 1, 3));
 				ic2.api.recipe.Recipes.compressor.addRecipe(new RecipeInputItemStack(new ItemStack(misc, 1, 3), 8), null, new ItemStack(Item.diamond));
 			
