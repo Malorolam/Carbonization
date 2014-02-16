@@ -49,6 +49,12 @@ public class CarbonizationInfo {
 			return fuelCellInfo();
 		case 17://fuel cell filler page 1
 			return fuelCellBenchInfo();
+		case 18://portable scanner page 1
+			return portableScannerInfo1();
+		case 19://portable scanner page 2
+			return portableScannerInfo2();
+		case 20://portable scanner page 3
+			return portableScannerInfo3();
 		default:
 			return defaultInfo();
 		}
@@ -392,6 +398,67 @@ public class CarbonizationInfo {
 		list.add("machine can be sped up by placing");
 		list.add("structure blocks in the upgrade");
 		list.add("slots on the right.");
+		
+		return list;
+	}
+	
+	private static List<String> portableScannerInfo1()
+	{
+		List<String> list = new ArrayList<String>();
+		
+		list.add("Portable Scanner:");
+		list.add("");
+		list.add("The portable scanner is a handheld tool");
+		list.add("that when used on a block will give you");
+		list.add("some information about the volume behind");
+		list.add("it.  Sneak-right clicking will open a gui");
+		list.add("where you can add fuel, either as a solid");
+		list.add("or in a fuel cell, change the dimensions");
+		list.add("of the volume by placing structure blocks");
+		list.add("in the three top left slots, or change the");
+		list.add("mode by placing a machine or furnace");
+		list.add("structure block in the top center slot.");
+		list.add("Every use consumes an amount of fuel,");
+		list.add("which can be seen by mousing over the");
+		
+		return list;
+	}
+	
+	private static List<String> portableScannerInfo2()
+	{
+		List<String> list = new ArrayList<String>();
+		
+		list.add("Portable Scanner:");
+		list.add("");
+		list.add("information area above the player");
+		list.add("inventory.  Increasing the tier of the");
+		list.add("structure blocks in the volume slots will");
+		list.add("decrease the fuel usage significantly.");
+		list.add("Keep in mind the tier of the block used to");
+		list.add("change modes does not matter.");
+		list.add("The two modes are Basic and Extended.");
+		list.add("Basic mode will tell you the total number");
+		list.add("of blocks in the volume, as well as the");
+		list.add("actual number of blocks, useful for finding");
+		list.add("nearby caves.  This mode will also show");
+		list.add("the maximum tool level needed to harvest");
+		
+		return list;
+	}
+	
+	private static List<String> portableScannerInfo3()
+	{
+		List<String> list = new ArrayList<String>();
+		
+		list.add("Portable Scanner:");
+		list.add("");
+		list.add("the entire volume as well as the average");
+		list.add("level needed.  Extended mode, in addition");
+		list.add("to showing the Basic mode information,");
+		list.add("also shows a list of the blocks in the");
+		list.add("volume and how many of each there are.");
+		list.add("The fuel usage for Extended mode is");
+		list.add("higher as well.");
 		
 		return list;
 	}

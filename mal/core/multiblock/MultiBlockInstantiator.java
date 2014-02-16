@@ -9,6 +9,7 @@ import mal.carbonization.carbonization;
 import mal.carbonization.tileentity.TileEntityMultiblockFurnace;
 import mal.carbonization.tileentity.TileEntityMultiblockInit;
 import mal.carbonization.tileentity.TileEntityStructureBlock;
+import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
@@ -79,7 +80,7 @@ public class MultiBlockInstantiator {
 		else//we are sad and have to do lots of calculations now :[
 			sideAxis = -1;
 		
-		System.out.println(sideAxis);
+		//System.out.println(sideAxis);
 		
 		//now we have limited the options to hopefully 2 planes to iterate through
 		//We loop through the two axises that are used
@@ -240,6 +241,37 @@ public class MultiBlockInstantiator {
 		}
 		return true;
 	}
+	
+	/**
+	 * Create a area from a pattern with a certain block for testing
+	 */
+	public static boolean createTestArea(MultiBlockMatcher mbMatch, int x, int y, int z, World world, int[] offset, Block block)
+	{
+		Multiblock[][][] pattern = mbMatch.getPattern();
+		MultiBlockMatcher test_matcher = new MultiBlockMatcher(pattern.length, pattern[0].length, pattern[0][0].length);
+		createWorldMultiBlock(test_matcher, x-offset[0], y-offset[1], z-offset[2], pattern.length, pattern[0].length, pattern[0][0].length, world);
+		Multiblock[][][] ipattern = test_matcher.getPattern();
+		
+		if(Side.SERVER == FMLCommonHandler.instance().getEffectiveSide())
+		{	
+			for(int i = 0; i<pattern.length; i++) {
+				for(int j=0;j<pattern[0].length;j++) {
+					for(int k=0;k<pattern[0][0].length;k++)
+					{
+						world.setBlock(x-offset[0]+i, y-offset[1]+j, z-offset[2]+k, block.blockID, 0, 2);
+					}
+				}
+			}
+		}
+		return true;
+	}
+	public static boolean createTestArea(MultiBlockMatcher mbMatch, int x, int y, int z, World world, Block block)
+	{
+		int[] offset = new int[3];
+		offset[0]=offset[1]=offset[2]=0;
+		return createTestArea(mbMatch,x,y,z,world,offset,block);
+	}
+	
 	/*
 	 * revert the multiblocks in an area
 	 * masterOverride will remove the control block to bypass an issue of the game not correctly recognizing that the block broke
@@ -372,13 +404,15 @@ public class MultiBlockInstantiator {
 					TileEntityStructureBlock ste = null;
 					if(te instanceof TileEntityStructureBlock)
 						ste = (TileEntityStructureBlock) te;
-					//else
-					//	System.out.println("Tile Entity " + ((te!=null)?te.toString():"null") + " at index: " + i + ", " + j + ", " + k);
-					boolean succ = mbMatch.setBlock(i, j, k, world.getBlockId(i+startX, j+startY, k+startZ), (ste != null)?ste.getData():world.getBlockMetadata(i+startX, j+startY, k+startZ), (ste == null));
-					if(succ==false)
+					
+					//if(!world.isAirBlock(i+startX, j+startY, k+startZ))
 					{
-						FMLLog.log(Level.WARNING, "Detect process failed at indices: "+i+", "+j+", "+k+": Previous process failed.");
-						return succ;
+						boolean succ = mbMatch.setBlock(i, j, k, world.getBlockId(i+startX, j+startY, k+startZ), (ste != null)?ste.getData():world.getBlockMetadata(i+startX, j+startY, k+startZ), (ste == null));
+						if(succ==false)
+						{
+							FMLLog.log(Level.WARNING, "Detect process failed at indices: "+i+", "+j+", "+k+": Previous process failed.");
+							return succ;
+						}
 					}
 				}
 		return true;

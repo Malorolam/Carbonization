@@ -607,12 +607,9 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
 			int action = 0;
 			action = this.handleInput(action);
 			action = this.handleQueue(action);
-		
-			if(action>0)
-			{
-				this.onInventoryChanged();
-			}
-			PacketDispatcher.sendPacketToAllAround(xCoord, yCoord, zCoord, 64, worldObj.provider.dimensionId, getDescriptionPacket());
+			
+			this.onInventoryChanged();
+			PacketDispatcher.sendPacketToAllAround(xCoord, yCoord, zCoord, 64, worldObj.provider.dimensionId, getDataPacket());
 		}
 		
 		//System.out.println("Jobs in Queue: " + this.numQueueJobs + ": " + worldObj.isRemote);
@@ -853,7 +850,7 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
         else if(par0ItemStack.getItem() instanceof IFuelContainer)
         {
         	//get the value
-        	int fuelValue = ((IFuelContainer)par0ItemStack.getItem()).getFuelValue(par0ItemStack);
+        	long fuelValue = ((IFuelContainer)par0ItemStack.getItem()).getFuelValue(par0ItemStack);
         	int value = (int) (maxFuelCapacity-fuelStack);
         	
         	//if it's a number, reduce it by some amount, we're using standard coal or the value, whichever is smaller
@@ -867,7 +864,7 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
         	else
         	{
         		((IFuelContainer)par0ItemStack.getItem()).setFuel(par0ItemStack, 0, true);
-        		return fuelValue;
+        		return (int)fuelValue;
         	}
         }
         else
@@ -913,7 +910,7 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
         else if(par0ItemStack.getItem() instanceof IFuelContainer)
         {
         	//get the value
-        	int fuelValue = ((IFuelContainer)par0ItemStack.getItem()).getFuelValue(par0ItemStack);
+        	long fuelValue = ((IFuelContainer)par0ItemStack.getItem()).getFuelValue(par0ItemStack);
         	int value = (int) (maxFuelCapacity-fuelStack);
         	
         	//if it's a number, reduce it by some amount, we're using standard coal or the value, whichever is smaller
@@ -925,7 +922,7 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
         	}
         	else
         	{
-        		return fuelValue;
+        		return (int)fuelValue;
         	}
         }
         else
@@ -1523,6 +1520,11 @@ public class TileEntityMultiblockFurnace extends TileEntity implements ITileEnti
 	public Packet getDescriptionPacket()
 	{
 	   return PacketHandler.getPacket(this);
+	}
+	
+	private Packet getDataPacket()
+	{
+		return PacketHandler.getPacket(this,"noinventory");
 	}
 	
 	public void closeGui()

@@ -18,14 +18,14 @@ public interface IFuelContainer {
 	 * @param fuelTime	the amount of fuel to add/remove
 	 * @param absolute	if this is true, the fuelTime value will be the new value, not added to the existing value
 	 */
-	public boolean setFuel(ItemStack is, int fuelTime, boolean absolute);
+	public boolean setFuel(ItemStack is, long fuelTime, boolean absolute);
 	
 	/**
 	 * 
 	 * @param is		the itemstack of the inventory item to interact with
 	 * @return			the amount of fuel in that itemstack
 	 */
-	public int getFuelValue(ItemStack is);
+	public long getFuelValue(ItemStack is);
 }
 
 /*******************************************************************************

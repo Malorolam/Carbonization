@@ -28,7 +28,8 @@ public class BlockFurnaceControl extends BlockContainer {
 	
 	public BlockFurnaceControl(int par1, Material par2Material) {
 		super(par1, par2Material);
-		this.setUnlocalizedName("carbonization:testblock");
+		this.setResistance(100f);
+		this.setHardness(10f);
 		this.setCreativeTab(carbonization.tabMachine);
 	}
 	

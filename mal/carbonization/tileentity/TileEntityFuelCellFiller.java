@@ -31,37 +31,37 @@ public class TileEntityFuelCellFiller extends TileEntity implements IInventory, 
 	public ItemStack[] inputStacks = new ItemStack[4];
 	public ItemStack outputStack;
 	public ItemStack[] upgradeStacks = new ItemStack[3];
-	
+
 	@Override
 	public void updateEntity()
 	{
 		super.updateEntity();
-		
+
 		//re-sort input stacks
 		sortInput();
-		
+
 		//manage the first input slot correctly
 		int value = getInputValue();
 		boolean flag = false;
 		if(isOutputValid(value))
 			flag = addOutputValue(value);
-		
+
 		if(flag)
 		{
 			craftingCooldown = processTime;
 		}
-		
+
 		//manage the upgrade slots
 		manageUpgrade();
 	}
-	
+
 	private void manageUpgrade()
 	{
 		if(upgradeStacks == null)
 			return;
-		
+
 		double value = 0;
-		
+
 		for(int i = 0; i < upgradeStacks.length; i++)
 		{
 			if(upgradeStacks[i] != null)
@@ -76,17 +76,17 @@ public class TileEntityFuelCellFiller extends TileEntity implements IInventory, 
 				}
 			}
 		}
-		
+
 		speedUpgrade = value;
 		calculateProcessTime();
 	}
-	
+
 	public void activate(World world, int x, int y, int z,
 			EntityPlayer player) {
 		//System.out.println("Component Tiers: " + componentTiers[0] + ", " + componentTiers[1] +"; queue capacity: " + queue.maxJobs + "; activated: " + properlyActivated);
 		player.openGui(carbonization.instance, 4, world, x, y, z);
 	}
-	
+
 	@Override
 	public void writeToNBT(NBTTagCompound nbt)
 	{
@@ -183,120 +183,104 @@ public class TileEntityFuelCellFiller extends TileEntity implements IInventory, 
 				this.upgradeStacks[var5] = ItemStack.loadItemStackFromNBT(var4);
 			}
 		}
-		
+
 		calculateProcessTime();
 	}
 
-	//build an int list of the inventory
-		public int[] buildIntList()
+	/*
+	 * Will take all the inventory and save it to a NBT array to be loaded later.
+	 */
+	public NBTTagCompound saveInventory()
+	{
+		NBTTagCompound nbt = new NBTTagCompound();
+
+		NBTTagList input = new NBTTagList();
+
+		for (int i = 0; i < this.inputStacks.length; ++i)
 		{
-			int[] list = new int[(inputStacks.length+1+upgradeStacks.length)*3+1];
-			//System.out.println("Created list of size " + list.length);
-			int pos = 0;
-			for(ItemStack is : inputStacks)
+			if (this.inputStacks[i] != null)
 			{
-				if(is != null)
-				{
-					//System.out.println("Putting input item: " + is.toString() + " in list");
-					list[pos++] = is.itemID;
-					list[pos++] = is.getItemDamage();
-					list[pos++] = is.stackSize;
-				}
-				else
-				{
-					//System.out.println("Putting null input item in list");
-					list[pos++] = 0;
-					list[pos++] = 0;
-					list[pos++] = 0;
-				}
+				NBTTagCompound var4 = new NBTTagCompound();
+				var4.setByte("Slot", (byte)i);
+				this.inputStacks[i].writeToNBT(var4);
+				input.appendTag(var4);
 			}
-			
-			ItemStack os = outputStack;
-			{
-				if(os != null)
-				{
-					//System.out.println("Putting output item: " + os.toString() + " in list");
-					list[pos++] = os.itemID;
-					list[pos++] = os.getItemDamage();
-					list[pos++] = os.stackSize;
-				}
-				else
-				{
-					//System.out.println("Putting null output item in list");
-					list[pos++] = 0;
-					list[pos++] = 0;
-					list[pos++] = 0;
-				}
-			}
-
-			for(ItemStack us : upgradeStacks)
-			{
-				if(us != null)
-				{
-					//System.out.println("Putting output item: " + os.toString() + " in list");
-					list[pos++] = us.itemID;
-					list[pos++] = us.getItemDamage();
-					list[pos++] = us.stackSize;
-				}
-				else
-				{
-					//System.out.println("Putting null output item in list");
-					list[pos++] = 0;
-					list[pos++] = 0;
-					list[pos++] = 0;
-				}
-			}
-
-			return list;
 		}
 
-		public void recoverIntList(int[] items)
+		nbt.setTag("inputItems", input);
+
+		NBTTagList output = new NBTTagList();
+
+		for (int i = 0; i < 1; ++i)
 		{
-			if(items != null)
+			if (this.outputStack != null)
 			{
-				int pos = 0;
-				for(int i = 0; i < this.inputStacks.length; i++)
-				{
-					if(pos+2 < items.length && items[pos+2]!=0)
-					{
-						ItemStack is = new ItemStack(items[pos], items[pos+2], items[pos+1]);
-						this.inputStacks[i]=is;
-					}
-					else
-					{
-						this.inputStacks[i] = null;
-					}
-					pos+= 3;
-				}
-				for(int i = 0; i < 1; i++)
-				{
-					if(pos+2 < items.length && items[pos+2]!=0)
-					{
-						ItemStack is = new ItemStack(items[pos], items[pos+2], items[pos+1]);
-						this.outputStack=is;
-					}
-					else
-					{
-						this.outputStack = null;
-					}
-					pos+= 3;
-				}
-				
-				for(int i = 0; i < this.upgradeStacks.length; i++)
-				{
-					if(pos+2 < items.length && items[pos+2]!=0)
-					{
-						ItemStack is = new ItemStack(items[pos], items[pos+2], items[pos+1]);
-						this.upgradeStacks[i]=is;
-					}
-					else
-					{
-						this.upgradeStacks[i] = null;
-					}
-					pos+= 3;
-				}
+				NBTTagCompound var4 = new NBTTagCompound();
+				var4.setByte("Slot", (byte)i);
+				this.outputStack.writeToNBT(var4);
+				output.appendTag(var4);
 			}
 		}
+
+		nbt.setTag("outputItems", output);
+
+		NBTTagList upgrade = new NBTTagList();
+		for(int i = 0; i < upgradeStacks.length; i++)
+		{
+			if(this.upgradeStacks[i] != null)
+			{
+				NBTTagCompound var4 = new NBTTagCompound();
+				var4.setByte("Slot", (byte)i);
+				this.upgradeStacks[i].writeToNBT(var4);
+				upgrade.appendTag(var4);
+			}
+		}
+		nbt.setTag("Upgrade", upgrade);
+
+		return nbt;
+	}
+
+
+	//Will load up the inventory data
+
+	public void loadInventory(NBTTagCompound nbt)
+	{
+		NBTTagList input = nbt.getTagList("inputItems");
+		for (int i = 0; i < input.tagCount(); ++i)
+		{
+			NBTTagCompound var4 = (NBTTagCompound)input.tagAt(i);
+			byte var5 = var4.getByte("Slot");
+
+			if (var5 >= 0 && var5 < this.inputStacks.length)
+			{
+				this.inputStacks[var5] = ItemStack.loadItemStackFromNBT(var4);
+			}
+		}
+
+		NBTTagList output = nbt.getTagList("outputItems");
+		for (int i = 0; i < output.tagCount(); ++i)
+		{
+			NBTTagCompound var4 = (NBTTagCompound)output.tagAt(i);
+			byte var5 = var4.getByte("Slot");
+
+			if (var5 >= 0 && var5 < 1)
+			{
+				this.outputStack = ItemStack.loadItemStackFromNBT(var4);
+			}
+		}
+
+		NBTTagList list = nbt.getTagList("Upgrade");
+		for(int i = 0; i<list.tagCount(); i++)
+		{
+			NBTTagCompound var4 = (NBTTagCompound)list.tagAt(i);
+			byte var5 = var4.getByte("Slot");
+
+			if (var5 >= 0 && var5 < this.upgradeStacks.length)
+			{
+				this.upgradeStacks[var5] = ItemStack.loadItemStackFromNBT(var4);
+			}
+		}
+	}
 
 	public void calculateProcessTime()
 	{
@@ -305,12 +289,17 @@ public class TileEntityFuelCellFiller extends TileEntity implements IInventory, 
 			processTime = 1;
 	}
 	
+	public double getBonusYield()
+	{
+		return 1+speedUpgrade/10;
+	}
+
 	//sort the input stacks
 	private void sortInput()
 	{
 		if(inputStacks == null)
 			return;
-		
+
 		for(int i = 0; i<3; i++)
 		{
 			if(inputStacks[i] == null)
@@ -340,19 +329,19 @@ public class TileEntityFuelCellFiller extends TileEntity implements IInventory, 
 						}
 					}
 				}
-					
+
 			}
 		}
 	}
-	
+
 	private int getInputValue()
 	{
 		if(inputStacks[0]==null)
 			return 0;
 		else
-			return getItemBurnTime(inputStacks[0]);
+			return (int) (getItemBurnTime(inputStacks[0])*getBonusYield());
 	}
-	
+
 	private boolean isOutputValid(int value)
 	{
 		if(craftingCooldown > 0)
@@ -360,7 +349,7 @@ public class TileEntityFuelCellFiller extends TileEntity implements IInventory, 
 			craftingCooldown--;
 			return false;
 		}
-		
+
 		if(value <= 0)
 			return false;
 		if(outputStack == null)
@@ -373,17 +362,17 @@ public class TileEntityFuelCellFiller extends TileEntity implements IInventory, 
 	{
 		if(outputStack == null || !(outputStack.getItem() instanceof IFuelContainer || value <= 0))
 			return false;
-		
+
 		if(inputStacks[0] != null)
 		{
 			inputStacks[0].stackSize -= 1;
 			if(inputStacks[0].stackSize <= 0)
 				inputStacks[0] = null;
 		}
-		
+
 		return ((IFuelContainer)outputStack.getItem()).setFuel(outputStack, value, false);
 	}
-	
+
 	/**
 	 * Returns the number of ticks that the supplied fuel item will keep the furnace burning, or 0 if the item isn't
 	 * fuel
@@ -427,7 +416,7 @@ public class TileEntityFuelCellFiller extends TileEntity implements IInventory, 
 			return GameRegistry.getFuelValue(par0ItemStack);
 		}
 	}
-	
+
 	//return the scaled percentage of the progress bar
 	@SideOnly(Side.CLIENT)
 	public int getCooldownScaled(int i)
@@ -435,7 +424,7 @@ public class TileEntityFuelCellFiller extends TileEntity implements IInventory, 
 		//return (int)(0.2*i);
 		return (int) (craftingCooldown*i/(processTime+1));
 	}
-	
+
 	public void dumpInventory()
 	{
 		if(worldObj == null || worldObj.isRemote)
@@ -548,7 +537,7 @@ public class TileEntityFuelCellFiller extends TileEntity implements IInventory, 
 		}
 
 	}
-	
+
 	@Override
 	public int[] getAccessibleSlotsFromSide(int var1) {
 		//Don't care, put and pull from every slot
@@ -776,7 +765,7 @@ public class TileEntityFuelCellFiller extends TileEntity implements IInventory, 
 
 	@Override
 	public void closeChest() {
-	
+
 	}
 
 	@Override
@@ -788,10 +777,10 @@ public class TileEntityFuelCellFiller extends TileEntity implements IInventory, 
 }
 
 /*******************************************************************************
-* Copyright (c) 2014 Malorolam.
-* 
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the included license, which is also
-* available at http://carbonization.wikispaces.com/License
-* 
-*********************************************************************************/
+ * Copyright (c) 2014 Malorolam.
+ * 
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the included license, which is also
+ * available at http://carbonization.wikispaces.com/License
+ * 
+ *********************************************************************************/

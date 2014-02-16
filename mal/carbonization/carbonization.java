@@ -24,6 +24,7 @@ import mal.carbonization.items.ItemHHPulverizer;
 import mal.carbonization.items.ItemHHPurifyer;
 import mal.carbonization.items.ItemIngots;
 import mal.carbonization.items.ItemMisc;
+import mal.carbonization.items.ItemPortableScanner;
 import mal.carbonization.items.ItemRecipeCharm;
 import mal.carbonization.items.ItemStructureBlock;
 import mal.carbonization.network.PacketHandler;
@@ -63,14 +64,15 @@ import cpw.mods.fml.common.registry.LanguageRegistry;
 import ic2.api.item.*;
 import ic2.api.recipe.RecipeInputItemStack;
 
-@Mod(modid="carbonization", name="Carbonization", version="0.9.0.1", dependencies = "required-after:Forge@[9.11,);required-after:FML@[6.4.30,)")
-@NetworkMod(clientSideRequired=true, channels={"CarbonizationChn"}, packetHandler = PacketHandler.class)
+@Mod(modid="carbonization", name="Carbonization", version="0.9.5", dependencies = "required-after:Forge@[9.11,);required-after:FML@[6.4.30,)")
+@NetworkMod(clientSideRequired=true, channels={"CarbonizationChn", "CarbonItemChn"}, packetHandler = PacketHandler.class)
 public class carbonization {
 
 	public static int ORESLAGRATIO = 300;//number of millibuckets needed for an item
 	public static int MAXAUTOCRAFTTIME = 600;//maximum amount of time to cooldown
 	public static int MINAUTOCRAFTTIME = 5;//minimum  amount of time to cooldown
 	public static int BASEAUTOCRAFTFUEL = 800;//maximum amount of fuel per craft
+	public static int MAXSCANNERDEPTH = 32;//maximum depth the scanner will scan
 	public static ItemFuel fuel;
 	public static ItemDust dust;
 	public static ItemMisc misc;
@@ -78,6 +80,7 @@ public class carbonization {
 	public static ItemHHPulverizer hhpulv;
 	public static ItemHHPurifyer hhpure;
 	public static ItemHHCompressor hhcomp;
+	public static ItemPortableScanner portableScanner;
 	public static Block fuelBlock;
 	public static BlockFurnaces furnaceBlock;
 	public static BlockFurnaces furnaceBlockActive;
@@ -107,6 +110,7 @@ public class carbonization {
 	int autocraftingBenchID = 1563;
 	int recipeCharmID = 9548;
 	int fuelCellID = 9549;
+	int scannerID = 9550;
 	
 	//Difficulty modifier, the higher the number, the more time the metals take to bake
 	private int difficultyMod = 10;
@@ -148,6 +152,7 @@ public class carbonization {
     		structureItemID = config.getItem("Structure Block ID", 9547).getInt();
     		recipeCharmID = config.getItem("Recipe Charm ID", 9548).getInt();
     		fuelCellID = config.getItem("Fuel Cell ID", 9549).getInt();
+    		scannerID = config.getItem("Portable Scanner ID", 9550).getInt();
     		blockID = config.getBlock("Block ID", 1560).getInt();
     		furnaceID = config.getBlock("Furnace ID", 1561).getInt();
     		furnaceID2 = config.getBlock("Active Furnace ID", 1562).getInt();
@@ -204,6 +209,7 @@ public class carbonization {
     		RecipeCharm = new ItemStack(recipeCharm,1);
     		itemStructureBlock = new ItemStructureBlock(structureItemID);
     		fuelCell = new ItemFuelCell(fuelCellID);
+    		portableScanner = new ItemPortableScanner(scannerID);
     		fuelBlock = new BlockFuel(blockID,0,Material.rock).setStepSound(Block.soundStoneFootstep).setHardness(3F).setResistance(1.0F);
     		furnaceBlock = new BlockFurnaces(furnaceID,false);
     		furnaceBlockActive = new BlockFurnaces(furnaceID2, true);
@@ -237,9 +243,11 @@ public class carbonization {
     		
     		GameRegistry.registerBlock(fuelBlock, ItemBlockFuels.class, "fuelBlock");
     		GameRegistry.registerBlock(FurnaceControl, ItemBlockMultiblockFurnaceControl.class, "furnacecontrol");
+    		GameRegistry.registerBlock(multiblockFurnaceControl, "multiblockfurnacecontrol");
     		GameRegistry.registerBlock(autocraftingBench, ItemBlockAutocraftingBench.class, "autocraftingbench");
     		GameRegistry.registerItem(itemStructureBlock, "itemStructureBlock");
     		GameRegistry.registerItem(fuelCell, "fuelCell");
+    		GameRegistry.registerItem(portableScanner, "portableScanner");
     		
     		//Names
     		//Fuels
@@ -302,6 +310,7 @@ public class carbonization {
     		LanguageRegistry.addName(new ItemStack(misc, 1, 19), "Fine Threading");
     		LanguageRegistry.addName(RecipeCharm, "Recipe Charm");
     		LanguageRegistry.addName(fuelCell, "Fuel Cell");
+    		LanguageRegistry.addName(portableScanner, "Portable Scanner");
     		
     		//Machines
     		LanguageRegistry.addName(new ItemStack(furnaceBlock,1,0), "Iron Furnace");
@@ -312,6 +321,7 @@ public class carbonization {
     		LanguageRegistry.addName(new ItemStack(autocraftingBench,1,2), "Fuel Cell Filler");
     		//Multiblock controls
     		LanguageRegistry.addName(new ItemStack(FurnaceControl), "Furnace Control System");
+    		LanguageRegistry.addName(new ItemStack(multiblockFurnaceControl), "Furnace Control System");
     		
     		LanguageRegistry.instance().addStringLocalization("itemGroup.tabStructure", "en_US", "Carbonization Structure Blocks");
     		LanguageRegistry.instance().addStringLocalization("itemGroup.tabMachine", "en_US", "Carbonization Blocks");
@@ -336,11 +346,12 @@ public class carbonization {
     		LanguageRegistry.instance().addStringLocalization("tile.autocraftingBench.fuelconverter.name", "Fuel Conversion Bench");
     		
     		prox.registerRenderThings();
+    		
 	}
 	
 	@Mod.EventHandler
 	public void load(FMLInitializationEvent event)
-	{	
+	{		
 		RenderingRegistry.registerBlockHandler(new StructureBlockRenderer());
 		prox.setCustomRenderers();
 		
@@ -360,7 +371,7 @@ public class carbonization {
 		OreDictionary.registerOre("dustAnthracite", new ItemStack(dust, 1, 6));
 		OreDictionary.registerOre("dustGraphite", new ItemStack(dust, 1, 7));
 		OreDictionary.registerOre("dustACharcoal", new ItemStack(dust,1,8));
-		OreDictionary.registerOre("ingotRefinedIron", new ItemStack(ingots,1,0));
+		OreDictionary.registerOre("ingotCRefinedIron", new ItemStack(ingots,1,0));//TODO: Revert back when IC2 stops being stupid
 		OreDictionary.registerOre("ingotPigIron", new ItemStack(ingots,1,1));
 		OreDictionary.registerOre("ingotHCSteel", new ItemStack(ingots,1,2));
 		OreDictionary.registerOre("ingotSteel", new ItemStack(ingots,1,3));
@@ -372,8 +383,8 @@ public class carbonization {
 		MinecraftForge.setBlockHarvestLevel(fuelBlock, 3, "pickaxe", 1);
 		MinecraftForge.setBlockHarvestLevel(fuelBlock, 4, "pickaxe", 1);
 		MinecraftForge.setBlockHarvestLevel(fuelBlock, 5, "pickaxe", 1);
-		
-		
+		MinecraftForge.setBlockHarvestLevel(FurnaceControl, "pickaxe", 0);
+		MinecraftForge.setBlockHarvestLevel(multiblockFurnaceControl, "pickaxe", 0);
 	}
 	
 	@Mod.EventHandler
@@ -413,22 +424,19 @@ public class carbonization {
 		generateStructure(ft);
 		generateMultiblockFurnaceRecipes();
 		generateCarbonizationInfo();
-		
-		//TODO: Attempt to "fix" the OD bug from IC2 by adding IngotIron again
-		OreDictionary.registerOre("IngotIron", Item.ingotIron);
 	}
 	
 	private void generateMash()
 	{
 		//handheld fuel to dust
 		GameRegistry.addShapelessRecipe(new ItemStack(dust,1,0), new Object[]{HHPulv, new ItemStack(Item.coal, 1, 1)});
-		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(dust,1,1), new Object[]{HHPulv,"brickPeat"}));
-		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(dust,1,2), new Object[]{HHPulv,"brickLignite"}));
-		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(dust,1,3), new Object[]{HHPulv,"brickSubBituminous"}));
-		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(dust,1,4), new Object[]{HHPulv,"brickBituminous"}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(dust,1,1), new Object[]{HHPulv,"fuelPeat"}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(dust,1,2), new Object[]{HHPulv,"fuelLignite"}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(dust,1,3), new Object[]{HHPulv,"fuelSubBituminous"}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(dust,1,4), new Object[]{HHPulv,"fuelBituminous"}));
 		GameRegistry.addShapelessRecipe(new ItemStack(dust,1,5), new Object[]{HHPulv, new ItemStack(Item.coal, 1, 0)});
-		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(dust,1,6), new Object[]{HHPulv,"brickAnthracite"}));
-		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(dust,1,7), new Object[]{HHPulv,"brickGraphite"}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(dust,1,6), new Object[]{HHPulv,"fuelAnthracite"}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(dust,1,7), new Object[]{HHPulv,"fuelGraphite"}));
 		
 		//handheld dust to fuel
 		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(Item.coal,1,1),new Object[]{HHComp, "dustCharcoal"}));
@@ -447,7 +455,7 @@ public class carbonization {
 		FurnaceRecipes.smelting().addSmelting(new ItemStack(Item.ingotIron).itemID, new ItemStack(ingots,1,0), 5);
 
 		//refined iron into pig iron
-		CarbonizationRecipes.smelting().addSmelting("ingotRefinedIron", new ItemStack(ingots,1,1), 5, (50*difficultyMod), 1);
+		CarbonizationRecipes.smelting().addSmelting("ingotCRefinedIron", new ItemStack(ingots,1,1), 5, (50*difficultyMod), 1);//TODO: fix later
 		//pig iron into mild steel
 		CarbonizationRecipes.smelting().addSmelting("ingotPigIron", new ItemStack(ingots,1,2), 5, (75*difficultyMod), 2);
 		//mild steel into steel
@@ -578,7 +586,7 @@ public class carbonization {
 		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(misc,2,17), new Object[]{"GGG", 'G', new ItemStack(misc,1,16)}));
 		
 		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(fuelCell,1,0), new Object[]{" S ", "SCS", " S ", 'S', "ingotSteel", 'C', new ItemStack(Item.coal,1,0)}));
-		
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(portableScanner), new Object[]{"LAL", "GDG", "OFO", 'L', Item.leather, 'A', "dyeBlue", 'G', new ItemStack(misc,1,11), 'D', Item.diamond, 'O', Item.ingotGold, 'F', new ItemStack(fuelCell)}));
 		
 		
 		GameRegistry.addShapelessRecipe(new ItemStack(Item.diamond), new Object[]{HHComp, new ItemStack(misc, 1, 3), new ItemStack(misc, 1, 3), 
@@ -588,11 +596,11 @@ public class carbonization {
 		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(misc,4,5), new Object[]{"xyx", "yxy", "xyx", 'x', Block.sand, 'y', new ItemStack(misc, 1, 3)}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(dust,1,0), new Object[]{new ItemStack(misc, 1, 6), new ItemStack(misc, 1, 6), new ItemStack(misc, 1, 6), new ItemStack(misc, 1, 6)}));
 		
-		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(misc, 1, 7), new Object[]{" x ", "xyx", " x ", 'x', Item.ingotIron, 'y', Item.redstone}));
-		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(misc, 1, 8), new Object[]{" x ", "xyx", " x ", 'x', "ingotRefinedIron", 'y', Item.redstone}));
-		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(misc, 1, 9), new Object[]{" x ", "xyx", " x ", 'x', "ingotPigIron", 'y', Item.redstone}));
-		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(misc, 1, 10), new Object[]{" x ", "xyx", " x ", 'x', "ingotHCSteel", 'y', Item.redstone}));
-		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(misc, 1, 11), new Object[]{" x ", "xyx", " x ", 'x', "ingotSteel", 'y', Item.redstone}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(misc, 1, 7), new Object[]{"x x", " y ", "x x", 'x', Item.ingotIron, 'y', Item.redstone}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(misc, 1, 8), new Object[]{"x x", " y ", "x x", 'x', "ingotCRefinedIron", 'y', Item.redstone}));//TODO: smack greg
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(misc, 1, 9), new Object[]{"x x", " y ", "x x", 'x', "ingotPigIron", 'y', Item.redstone}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(misc, 1, 10), new Object[]{"x x", " y ", "x x", 'x', "ingotHCSteel", 'y', Item.redstone}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(misc, 1, 11), new Object[]{"x x", " y ", "x x", 'x', "ingotSteel", 'y', Item.redstone}));
 		
 		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(misc,1,18), new Object[]{"xxx", 'x', new ItemStack(ingots,1,0)}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(misc,1,19), new Object[]{"xxx", 'x', "ingotSteel"}));
@@ -629,11 +637,11 @@ public class carbonization {
 			CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(furnaceBlock,1,0), 
 					new Object[]{"   ", "III", "IFI", 'I' ,Item.ingotIron, 'F', Block.furnaceIdle}));
 			CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(furnaceBlock,1,1), 
-					new Object[]{"III", "IFI", "BBB", 'I' ,"ingotRefinedIron", 'F', Items.getItem("ironFurnace"), 'B', Block.brick}));
+					new Object[]{"III", "IFI", "BBB", 'I' ,"ingotCRefinedIron", 'F', Items.getItem("ironFurnace"), 'B', Block.brick}));//TODO: time for blood
 
 		}
 		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(furnaceBlock,1,1), 
-				new Object[]{"III", "IFI", "BBB", 'I' ,"ingotRefinedIron", 'F', new ItemStack(furnaceBlock,1,0), 'B', Block.brick}));
+				new Object[]{"III", "IFI", "BBB", 'I' ,"ingotCRefinedIron", 'F', new ItemStack(furnaceBlock,1,0), 'B', Block.brick}));//TODO: rawr
 		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(furnaceBlock,1,2), 
 				new Object[]{"SSS", "SFS", "SSS", 'S' ,"ingotSteel", 'F', new ItemStack(furnaceBlock,1,1)}));
 	}
@@ -680,11 +688,11 @@ public class carbonization {
 		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(misc,1,13), new Object[]{new ItemStack(itemStructureBlock,1,4)}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(itemStructureBlock,5,5), new Object[]{"x x", " y ", "x x", 'x', new ItemStack(Item.ingotIron), 'y', new ItemStack(misc,1,13)}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(Item.ingotIron), new Object[]{new ItemStack(itemStructureBlock,1,5)}));
-		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(itemStructureBlock,5,6), new Object[]{"x x", " y ", "x x", 'x', "ingotRefinedIron", 'y', "ingotRefinedIron"}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(itemStructureBlock,5,6), new Object[]{"x x", " y ", "x x", 'x', "ingotCRefinedIron", 'y', "ingotCRefinedIron"}));//TODO: narf!
 		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(ingots,1,0), new Object[]{new ItemStack(itemStructureBlock,1,6)}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(itemStructureBlock,5,7), new Object[]{"x x", " y ", "x x", 'x', new ItemStack(misc,1,14), 'y', new ItemStack(misc,1,14)}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(misc,1,14), new Object[]{new ItemStack(itemStructureBlock,1,7)}));
-		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(itemStructureBlock,5,8), new Object[]{"x x", " y ", "x x", 'x', "ingotRefinedIron", 'y', new ItemStack(misc,1,14)}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(itemStructureBlock,5,8), new Object[]{"x x", " y ", "x x", 'x', "ingotCRefinedIron", 'y', new ItemStack(misc,1,14)}));//TODO: cheep cheep
 		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(ingots,1,0), new Object[]{new ItemStack(itemStructureBlock,1,8)}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(itemStructureBlock,5,9), new Object[]{"x x", " y ", "x x", 'x', "ingotPigIron", 'y', "ingotPigIron"}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(ingots,1,1), new Object[]{new ItemStack(itemStructureBlock,1,9)}));
@@ -704,7 +712,7 @@ public class carbonization {
 		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(misc,1,17), new Object[]{new ItemStack(itemStructureBlock,1,16)}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(itemStructureBlock,5,17), new Object[]{"x x", " y ", "x x", 'x', "ingotSteel", 'y', new ItemStack(misc,1,17)}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(ingots,1,3), new Object[]{new ItemStack(itemStructureBlock,1,17)}));
-		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(itemStructureBlock,2,18), new Object[]{"x x", " y ", "x x", 'x', new ItemStack(Item.netherStar), 'y', new ItemStack(Block.dragonEgg)}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(itemStructureBlock,5,18), new Object[]{"x x", " y ", "x x", 'x', new ItemStack(Item.netherStar), 'y', new ItemStack(Block.dragonEgg)}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(Block.dragonEgg), new Object[]{new ItemStack(itemStructureBlock,1,18)}));
 		
 		//Purpose
@@ -866,6 +874,10 @@ public class carbonization {
 		CarbonizationRecipes.smelting().addInfoItem(new ItemStack(autocraftingBench,1,2), 17);
 		
 		CarbonizationRecipes.smelting().addInfoItem(new ItemStack(fuelCell,1), 16);
+		
+		CarbonizationRecipes.smelting().addInfoItem(new ItemStack(portableScanner), 18);
+		CarbonizationRecipes.smelting().addInfoItem(new ItemStack(portableScanner), 19);
+		CarbonizationRecipes.smelting().addInfoItem(new ItemStack(portableScanner), 20);
 		
 		for(int i = 0; i < 3; i++)
 			CarbonizationRecipes.smelting().addInfoItem(new ItemStack(furnaceBlock, 1, i), 9);

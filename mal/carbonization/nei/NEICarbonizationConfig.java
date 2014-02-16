@@ -1,5 +1,6 @@
 package mal.carbonization.nei;
 
+import mal.carbonization.carbonization;
 import mal.carbonization.gui.GuiCarbonizationInfo;
 import mal.carbonization.gui.GuiFurnaces;
 import mal.carbonization.gui.GuiNEIMultiblockFurnace;
@@ -21,6 +22,8 @@ public class NEICarbonizationConfig implements IConfigureNEI {
 		API.registerRecipeHandler(new CarbonizationItemInformationHandler());
 		API.registerUsageHandler(new CarbonizationItemInformationHandler());
 		API.setGuiOffset(GuiCarbonizationInfo.class, 0, 0);
+		
+		API.hideItem(carbonization.multiblockFurnaceControl.blockID);
 	}
 
 	@Override

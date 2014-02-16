@@ -2,12 +2,15 @@ package mal.carbonization.items;
 
 import java.util.List;
 
+import org.lwjgl.input.Keyboard;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 import mal.api.IFuelContainer;
 import mal.carbonization.carbonization;
 import mal.core.ColorReference;
+import mal.core.FormatReference;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -32,7 +35,7 @@ public class ItemFuelCell extends Item implements IFuelContainer{
 	/*
 	 * Set the contents of the NBTTag in a specific itemstack
 	 */
-	public boolean setFuel(ItemStack is, int fuelValue, boolean absolute)
+	public boolean setFuel(ItemStack is, long fuelValue, boolean absolute)
 	{
 		if(is.stackTagCompound == null)
 		{
@@ -40,25 +43,25 @@ public class ItemFuelCell extends Item implements IFuelContainer{
 		}
 		
 		//bit of a check to see if we are reducing the value and if it's going to be less than 0, because that's bad mmKay
-		boolean flag = (fuelValue<0)?(fuelValue>is.stackTagCompound.getInteger("FuelTime")):(false);
+		boolean flag = (fuelValue<0)?(fuelValue>is.stackTagCompound.getLong("FuelTime")):(false);
 		if(flag)
 		{
-			is.stackTagCompound.setInteger("FuelTime", 0);
+			is.stackTagCompound.setLong("FuelTime", 0);
 			return true;
 		}
 		else if(absolute)
 		{
-			is.stackTagCompound.setInteger("FuelTime", fuelValue);
+			is.stackTagCompound.setLong("FuelTime", fuelValue);
 			return true;
 		}
-		else if(is.stackTagCompound.getInteger("FuelTime") < 0)
+		else if(is.stackTagCompound.getLong("FuelTime") < 0)
 		{
-			is.stackTagCompound.setInteger("FuelTime", 0);
+			is.stackTagCompound.setLong("FuelTime", 0);
 			return true;
 		}
 		else
 		{
-			is.stackTagCompound.setInteger("FuelTime", is.stackTagCompound.getInteger("FuelTime")+fuelValue);
+			is.stackTagCompound.setLong("FuelTime", is.stackTagCompound.getLong("FuelTime")+fuelValue);
 			return true;
 		}
 	}
@@ -66,11 +69,11 @@ public class ItemFuelCell extends Item implements IFuelContainer{
 	/*
 	 * Get the amount of fuel stored
 	 */
-	public int getFuelValue(ItemStack is)
+	public long getFuelValue(ItemStack is)
 	{
 		if(is.stackTagCompound==null)
 			setFuel(is,0,true);
-		return is.stackTagCompound.getInteger("FuelTime");
+		return is.stackTagCompound.getLong("FuelTime");
 	}
 	
 	@Override
@@ -84,7 +87,7 @@ public class ItemFuelCell extends Item implements IFuelContainer{
 	public void addInformation(ItemStack is, EntityPlayer ep, List list, boolean bool)
 	{
 		list.add(setTooltipData("A capsule of processed fuel.", ColorReference.DARKGREY));
-		list.add(setTooltipData("Stored Fuel Time: " + getFuelValue(is), ColorReference.DARKGREY));
+		list.add(setTooltipData("Stored Fuel Time: " + ((Keyboard.isKeyDown(42)) || (Keyboard.isKeyDown(54))?(getFuelValue(is)):(FormatReference.compressLong(getFuelValue(is)))), ColorReference.DARKGREY));
 	}
 	
 	//The tool tip information
@@ -107,7 +110,7 @@ public class ItemFuelCell extends Item implements IFuelContainer{
 		if(is.stackTagCompound==null)
 			setFuel(is,0,true);
 		
-		if(is.stackTagCompound.getInteger("FuelTime")==0)
+		if(is.stackTagCompound.getLong("FuelTime")==0)
 			return iconArray[0];
 		else
 			return iconArray[1];
@@ -119,7 +122,7 @@ public class ItemFuelCell extends Item implements IFuelContainer{
 		if(is.stackTagCompound==null)
 			setFuel(is,0,true);
 		
-		if(is.stackTagCompound.getInteger("FuelTime")==0)
+		if(is.stackTagCompound.getLong("FuelTime")==0)
 			return iconArray[0];
 		else
 			return iconArray[1];

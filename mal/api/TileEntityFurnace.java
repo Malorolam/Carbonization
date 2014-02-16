@@ -385,7 +385,7 @@ public class TileEntityFurnace extends TileEntity implements ISidedInventory
         else if(par0ItemStack.getItem() instanceof IFuelContainer)
         {
         	//get the value
-        	int fuelValue = ((IFuelContainer)par0ItemStack.getItem()).getFuelValue(par0ItemStack);
+        	long fuelValue = ((IFuelContainer)par0ItemStack.getItem()).getFuelValue(par0ItemStack);
         	
         	//if it's a number, reduce it by some amount, we're using standard coal or the value, whichever is smaller
         	if(fuelValue == 0)
@@ -398,7 +398,7 @@ public class TileEntityFurnace extends TileEntity implements ISidedInventory
         	else
         	{
         		((IFuelContainer)par0ItemStack.getItem()).setFuel(par0ItemStack, 0, true);
-        		return fuelValue;
+        		return (int)fuelValue;
         	}
         }
 //IFuelContainer interaction end
@@ -449,7 +449,7 @@ public class TileEntityFurnace extends TileEntity implements ISidedInventory
         else if(par0ItemStack.getItem() instanceof IFuelContainer)
         {
         	//get the value
-        	int fuelValue = ((IFuelContainer)par0ItemStack.getItem()).getFuelValue(par0ItemStack);
+        	long fuelValue = ((IFuelContainer)par0ItemStack.getItem()).getFuelValue(par0ItemStack);
         	int value = (int) (1600);
         	
         	//if it's a number, reduce it by some amount, we're using standard coal or the value, whichever is smaller
@@ -461,7 +461,7 @@ public class TileEntityFurnace extends TileEntity implements ISidedInventory
         	}
         	else
         	{
-        		return fuelValue;
+        		return (int)fuelValue;
         	}
         }
         else

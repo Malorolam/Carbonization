@@ -3,6 +3,7 @@ package mal.core.multiblock;
 import mal.carbonization.carbonization;
 import net.minecraft.block.Block;
 //Stores a block and it's location, as well as it's tier if it's one of the valid multiblock blocks
+import net.minecraft.item.ItemStack;
 
 public class Multiblock {
 
@@ -126,6 +127,12 @@ public class Multiblock {
 		System.out.println(".");*/
 		
 		return false;
+	}
+	
+	public String toString()
+	{
+		ItemStack is = new ItemStack(blockID,1,data);
+		return is.getDisplayName();
 	}
 }
 

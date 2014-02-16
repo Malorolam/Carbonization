@@ -536,7 +536,7 @@ public class TileEntityFurnaces extends TileEntity implements IInventory, net.mi
         else if(par0ItemStack.getItem() instanceof IFuelContainer)
         {
         	//get the value
-        	int fuelValue = ((IFuelContainer)par0ItemStack.getItem()).getFuelValue(par0ItemStack);
+        	long fuelValue = ((IFuelContainer)par0ItemStack.getItem()).getFuelValue(par0ItemStack);
         	int value = (int) (1600);
         	
         	//if it's a number, reduce it by some amount, we're using standard coal or the value, whichever is smaller
@@ -550,7 +550,7 @@ public class TileEntityFurnaces extends TileEntity implements IInventory, net.mi
         	else
         	{
         		((IFuelContainer)par0ItemStack.getItem()).setFuel(par0ItemStack, 0, true);
-        		return fuelValue;
+        		return (int)fuelValue;
         	}
         }
         else
@@ -594,7 +594,7 @@ public class TileEntityFurnaces extends TileEntity implements IInventory, net.mi
         else if(par0ItemStack.getItem() instanceof IFuelContainer)
         {
         	//get the value
-        	int fuelValue = ((IFuelContainer)par0ItemStack.getItem()).getFuelValue(par0ItemStack);
+        	long fuelValue = ((IFuelContainer)par0ItemStack.getItem()).getFuelValue(par0ItemStack);
         	int value = (int) (1600);
         	
         	//if it's a number, reduce it by some amount, we're using standard coal or the value, whichever is smaller
@@ -606,7 +606,7 @@ public class TileEntityFurnaces extends TileEntity implements IInventory, net.mi
         	}
         	else
         	{
-        		return fuelValue;
+        		return (int)fuelValue;
         	}
         }
         else

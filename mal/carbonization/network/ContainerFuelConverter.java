@@ -55,6 +55,7 @@ public class ContainerFuelConverter extends Container {
             this.addSlotToContainer(new Slot(par1InventoryPlayer, i, 8 + i * 18, 196));
         }
 	}
+	
 	@Override
 	public boolean canInteractWith(EntityPlayer entityplayer) {
 		// TODO Auto-generated method stub

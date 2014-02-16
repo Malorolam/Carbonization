@@ -109,13 +109,13 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
 			action = handleUpgrade(action);
 			action = handleInput(action);
 			
-			if(action)
+			//if(action)
 			{
 				onInventoryChanged();
 			}
-			else
-				inventoryChanged=false;
-			PacketDispatcher.sendPacketToAllAround(xCoord, yCoord, zCoord, 64, worldObj.provider.dimensionId, getDescriptionPacket());
+			//else
+				//inventoryChanged=false;
+			PacketDispatcher.sendPacketToAllAround(xCoord, yCoord, zCoord, 64, worldObj.provider.dimensionId, getDataPacket());
 		}
 	}
 	
@@ -134,7 +134,7 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
 				if(upgradeStacks[0].getItemDamage() >= 1000 && upgradeStacks[0].getItemDamage() < 2000)
 				{
 					double[] d = ItemStructureBlock.getTier(upgradeStacks[0].getItemDamage());
-					upgradeTier = (d[0]+d[1])/2*Math.sqrt(upgradeStacks[0].stackSize);
+					upgradeTier = (d[0]+d[1])/2*(1+1.25*(upgradeStacks[0].stackSize/upgradeStacks[0].getMaxStackSize()));
 					action = true;
 				}
 				else
@@ -377,7 +377,7 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
 				NBTTagCompound var4 = new NBTTagCompound();
 				var4.setByte("Slot", (byte)i);
 				this.upgradeStacks[i].writeToNBT(var4);
-				output.appendTag(var4);
+				upgrade.appendTag(var4);
 			}
 		}
 		nbt.setTag("Upgrade", upgrade);
@@ -619,9 +619,9 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
         else if(par0ItemStack.getItem() instanceof IFuelContainer)
         {
         	//get the value
-        	int fuelValue = ((IFuelContainer)par0ItemStack.getItem()).getFuelValue(par0ItemStack);
+        	long fuelValue = ((IFuelContainer)par0ItemStack.getItem()).getFuelValue(par0ItemStack);
         	int value = (int) (maxFuelCapacity-fuelTank);
-        	System.out.println("fuelvalue: " + fuelValue + " value: " + value);
+        	//System.out.println("fuelvalue: " + fuelValue + " value: " + value);
         	
         	//if it's a number, reduce it by some amount, we're using standard coal or the value, whichever is smaller
         	if(fuelValue == 0)
@@ -634,7 +634,7 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
         	else
         	{
         		((IFuelContainer)par0ItemStack.getItem()).setFuel(par0ItemStack, 0, true);
-        		return fuelValue;
+        		return (int)fuelValue;
         	}
         }
         else
@@ -680,7 +680,7 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
         else if(par0ItemStack.getItem() instanceof IFuelContainer)
         {
         	//get the value
-        	int fuelValue = ((IFuelContainer)par0ItemStack.getItem()).getFuelValue(par0ItemStack);
+        	long fuelValue = ((IFuelContainer)par0ItemStack.getItem()).getFuelValue(par0ItemStack);
         	int value = (int) (maxFuelCapacity-fuelTank);
         	
         	//if it's a number, reduce it by some amount, we're using standard coal or the value, whichever is smaller
@@ -692,7 +692,7 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
         	}
         	else
         	{
-        		return fuelValue;
+        		return (int)fuelValue;
         	}
         }
         else
@@ -1534,6 +1534,11 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
 	public Packet getDescriptionPacket()
 	{
 	   return PacketHandler.getPacket(this);
+	}
+			
+	private Packet getDataPacket()
+	{
+		return PacketHandler.getPacket(this,"noinventory");
 	}
 
 	public void closeGui()

@@ -29,7 +29,8 @@ public class BlockMultiblockFurnaceControl extends BlockContainer {
 	
 	public BlockMultiblockFurnaceControl(int par1, Material par2Material) {
 		super(par1, par2Material);
-		this.setResistance(20f);
+		this.setResistance(100f);
+		this.setHardness(10f);
 		this.setUnlocalizedName("carbonization:multiblockfurnacecontrol");
 	}
 	

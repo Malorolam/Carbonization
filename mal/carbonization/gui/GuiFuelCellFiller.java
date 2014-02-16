@@ -96,6 +96,7 @@ public class GuiFuelCellFiller extends GuiContainer {
 			
 			list.add(ColorReference.DARKCYAN.getCode() + "Ticks until crafting: ");
 			list.add(bench.craftingCooldown + "/" + bench.processTime);
+			list.add(ColorReference.DARKCYAN.getCode() + "Bonus Yield Multiplyer: " + String.format("%.2f", bench.getBonusYield()));
 			
 	        this.drawHoveringText(list, par1, par2, fontRenderer);
 		}

@@ -8,6 +8,9 @@ import mal.carbonization.gui.GuiFuelConverter;
 import mal.carbonization.gui.GuiFurnaces;
 import mal.carbonization.gui.GuiMultiblockFurnace;
 import mal.carbonization.gui.GuiMultiblockInit;
+import mal.carbonization.gui.GuiPortableScanner;
+import mal.carbonization.items.ItemPortableScanner;
+import mal.carbonization.network.PortableScannerWrapper;
 import mal.carbonization.tileentity.TileEntityAutocraftingBench;
 import mal.carbonization.tileentity.TileEntityFuelCellFiller;
 import mal.carbonization.tileentity.TileEntityFuelConverter;
@@ -65,6 +68,11 @@ public class ClientProxy extends CommonProxy {
         }
         if(tileEntity instanceof TileEntityFuelCellFiller)
         	return new GuiFuelCellFiller(player.inventory, (TileEntityFuelCellFiller)tileEntity);
+        
+        if(id == 4 && player.getCurrentEquippedItem() != null && player.getCurrentEquippedItem().getItem().itemID == carbonization.portableScanner.itemID)
+        {
+        	return new GuiPortableScanner(player.inventory, new PortableScannerWrapper(player.getCurrentEquippedItem()));
+        }
         return null;
 	}
 }

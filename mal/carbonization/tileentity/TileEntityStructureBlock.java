@@ -118,7 +118,7 @@ public class TileEntityStructureBlock extends TileEntity implements ITileEntityM
 	{
 		if(masterEntity != null)
 		{
-			System.out.println("Master Entity " + masterEntity.toString() + " at: " + masterEntity.getX() + ", " + masterEntity.getY() + ", " + masterEntity.getZ());
+			//System.out.println("Master Entity " + masterEntity.toString() + " at: " + masterEntity.getX() + ", " + masterEntity.getY() + ", " + masterEntity.getZ());
 			if(this.isUseableByPlayer(par5EntityPlayer))
 				masterEntity.activate(world, masterEntity.getX(), masterEntity.getY(), masterEntity.getZ(), par5EntityPlayer);
 		}

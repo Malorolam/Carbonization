@@ -6,10 +6,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.Map.Entry;
+import java.util.logging.Level;
 
 import mal.carbonization.CarbonizationRecipes;
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.tileentity.TileEntityFurnace;
@@ -22,6 +24,7 @@ import codechicken.nei.recipe.FurnaceRecipeHandler;
 import codechicken.nei.recipe.TemplateRecipeHandler;
 import codechicken.nei.recipe.FurnaceRecipeHandler.FuelPair;
 import codechicken.nei.recipe.FurnaceRecipeHandler.SmeltingPair;
+import cpw.mods.fml.common.FMLLog;
 
 public class CarbonizationFurnaceRecipeHandler extends TemplateRecipeHandler{
 
@@ -65,7 +68,10 @@ public class CarbonizationFurnaceRecipeHandler extends TemplateRecipeHandler{
 		
 		public PositionedStack getOtherStack()
 		{
-			return fuels.get((cycleticks/48)%fuels.size()).stack;
+			if(fuels.size() > 0)
+				return fuels.get((cycleticks/48)%fuels.size()).stack;
+			else
+				return new PFuel(new ItemStack(Item.coal, 1, 0), TileEntityFurnace.getItemBurnTime(new ItemStack(Item.coal,1,0))).stack;
 		}
 		
 	}

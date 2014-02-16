@@ -353,6 +353,10 @@ public class ItemStructureBlock extends Item{
 		return value;
 	}
 	
+	/*
+	 * d[0]=insulation
+	 * d[1]=conduction
+	 */
 	public static double[] getTier(int damage)
 	{
 		int[] v = deconstructDamage(damage);

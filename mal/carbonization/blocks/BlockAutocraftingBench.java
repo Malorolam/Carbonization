@@ -174,7 +174,7 @@ public class BlockAutocraftingBench extends BlockContainer {
     	case 2:
         	return new TileEntityFuelCellFiller();
     	default:
-    		System.out.println("metadata is " + metadata);
+    		//System.out.println("metadata is " + metadata);
     		return null;
     	}
     }

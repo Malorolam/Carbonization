@@ -164,16 +164,16 @@ public class TileEntityMultiblockInit extends TileEntity {
 		else//an actual offset
 			value = MultiBlockInstantiator.matchPatternWithOffset(match, xCoord, yCoord, zCoord, worldObj, new Multiblock(worldObj.getBlockId(xCoord, yCoord, zCoord),te.blockMetadata, true), offset);
 		
-		System.out.println("Offset: " + offset[0] +", "+ offset[1] +", "+ offset[2]);
+		//System.out.println("Offset: " + offset[0] +", "+ offset[1] +", "+ offset[2]);
 		
 		if(value != null)
 		{
-			System.out.println("Value: " + value[0] +", "+ value[1] +", "+ value[2]);
+			//System.out.println("Value: " + value[0] +", "+ value[1] +", "+ value[2]);
 			MultiBlockInstantiator.createMultiBlock(match, xCoord, yCoord, zCoord, worldObj, value);
 		}
 		else
 		{
-			System.out.println("Value is Null");
+			//System.out.println("Value is Null");
 		}
 	}
 	

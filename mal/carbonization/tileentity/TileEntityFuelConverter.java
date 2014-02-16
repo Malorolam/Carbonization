@@ -161,7 +161,7 @@ public class TileEntityFuelConverter extends TileEntity implements IInventory, n
 	{
 		super.onInventoryChanged();
 
-		inventoryChanged = true;
+		inventoryChanged = false;
 	}
 
 	private boolean inventoryChanged;
@@ -183,14 +183,12 @@ public class TileEntityFuelConverter extends TileEntity implements IInventory, n
 			action = handleUpgrade(action);
 			action = handleInput(action);
 			action = handlePotential(action);
-
-			if(action)
-			{
-				onInventoryChanged();
-			}
-			else
-				inventoryChanged=false;
-			PacketDispatcher.sendPacketToAllAround(xCoord, yCoord, zCoord, 64, worldObj.provider.dimensionId, getDescriptionPacket());
+			
+			PacketDispatcher.sendPacketToAllPlayers(getDataPacket());
+	//		if(!inventoryChanged)
+//				PacketDispatcher.sendPacketToAllAround(xCoord, yCoord, zCoord, 64, worldObj.provider.dimensionId, getDescriptionPacket());
+			
+			onInventoryChanged();
 		}
 	}
 
@@ -241,7 +239,7 @@ public class TileEntityFuelConverter extends TileEntity implements IInventory, n
 				{
 					double[] d = ItemStructureBlock.getTier(upgradeStacks[0].getItemDamage());
 					double a = 1.0/3.0;
-					speedUpgrade = (d[0]+d[1])/2*Math.pow(upgradeStacks[0].stackSize, a);
+					speedUpgrade = (d[0]+d[1])/2*(1+1.25*upgradeStacks[0].stackSize/upgradeStacks[0].getMaxStackSize());
 					action = true;
 				}
 				else
@@ -261,7 +259,7 @@ public class TileEntityFuelConverter extends TileEntity implements IInventory, n
 				{
 					double[] d = ItemStructureBlock.getTier(upgradeStacks[1].getItemDamage());
 					double a = 1.0/3.0;
-					efficiencyUpgrade = (d[0]+d[1])/2*Math.pow(upgradeStacks[1].stackSize, a);
+					efficiencyUpgrade = (d[0]+d[1])/2*(1+1.25*upgradeStacks[1].stackSize/upgradeStacks[1].getMaxStackSize());
 					action = true;
 				}
 				else
@@ -404,7 +402,7 @@ public class TileEntityFuelConverter extends TileEntity implements IInventory, n
 	{
 		fuelMultiplyer = 1/(efficiencyUpgrade-0.01*speedUpgrade+1);
 		potentialMultiplyer = 3.2/(efficiencyUpgrade-0.01*speedUpgrade+3.2);
-		processTime = carbonization.MAXAUTOCRAFTTIME - (int) ((Math.pow(speedUpgrade,1.2)-0.01*efficiencyUpgrade)*(carbonization.MAXAUTOCRAFTTIME-carbonization.MINAUTOCRAFTTIME)/47.3);
+		processTime = carbonization.MAXAUTOCRAFTTIME - (int) (4.23*(Math.pow(speedUpgrade,1)-0.01*efficiencyUpgrade)*(carbonization.MAXAUTOCRAFTTIME-carbonization.MINAUTOCRAFTTIME)/47.3);
 		if(processTime < carbonization.MINAUTOCRAFTTIME)
 			processTime = carbonization.MINAUTOCRAFTTIME;
 	}
@@ -666,7 +664,7 @@ public class TileEntityFuelConverter extends TileEntity implements IInventory, n
 				NBTTagCompound var4 = new NBTTagCompound();
 				var4.setByte("Slot", (byte)i);
 				this.upgradeStacks[i].writeToNBT(var4);
-				output.appendTag(var4);
+				upgrade.appendTag(var4);
 			}
 		}
 		nbt.setTag("Upgrade", upgrade);
@@ -1121,7 +1119,7 @@ public class TileEntityFuelConverter extends TileEntity implements IInventory, n
 		else if(par0ItemStack.getItem() instanceof IFuelContainer)
         {
         	//get the value
-        	int fuelValue = ((IFuelContainer)par0ItemStack.getItem()).getFuelValue(par0ItemStack);
+        	long fuelValue = ((IFuelContainer)par0ItemStack.getItem()).getFuelValue(par0ItemStack);
         	int value = (int) (maxFuelCapacity-fuelTank);
         	
         	//if it's a number, reduce it by some amount, we're using standard coal or the value, whichever is smaller
@@ -1135,7 +1133,7 @@ public class TileEntityFuelConverter extends TileEntity implements IInventory, n
         	else
         	{
         		((IFuelContainer)par0ItemStack.getItem()).setFuel(par0ItemStack, 0, true);
-        		return fuelValue;
+        		return (int) fuelValue;
         	}
         }
 		else
@@ -1181,7 +1179,7 @@ public class TileEntityFuelConverter extends TileEntity implements IInventory, n
 	        else if(par0ItemStack.getItem() instanceof IFuelContainer)
 	        {
 	        	//get the value
-	        	int fuelValue = ((IFuelContainer)par0ItemStack.getItem()).getFuelValue(par0ItemStack);
+	        	long fuelValue = ((IFuelContainer)par0ItemStack.getItem()).getFuelValue(par0ItemStack);
 	        	int value = (int) (maxFuelCapacity-fuelTank);
 	        	
 	        	//if it's a number, reduce it by some amount, we're using standard coal or the value, whichever is smaller
@@ -1193,7 +1191,7 @@ public class TileEntityFuelConverter extends TileEntity implements IInventory, n
 	        	}
 	        	else
 	        	{
-	        		return fuelValue;
+	        		return (int)fuelValue;
 	        	}
 	        }
 	        else
@@ -1412,6 +1410,11 @@ public class TileEntityFuelConverter extends TileEntity implements IInventory, n
 	public Packet getDescriptionPacket()
 	{
 		return PacketHandler.getPacket(this);
+	}
+	
+	private Packet getDataPacket()
+	{
+		return PacketHandler.getPacket(this,"noinventory");
 	}
 }
 

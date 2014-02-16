@@ -126,6 +126,14 @@ public class MultiBlockMatcher {
 	 */
 	public boolean comparePatternBlock(Multiblock[][][] test_pattern, int i, int j, int k)
 	{
+/*		if(test_pattern[i][j][k] == null)
+		{
+			if(pattern[i][j][k] != null)
+				return false;
+			else
+				return true;
+		}*/
+		
 		if(test_pattern[i][j][k].compare(pattern[i][j][k], true))
 			return true;
 		return false;
@@ -157,7 +165,13 @@ public class MultiBlockMatcher {
 			for(int j = 0; j<pattern[0].length; j++)
 				for(int k = 0; k<pattern[0][0].length; k++)
 				{
-					//System.out.println(i + ", " + j + ", " + k);
+					/*if(pattern[i][j][k] == null)
+					{
+						if(test_pattern[i][j][k] != null)
+							return false;
+							
+					}*/
+					
 					if(!pattern[i][j][k].compare(test_pattern[i][j][k],false))
 					{
 						if(test_pattern[i][j][k].compare(exceptionBlock,false) && count<exceptionCount)
