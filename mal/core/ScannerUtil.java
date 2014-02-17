@@ -16,6 +16,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.common.MinecraftForge;
 
 /*
  * herp derp
@@ -160,8 +161,8 @@ public class ScannerUtil {
 	{
 		int totalBlocks = 0;
 		int totalVolume = pattern.length*pattern[0].length*pattern[0][0].length;
-		int maxToolRequired = 0;
-		int totalToolRequired = 0;
+		int maxToolRequired = -100;
+		//int totalToolRequired = 0;
 		
 		for(int i = 0; i < pattern.length; i++)
 			for(int j = 0; j<pattern[0].length; j++)
@@ -170,17 +171,17 @@ public class ScannerUtil {
 					if(pattern[i][j][k]!=null && !world.isAirBlock(startX+i, startY+j, startZ+k))
 					{
 						totalBlocks++;
-						int toolR = getBlockHarvestLevel(pattern[i][j][k].blockID, pattern[i][j][k].data);
-						totalToolRequired += toolR;
+						int toolR = getBlockHarvestLevel(pattern[i][j][k].blockID, pattern[i][j][k].data, world, startX+i, startY+j, startZ+k);
+						//totalToolRequired += (toolR>0)?(toolR):(0);
 						if(toolR > maxToolRequired)
 							maxToolRequired = toolR;
 					}
 				}
 		double percent = ((double)totalBlocks)/((double)totalVolume)*100;
-		double avgTool = ((double)totalToolRequired)/((double)totalBlocks);
+		//double avgTool = ((double)totalToolRequired)/((double)totalBlocks);
 		List<String> list = new ArrayList<String>();
 		list.add("Volume: " + totalBlocks + "/" + totalVolume + " (" + String.format("%.2f", percent) + "% solid)");
-		list.add("Max tool material required: " + convertToolLevel(maxToolRequired) + ((totalBlocks>1)?("; Average tool material required: " + convertToolLevel((int)Math.ceil(avgTool))):("")));
+		list.add("Tool material required to harvest all: " + convertToolLevel(maxToolRequired));// + ((totalBlocks>1)?("; Average tool material required: " + convertToolLevel((int)Math.ceil(avgTool))):("")));
 		
 		return list;
 	}
@@ -192,8 +193,8 @@ public class ScannerUtil {
 	{
 		int totalBlocks = 0;
 		int totalVolume = pattern.length*pattern[0].length*pattern[0][0].length;
-		int maxToolRequired = 0;
-		int totalToolRequired = 0;
+		int maxToolRequired = -100;
+		//int totalToolRequired = 0;
 		HashMap<String,Integer> map = new HashMap<String,Integer>();
 		
 		for(int i = 0; i < pattern.length; i++)
@@ -203,18 +204,18 @@ public class ScannerUtil {
 					if(pattern[i][j][k]!=null && !world.isAirBlock(startX+i, startY+j, startZ+k))
 					{
 						totalBlocks++;
-						int toolR = getBlockHarvestLevel(pattern[i][j][k].blockID, pattern[i][j][k].data);
-						totalToolRequired += toolR;
+						int toolR = getBlockHarvestLevel(pattern[i][j][k].blockID, pattern[i][j][k].data, world, startX+i, startY+j, startZ+k);
+						//totalToolRequired += (toolR>0)?(toolR):(0);
 						if(toolR > maxToolRequired)
 							maxToolRequired = toolR;
 						addBlocktoMap(pattern[i][j][k], 1, map);
 					}
 				}
 		double percent = ((double)totalBlocks)/((double)totalVolume)*100;
-		double avgTool = ((double)totalToolRequired)/((double)totalBlocks);
+		//double avgTool = ((double)totalToolRequired)/((double)totalBlocks);
 		List<String> list = new ArrayList<String>();
 		list.add("Volume: " + totalBlocks + "/" + totalVolume + " (" + String.format("%.2f", percent) + "% solid)");
-		list.add("Max tool material required: " + convertToolLevel(maxToolRequired) + ((totalBlocks>1)?("; Average tool material required: " + convertToolLevel((int)Math.ceil(avgTool))):("")));
+		list.add("Tool material required to harvest all: " + convertToolLevel(maxToolRequired));// + ((totalBlocks>1)?("; Average tool material required: " + convertToolLevel((int)Math.ceil(avgTool))):("")));
 		
 		List<String> l = new ArrayList<String>();
 		for(String s : map.keySet())
@@ -253,64 +254,40 @@ public class ScannerUtil {
 			map.put(is.getDisplayName(), value);
 	}
 	
-	/**
-	 * A dirty way to get the harvest level of a block
-	 * offset by 1 so that blocks that need no tool have a different index from blocks that need any tool of a type
-	 */
-	private static int getBlockHarvestLevel(int blockID, int metadata)
+	private static int getBlockHarvestLevel(int blockID, int metadata, World world, int x, int y, int z)
 	{
 		Block block = Block.blocksList[blockID]; 
 		if(block==null)
 			return 0;
-		if (block.blockMaterial.isToolNotRequired())
-            return 0;
+		if(block.getBlockHardness(world, x, y, z) == -1.0f)
+			return -6;
 		
-		//try different tools until we get a successful value
-		//pickaxes
-		ItemStack is = new ItemStack(Item.pickaxeWood);
-		if(ForgeHooks.canToolHarvestBlock(block, metadata, is))
-			return 1;
-		is = new ItemStack(Item.pickaxeStone);
-		if(ForgeHooks.canToolHarvestBlock(block, metadata, is))
-			return 2;
-		is = new ItemStack(Item.pickaxeIron);
-		if(ForgeHooks.canToolHarvestBlock(block, metadata, is))
-			return 3;
-		is = new ItemStack(Item.pickaxeDiamond);
-		if(ForgeHooks.canToolHarvestBlock(block, metadata, is))
-			return 4;
-		//TODO: Eventually put TC tool support in
+		int level = MinecraftForge.getBlockHarvestLevel(block, metadata, "pickaxe");
+		if(level == -1)//no mapping for picks
+		{
+			level = MinecraftForge.getBlockHarvestLevel(block, metadata, "shovel");
+			if(level == -1)
+				level = MinecraftForge.getBlockHarvestLevel(block, metadata, "axe");
+		}
 		
-		//i can has shuvl
-		is = new ItemStack(Item.shovelWood);
-		if(ForgeHooks.canToolHarvestBlock(block, metadata, is))
-			return 1;
-		is = new ItemStack(Item.shovelStone);
-		if(ForgeHooks.canToolHarvestBlock(block, metadata, is))
-			return 2;
-		is = new ItemStack(Item.shovelIron);
-		if(ForgeHooks.canToolHarvestBlock(block, metadata, is))
-			return 3;
-		is = new ItemStack(Item.shovelDiamond);
-		if(ForgeHooks.canToolHarvestBlock(block, metadata, is))
-			return 4;
+		if(level == 0)
+		{
+			if(block.blockMaterial.isToolNotRequired())
+				return -5;
+			else
+				return 0;
+		}
 		
-		//gotta axe you a question
-		is = new ItemStack(Item.axeWood);
-		if(ForgeHooks.canToolHarvestBlock(block, metadata, is))
-			return 1;
-		is = new ItemStack(Item.axeStone);
-		if(ForgeHooks.canToolHarvestBlock(block, metadata, is))
-			return 2;
-		is = new ItemStack(Item.axeIron);
-		if(ForgeHooks.canToolHarvestBlock(block, metadata, is))
-			return 3;
-		is = new ItemStack(Item.axeDiamond);
-		if(ForgeHooks.canToolHarvestBlock(block, metadata, is))
-			return 4;
+		if(level == -1)//some exceptions for stuff we know about, like grass
+		{
+			if(block.isBlockReplaceable(world, x, y, z))//exception for stuff like liquids and plants
+				return -5;
+			if(block.isLeaves(world, x, y, z))
+				return 2;
+			return -100;//suppress the -1 into -100 so anything else shows sooner
+		}
 		
-		//we found something no tool we know about will mine, soooooo yeaaaahhhhhhhh just don't consider it for now
-		return 0;
+		return level;
 	}
 	
 	/**
@@ -322,23 +299,29 @@ public class ScannerUtil {
 		
 		switch(level)
 		{
-		case 0:
+		case -100:
+			s = "Unknown Tool Required";
+			break;
+		case -5:
 			s = "No Tool Required";
 			break;
-		case 1:
+		case 0:
 			s = "Wood";
 			break;
-		case 2:
+		case 1:
 			s = "Stone";
 			break;
-		case 3:
+		case 2:
 			s = "Iron";
 			break;
-		case 4:
+		case 3:
 			s = "Diamond";
 			break;
+		case -6:
+			s = "Indestructable";
+			break;
 		default:
-			s = "dunno";
+			s = "Greater Than Diamond Required";
 		}
 		return s;
 	}

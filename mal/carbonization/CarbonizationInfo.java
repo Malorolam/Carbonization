@@ -452,13 +452,12 @@ public class CarbonizationInfo {
 		
 		list.add("Portable Scanner:");
 		list.add("");
-		list.add("the entire volume as well as the average");
-		list.add("level needed.  Extended mode, in addition");
-		list.add("to showing the Basic mode information,");
-		list.add("also shows a list of the blocks in the");
-		list.add("volume and how many of each there are.");
-		list.add("The fuel usage for Extended mode is");
-		list.add("higher as well.");
+		list.add("the entire volume.  Extended mode, in");
+		list.add("addition to showing the Basic mode");
+		list.add("information, also shows a list of");
+		list.add("blocks in the volume and how many of");
+		list.add("each there are.  The fuel usage for");
+		list.add("Extended mode is higher as well.");
 		
 		return list;
 	}

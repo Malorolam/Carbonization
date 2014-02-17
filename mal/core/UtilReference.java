@@ -8,7 +8,10 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemHoe;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemSword;
+import net.minecraft.item.ItemTool;
 
 /**
  * @author Mal
@@ -67,21 +70,21 @@ public class UtilReference {
         }
 		else
 		{
-			int var1 = par0ItemStack.getItem().itemID;
-			Item var2 = par0ItemStack.getItem();
+			int itemID = par0ItemStack.getItem().itemID;
+			Item item = par0ItemStack.getItem();
 
-			if (par0ItemStack.getItem() instanceof ItemBlock && Block.blocksList[var1] != null)
+			if (par0ItemStack.getItem() instanceof ItemBlock && Block.blocksList[itemID] != null)
 			{
-				Block var3 = Block.blocksList[var1];
+				Block var3 = Block.blocksList[itemID];
 
 				if (var3 == Block.woodSingleSlab)
 				{
-					return 0;
+					return 150;
 				}
 
 				if (var3.blockMaterial == Material.wood)
 				{
-					return 0;
+					return 300;
 				}
 
 				if (var3 == Block.coalBlock)
@@ -90,11 +93,14 @@ public class UtilReference {
 				}
 			}
 
-			if (var1 == Item.stick.itemID) return 0;
-			if (var1 == Item.coal.itemID) return 1600;
-			if (var1 == Item.bucketLava.itemID) return 0;
-			if (var1 == Block.sapling.blockID) return 0;
-			if (var1 == Item.blazeRod.itemID) return 0;
+			if (item instanceof ItemTool && ((ItemTool) item).getToolMaterialName().equals("WOOD")) return 200;
+            if (item instanceof ItemSword && ((ItemSword) item).getToolMaterialName().equals("WOOD")) return 200;
+            if (item instanceof ItemHoe && ((ItemHoe) item).getMaterialName().equals("WOOD")) return 200;
+            if (itemID == Item.stick.itemID) return 100;
+            if (itemID == Item.coal.itemID) return 1600;
+            if (itemID == Item.bucketLava.itemID) return 20000;
+            if (itemID == Block.sapling.blockID) return 100;
+            if (itemID == Item.blazeRod.itemID) return 2400;
 			return GameRegistry.getFuelValue(par0ItemStack);
 		}
 	}

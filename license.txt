@@ -12,7 +12,7 @@ Terms and Conditions:
 -Usage of the mod, either in .jar or source code form constitutes a complete and unconditional agreement with the following terms.
 
 2: Liability
--Carbonization is provided "as is" with no warranties, implied or otherwise.  The owner of the mod takes no responsibility for and damages incurred from the use of the mod.  Carbonization alters fundamental parts of the Minecraft game, and parts of Minecraft may not work with the mod installed.  All damages caused from the use or misuse of the mod falls on the user. 
+-Carbonization is provided "as is" with no warranties, implied or otherwise.  The owner of the mod takes no responsibility for any damages incurred from the use of the mod.  Carbonization alters fundamental parts of the Minecraft game, and parts of Minecraft may not work with the mod installed.  All damages caused from the use or misuse of the mod falls on the user. 
 
 3: Use
 -Use of the mod to be installed, manually or automatically, is given to the user without restriction.

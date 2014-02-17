@@ -13,6 +13,7 @@ import mal.carbonization.CarbonizationRecipes;
 import mal.carbonization.carbonization;
 import mal.carbonization.items.ItemStructureBlock;
 import mal.carbonization.network.PacketHandler;
+import mal.core.UtilReference;
 import mal.core.multiblock.MultiblockWorkQueueItem;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -466,7 +467,7 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
   	{
   		if(item == null)
   			return false;
-  		int time = getItemBurnTime(item);
+  		int time = UtilReference.getItemBurnTime(item,(int) (this.maxFuelCapacity-this.fuelTank),true);
   		if(time <= 0)
   			return false;
   		
@@ -606,128 +607,7 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
   		return false;
   	}
 
-	/**
-     * Returns the number of ticks that the supplied fuel item will keep the furnace burning, or 0 if the item isn't
-     * fuel
-     */
-    public int getItemBurnTime(ItemStack par0ItemStack)
-    {
-        if (par0ItemStack == null)
-        {
-            return 0;
-        }
-        else if(par0ItemStack.getItem() instanceof IFuelContainer)
-        {
-        	//get the value
-        	long fuelValue = ((IFuelContainer)par0ItemStack.getItem()).getFuelValue(par0ItemStack);
-        	int value = (int) (maxFuelCapacity-fuelTank);
-        	//System.out.println("fuelvalue: " + fuelValue + " value: " + value);
-        	
-        	//if it's a number, reduce it by some amount, we're using standard coal or the value, whichever is smaller
-        	if(fuelValue == 0)
-        		return 0;
-        	else if(fuelValue >= value)
-        	{
-        		((IFuelContainer)par0ItemStack.getItem()).setFuel(par0ItemStack, -value, false);
-        		return value;
-        	}
-        	else
-        	{
-        		((IFuelContainer)par0ItemStack.getItem()).setFuel(par0ItemStack, 0, true);
-        		return (int)fuelValue;
-        	}
-        }
-        else
-        {
-            int var1 = par0ItemStack.getItem().itemID;
-            Item var2 = par0ItemStack.getItem();
-
-            if (par0ItemStack.getItem() instanceof ItemBlock && Block.blocksList[var1] != null)
-            {
-                Block var3 = Block.blocksList[var1];
-
-                if (var3 == Block.woodSingleSlab)
-                {
-                    return 0;
-                }
-
-                if (var3.blockMaterial == Material.wood)
-                {
-                    return 0;
-                }
-                
-                if (var3 == Block.coalBlock)
-                {
-                    return 16000;
-                }
-            }
-
-            if (var1 == Item.stick.itemID) return 0;
-            if (var1 == Item.coal.itemID) return 1600;
-            if (var1 == Item.bucketLava.itemID) return 0;
-            if (var1 == Block.sapling.blockID) return 0;
-            if (var1 == Item.blazeRod.itemID) return 0;
-            return GameRegistry.getFuelValue(par0ItemStack);
-        }
-    }
-    
-    public int checkItemBurnTime(ItemStack par0ItemStack)
-    {
-        if (par0ItemStack == null)
-        {
-            return 0;
-        }
-        else if(par0ItemStack.getItem() instanceof IFuelContainer)
-        {
-        	//get the value
-        	long fuelValue = ((IFuelContainer)par0ItemStack.getItem()).getFuelValue(par0ItemStack);
-        	int value = (int) (maxFuelCapacity-fuelTank);
-        	
-        	//if it's a number, reduce it by some amount, we're using standard coal or the value, whichever is smaller
-        	if(fuelValue == 0)
-        		return 0;
-        	else if(fuelValue >= value)
-        	{
-        		return value;
-        	}
-        	else
-        	{
-        		return (int)fuelValue;
-        	}
-        }
-        else
-        {
-            int var1 = par0ItemStack.getItem().itemID;
-            Item var2 = par0ItemStack.getItem();
-
-            if (par0ItemStack.getItem() instanceof ItemBlock && Block.blocksList[var1] != null)
-            {
-                Block var3 = Block.blocksList[var1];
-
-                if (var3 == Block.woodSingleSlab)
-                {
-                    return 150;
-                }
-
-                if (var3.blockMaterial == Material.wood)
-                {
-                    return 300;
-                }
-            }
-
-            if (var2 instanceof ItemTool && ((ItemTool) var2).getToolMaterialName().equals("WOOD")) return 200;
-            if (var2 instanceof ItemSword && ((ItemSword) var2).getToolMaterialName().equals("WOOD")) return 200;
-            if (var2 instanceof ItemHoe && ((ItemHoe) var2).getMaterialName().equals("WOOD")) return 200;
-            if (var1 == Item.stick.itemID) return 100;
-            if (var1 == Item.coal.itemID) return 1600;
-            if (var1 == Item.bucketLava.itemID) return 20000;
-            if (var1 == Block.sapling.blockID) return 100;
-            if (var1 == Item.blazeRod.itemID) return 2400;
-            return GameRegistry.getFuelValue(par0ItemStack);
-        }
-    }
-
-    
+	
 	public int getFuelUsagePercent()
 	{
 		return fuelUsePercent;
@@ -1235,11 +1115,14 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
 	/*
 	 * checks to see if the item can be inserted into the slot by a machine
 	 * since we don't care about which side stuff gets inserted into
-	 * j doesn't matter
+	 * only allow fuel in the sides, input in the top
 	 */
 	@Override
 	public boolean canInsertItem(int slot, ItemStack itemstack, int j) {
-		return this.isItemValidForSlot(slot, itemstack);
+		if(j==1)
+			return this.isItemValidForSlot(slot, itemstack);
+		else
+			return (UtilReference.getItemBurnTime(itemstack,1,false) > 0);
 	}
 
 	/*
@@ -1525,7 +1408,7 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
 		if(slot<inputStacks.length)
 			return true;
 		if(slot == 35)
-			if(checkItemBurnTime(itemstack) > 0)
+			if(UtilReference.getItemBurnTime(itemstack,1,false) > 0)
 				return true;
 		return false;
 	}
@@ -1579,13 +1462,13 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
 			}
 			return top;
 		}
-		else//put/pull anything and fuel
+		else//put/pull fuel
 		{
-			int[] sid = new int[inputStacks.length+outputStacks.length+1];
+			int[] sid = new int[outputStacks.length+1];
 			sid[0] = 35;
 			for (int i = 1; i < sid.length; i++)
 			{
-				sid[i]=i-1;
+				sid[i]=i+inputStacks.length-1;
 			}
 			return sid;
 		}
