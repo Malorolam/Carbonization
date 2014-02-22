@@ -68,6 +68,8 @@ public class ItemBlockAutocraftingBench extends ItemBlock {
 			return "tile.autocraftingbench";
 		case 1:
 			return "tile.fuelconverter";
+		case 2:
+			return "tile.fuelcellfiller";
 		default:
 			return "blaarg";
 		}

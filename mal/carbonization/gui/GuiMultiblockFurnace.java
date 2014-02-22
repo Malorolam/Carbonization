@@ -108,7 +108,7 @@ public class GuiMultiblockFurnace extends GuiContainer{
 			ArrayList list = new ArrayList();
 			
 			list.add(ColorReference.DARKCYAN.getCode() + "Stored Fuel Time:");
-			list.add(ColorReference.DARKGREY.getCode() + furnaceInventory.getFuelStack()+"/"+furnaceInventory.getMaxFuelCapacity());
+			list.add(ColorReference.DARKGREY.getCode() + furnaceInventory.getFuelStack()+"/"+furnaceInventory.getMaxFuelCapacity()+"FT");
 			
 	        this.drawHoveringText(list, par1, par2, fontRenderer);
 		}

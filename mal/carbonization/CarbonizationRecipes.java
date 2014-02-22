@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Level;
 
 import cpw.mods.fml.common.FMLLog;
@@ -41,6 +42,13 @@ public class CarbonizationRecipes
     
     private List<ItemStack> carbonizationInfoList = new ArrayList<ItemStack>();
     private List<Integer> carbonizationIndexList = new ArrayList<Integer>();
+    
+    /** Fuel Conversion Bench maps*/
+    /* Because maps are inconsistent in loading, we have to use lists*/
+    private List<String> fuelConversionRegistry = new ArrayList<String>();//name of the mapping
+    private List<ItemStack> fuelConversionOutput = new ArrayList<ItemStack>();//output item of the mapping
+    private List<Integer> fuelConversionCosts = new ArrayList<Integer>();
+    private List<String> fuelConversionTab = new ArrayList<String>();
     
 
     /**
@@ -171,7 +179,7 @@ public class CarbonizationRecipes
     		{
     			if(OreDictionary.getOres((String)output) == null)
     				FMLLog.log(Level.INFO, "OreDictionary Slag Registration of Type: " + oreSlagType + " Failed: OreDictionary entry " 
-    						+ (String)output + " invalid.  Contact Mal or the mod author who added the recipe so they can fix it.");
+    						+ (String)output + " invalid.  Contact Mal or the mod author who added the recipe so they can fix it.  ");
     			else if(OreDictionary.getOres((String)output).size()<1)
     				FMLLog.log(Level.INFO, "OreDictionary Slag Registration of Type: " + oreSlagType + " Failed: OreDictionary entry " 
     						+ (String)output + " invalid.  Contact Mal or the mod author who added the recipe so they can fix it.");
@@ -207,6 +215,106 @@ public class CarbonizationRecipes
     	this.carbonizationInfoList.add(item);
     	this.carbonizationIndexList.add(index);
     	return true;
+    }
+    
+    /**
+     * Adds an output to the fuel conversion bench mapping so it shows up in the correct list
+     * If you want to add a item to be used as potential, it needs to be considered fuel by minecraft
+     * 
+     * item - the resulting item
+     * name - the name the mapping is under
+     * tab - which tab the item is under, currently fuel, dust, or other; anything else will go under other
+     * requiredPotential - how much potential is needed to make the item
+     * 
+     * returns false if no mapping was added, true if one was
+     */
+    public boolean addFuelConversionOutput(ItemStack item, String name, String tab, int requiredPotential)
+    {
+    	if(item==null||name==null||name==""||requiredPotential<=0)//not a recipe, or a recipe that will cause issues
+    		return false;
+    	
+    	if(tab==null || (!tab.equalsIgnoreCase("fuel") && !tab.equalsIgnoreCase("dust") && !tab.equalsIgnoreCase("other")))
+    		tab = "other";
+    	
+    	//make sure the mapping isn't already here
+    	if(fuelConversionRegistry.contains(name))
+    	{
+    		FMLLog.log(Level.INFO,"Fuel Conversion " + name + " already in mapping.");
+    		return false;
+    	}
+    	
+    	fuelConversionRegistry.add(name);
+    	fuelConversionOutput.add(item);
+    	fuelConversionCosts.add(requiredPotential);
+    	fuelConversionTab.add(tab);
+    	
+    	return true;
+    }
+    
+    /*
+     * yaay oredictionary
+     */
+    public boolean addFuelConversionOutput(String item, String name, String tab, int requiredPotential)
+    {
+    	//Just use the first result from the list
+		if(OreDictionary.getOreID((String)item) != -1)
+		{
+			if(OreDictionary.getOres((String)item) == null)
+				FMLLog.log(Level.INFO, "OreDictionary Fuel Conversion Registration of Type: " + name + " Failed: OreDictionary entry " 
+						+ (String)item + " invalid.  Contact Mal or the mod author who added the recipe so they can fix it.  ");
+			else if(OreDictionary.getOres((String)item).size()<1)
+				FMLLog.log(Level.INFO, "OreDictionary Fuel Conversion Registration of Type: " + name + " Failed: OreDictionary entry " 
+						+ (String)item + " invalid.  Contact Mal or the mod author who added the recipe so they can fix it.");
+			else
+			{
+				ItemStack is = OreDictionary.getOres((String)item).get(0);
+				return addFuelConversionOutput(is,name,tab,requiredPotential);
+			}
+		}
+		return false;
+    }
+    
+    /*
+     * yaay lazier
+     */
+    public boolean addFuelConversionOutput(String item, String tab, int requiredPotential)
+    {
+    	return addFuelConversionOutput(item,item,tab,requiredPotential);
+    }
+    
+    public ItemStack getFuelConversionOutput(String name)
+    {
+    	if(fuelConversionRegistry.contains(name))
+    	{
+    		int val = fuelConversionRegistry.indexOf(name);
+    		return fuelConversionOutput.get(val);
+    	}
+    	return null;
+    }
+    
+    public int getFuelConversionOutputCost(String name)
+    {
+    	if(fuelConversionRegistry.contains(name))
+    	{
+    		int val = fuelConversionRegistry.indexOf(name);
+    		return fuelConversionCosts.get(val);
+    	}
+    	return -1;
+    }
+    
+    public String getFuelConversionOutputTab(String name)
+    {
+    	if(fuelConversionRegistry.contains(name))
+    	{
+    		int val = fuelConversionRegistry.indexOf(name);
+    		return fuelConversionTab.get(val);
+    	}
+    	return null;
+    }
+    
+    public List<String> getFuelConversionRegistry()
+    {
+    	return fuelConversionRegistry;
     }
     
     /**

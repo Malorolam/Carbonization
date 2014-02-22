@@ -76,19 +76,19 @@ public class ItemFuel extends Item {
 		switch(is.getItemDamage())
 		{
 		case 0:
-			return "peat";
+			return "item.peat";
 		case 1:
-			return "lignite";
+			return "item.lignite";
 		case 2:
-			return "sBitCoal";
+			return "item.sBitCoal";
 		case 3:
-			return "bitCoal";
+			return "item.bitCoal";
 		case 4:
-			return "anthracite";
+			return "item.anthracite";
 		case 5:
-			return "graphite";
+			return "item.graphite";
 		default:
-			return "ItemFuel";
+			return "item.ItemFuel";
 		}
 	}
 	

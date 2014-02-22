@@ -100,7 +100,7 @@ public class GuiAutocraftingBench extends GuiContainer {
 			ArrayList list = new ArrayList();
 			
 			list.add(ColorReference.DARKCYAN.getCode() + "Stored Fuel Time:");
-			list.add(ColorReference.DARKGREY.getCode() + String.format("%.2f", bench.getFuelStack())+"/"+bench.maxFuelCapacity);
+			list.add(ColorReference.DARKGREY.getCode() + String.format("%.2f", bench.getFuelStack())+"/"+bench.maxFuelCapacity+"FT");
 			
 	        this.drawHoveringText(list, par1, par2, fontRenderer);
 		}
@@ -144,7 +144,7 @@ public class GuiAutocraftingBench extends GuiContainer {
 			
 			list.add(ColorReference.DARKCYAN.getCode() + "Bench Information:");
 			list.add(ColorReference.DARKCYAN.getCode() + "Fuel Usage Percent: " + bench.fuelUsePercent + "%");
-			list.add(ColorReference.DARKCYAN.getCode() + "Fuel Usage Per Job: " + String.format("%.2f", bench.getFuelUsage()));
+			list.add(ColorReference.DARKCYAN.getCode() + "Fuel Usage Per Job: " + String.format("%.2f", bench.getFuelUsage())+"FT");
 
 			this.drawHoveringText(list, par1, par2, fontRenderer);
 		}

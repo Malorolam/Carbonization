@@ -86,25 +86,25 @@ public class ItemDust extends Item {
 		switch(is.getItemDamage())
 		{
 		case 0:
-			return "charcoalDust";
+			return "item.charcoalDust";
 		case 1:
-			return "peatDust";
+			return "item.peatDust";
 		case 2:
-			return "ligniteDust";
+			return "item.ligniteDust";
 		case 3:
-			return "sBitCoalDust";
+			return "item.sBitCoalDust";
 		case 4:
-			return "bitCoalDust";
+			return "item.bitCoalDust";
 		case 5:
-			return "coalDust";
+			return "item.coalDust";
 		case 6:
-			return "anthraciteDust";
+			return "item.anthraciteDust";
 		case 7:
-			return "graphiteDust";
+			return "item.graphiteDust";
 		case 8:
-			return "aCharcoalDust";
+			return "item.aCharcoalDust";
 		default:
-			return "ItemDust";
+			return "item.ItemDust";
 		}
 	}
 	

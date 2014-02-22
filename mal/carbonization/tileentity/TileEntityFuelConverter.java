@@ -1,5 +1,7 @@
 package mal.carbonization.tileentity;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -8,6 +10,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import mal.api.IFuelContainer;
+import mal.carbonization.CarbonizationRecipes;
 import mal.carbonization.carbonization;
 import mal.carbonization.items.ItemStructureBlock;
 import mal.carbonization.network.PacketHandler;
@@ -69,6 +72,15 @@ public class TileEntityFuelConverter extends TileEntity implements IInventory, n
 			return index;
 		}
 	}
+	
+	//new system, using the recipes
+	private ArrayList<ItemStack> fuelList = new ArrayList<ItemStack>();
+	private ArrayList<String> fuelKeyList = new ArrayList<String>();
+	private ArrayList<ItemStack> dustList = new ArrayList<ItemStack>();
+	private ArrayList<String> dustKeyList = new ArrayList<String>();
+	private ArrayList<ItemStack> otherList = new ArrayList<ItemStack>();
+	private ArrayList<String> otherKeyList = new ArrayList<String>();
+	public String currentTag;
 
 	public int craftingCooldown;
 	public int processTime = carbonization.MAXAUTOCRAFTTIME;
@@ -81,7 +93,7 @@ public class TileEntityFuelConverter extends TileEntity implements IInventory, n
 	public double speedUpgrade;
 	public double efficiencyUpgrade;
 	
-	public boolean makeDust = false;
+	//public boolean makeDust = false;
 	public int currentIndex = 0;
 
 	public double potentialMultiplyer;//reduces the amount of potential fuel by this percentage
@@ -94,12 +106,25 @@ public class TileEntityFuelConverter extends TileEntity implements IInventory, n
 	public ItemStack[] outputStacks = new ItemStack[12];
 	public ItemStack[] upgradeStacks = new ItemStack[3];
 
+	public TileEntityFuelConverter()
+	{
+		currentTag = "fuel";
+		updateLists();
+	}
 
 	public void changeTargetFuel(boolean pos)
 	{
+		ArrayList list;
+		if(currentTag.equalsIgnoreCase("fuel"))
+			list = fuelList;
+		else if(currentTag.equalsIgnoreCase("dust"))
+			list = dustList;
+		else
+			list = otherList;
+		
 		if(pos)
 		{
-			if(currentIndex < 7)
+			if(currentIndex < list.size()-1)
 			{
 				currentIndex++;
 			}
@@ -113,48 +138,20 @@ public class TileEntityFuelConverter extends TileEntity implements IInventory, n
 			if(currentIndex>0)
 				currentIndex--;
 			else
-				currentIndex=7;
+				currentIndex=list.size()-1;
 		}
-	}
-	
-	public ItemStack getCurrentFuel()
-	{
-		return getCurrentFuel(currentIndex, false);
-	}
-	
-	public ItemStack getCurrentFuel(boolean dust)
-	{
-		return getCurrentFuel(currentIndex, dust);
-	}
-	
-	public ItemStack getCurrentFuel(int index)
-	{
-		return getCurrentFuel(index,false);
 	}
 
-	public ItemStack getCurrentFuel(int index, boolean dust)
+	public ItemStack getCurrentFuel(int index, String tag)
 	{
-		switch(currentIndex)
-		{
-		case 0:
-			return (dust)?(FuelTypes.CHARCOAL.getDust()):(FuelTypes.CHARCOAL.getItem());
-		case 1:
-			return (dust)?(FuelTypes.PEAT.getDust()):(FuelTypes.PEAT.getItem());
-		case 2:
-			return (dust)?(FuelTypes.LIGNITE.getDust()):(FuelTypes.LIGNITE.getItem());
-		case 3:
-			return (dust)?(FuelTypes.SUBBIT.getDust()):(FuelTypes.SUBBIT.getItem());
-		case 4:
-			return (dust)?(FuelTypes.BIT.getDust()):(FuelTypes.BIT.getItem());
-		case 5:
-			return (dust)?(FuelTypes.COAL.getDust()):(FuelTypes.COAL.getItem());
-		case 6:
-			return (dust)?(FuelTypes.ANTHRACITE.getDust()):(FuelTypes.ANTHRACITE.getItem());
-		case 7:
-			return (dust)?(FuelTypes.GRAPHITE.getDust()):(FuelTypes.GRAPHITE.getItem());
-		default:
+		if(tag.equalsIgnoreCase("fuel") && index<fuelList.size())
+			return fuelList.get(index);
+		else if(tag.equalsIgnoreCase("dust") && index<dustList.size())
+			return dustList.get(index);
+		else if(tag.equalsIgnoreCase("other") && index<otherList.size())
+			return otherList.get(index);
+		else
 			return null;
-		}
 	}
 
 	@Override
@@ -190,6 +187,34 @@ public class TileEntityFuelConverter extends TileEntity implements IInventory, n
 //				PacketDispatcher.sendPacketToAllAround(xCoord, yCoord, zCoord, 64, worldObj.provider.dimensionId, getDescriptionPacket());
 			
 			onInventoryChanged();
+		}
+	}
+	
+	/*
+	 * Add all the recipes to the correct lists
+	 */
+	private void updateLists()
+	{
+		for(String s : CarbonizationRecipes.smelting().getFuelConversionRegistry())
+		{
+			if(CarbonizationRecipes.smelting().getFuelConversionOutputTab(s).equalsIgnoreCase("fuel"))
+			{
+				fuelKeyList.add(s);
+				fuelList.add(CarbonizationRecipes.smelting().getFuelConversionOutput(s));
+				//System.out.println("Added " + s + " to fuel list");
+			}
+			else if(CarbonizationRecipes.smelting().getFuelConversionOutputTab(s).equalsIgnoreCase("dust"))
+			{
+				dustKeyList.add(s);
+				dustList.add(CarbonizationRecipes.smelting().getFuelConversionOutput(s));
+				//System.out.println("Added " + s + " to dust list");
+			}
+			else if(CarbonizationRecipes.smelting().getFuelConversionOutputTab(s).equalsIgnoreCase("other"))
+			{
+				otherKeyList.add(s);
+				otherList.add(CarbonizationRecipes.smelting().getFuelConversionOutput(s));
+				//System.out.println("Added " + s + " to other list");
+			}
 		}
 	}
 
@@ -301,12 +326,21 @@ public class TileEntityFuelConverter extends TileEntity implements IInventory, n
 		if(potentialTank == 0)
 			return action;
 		
-		int time = getPotentialTime(getCurrentFuel(currentIndex));
+		String name = "";
+		if(currentTag.equalsIgnoreCase("fuel"))
+			name = fuelKeyList.get(currentIndex);
+		if(currentTag.equalsIgnoreCase("dust"))
+			name = dustKeyList.get(currentIndex);
+		if(currentTag.equalsIgnoreCase("other"))
+			name = otherKeyList.get(currentIndex);
+		
+		
+		int time = getPotentialTime(getCurrentFuel(currentIndex,currentTag), name);
 		if(time==0 || craftingCooldown > 0)
 			return action;
 		if(time <= potentialTank && fuelTank >= getFuelUsage())
 		{
-			if(insertOutputItem(getCurrentFuel(makeDust).copy(),-1))
+			if(insertOutputItem(getCurrentFuel(currentIndex,currentTag).copy(),-1))
 			{
 				potentialTank -= time;
 				fuelTank -= getFuelUsage();
@@ -321,33 +355,53 @@ public class TileEntityFuelConverter extends TileEntity implements IInventory, n
 
 	private int getPotentialTime(ItemStack is)
 	{
-		if(!(is.getItem() instanceof IFuelContainer))
+		return getPotentialTime(is,null);
+	}
+	private int getPotentialTime(ItemStack is, String name)
+	{
+		if(is==null)
+			return -1;
+		else if(name==null||name=="")
 		{
-			if(UtilReference.getItemBurnTime(is,1,false)>0)
-				return UtilReference.getItemBurnTime(is,1,false);
-		}
-		
-		if(is.itemID == carbonization.dust.itemID)
-		{
-			switch(is.getItemDamage())
+			if(!(is.getItem() instanceof IFuelContainer))
 			{
-			case 0:
-				return 1600;
-			case 1:
-				return 600;
-			case 2:
-				return 800;
-			case 3:
-				return 1000;
-			case 4:
-				return 1200;
-			case 5:
-				return 1600;
-			case 6:
-				return 2000;
-			case 7:
-				return 333;
+				if(UtilReference.getItemBurnTime(is,1,false)>0)
+					return UtilReference.getItemBurnTime(is,1,false);
 			}
+			
+			if(is.itemID == carbonization.dust.itemID)
+			{
+				switch(is.getItemDamage())
+				{
+				case 0:
+					return 1600;
+				case 1:
+					return 600;
+				case 2:
+					return 800;
+				case 3:
+					return 1000;
+				case 4:
+					return 1200;
+				case 5:
+					return 1600;
+				case 6:
+					return 2000;
+				case 7:
+					return 333;
+				}
+			}
+		}
+		else//output
+		{
+			try {
+				if(CarbonizationRecipes.smelting().getFuelConversionOutput(name).itemID == is.itemID && CarbonizationRecipes.smelting().getFuelConversionOutput(name).getItemDamage()==is.getItemDamage())
+				{
+					return CarbonizationRecipes.smelting().getFuelConversionOutputCost(name);
+				}
+			}
+			catch (NullPointerException e)
+			{}
 		}
 		
 		return 0;
@@ -358,6 +412,17 @@ public class TileEntityFuelConverter extends TileEntity implements IInventory, n
 	{
 		return (int) (this.getFuelStack()*i/(this.maxFuelCapacity+1));
 	}
+	
+	public ItemStack getCurrentItem()
+	{
+		if(currentTag.equalsIgnoreCase("fuel"))
+			return fuelList.get(currentIndex);
+		if(currentTag.equalsIgnoreCase("dust"))
+			return dustList.get(currentIndex);
+		if(currentTag.equalsIgnoreCase("other"))
+			return otherList.get(currentIndex);
+		return null;
+	}
 
 	@SideOnly(Side.CLIENT)
 	public int getPotentialCapacityScaled(int i)
@@ -365,14 +430,67 @@ public class TileEntityFuelConverter extends TileEntity implements IInventory, n
 		return (int) (potentialTank*i)/(maxPotentialTank);
 	}
 	
-	public void swapDustState()
+	public void swapTagState()
 	{
-		if(makeDust)
-			makeDust = false;
-		else
-			makeDust = true;
+		if(currentTag.equalsIgnoreCase("fuel"))
+		{
+			if(dustList.size()>0)
+			{
+				if(currentIndex>=dustList.size())
+					currentIndex=0;
+				currentTag="dust";
+			}
+			else if(otherList.size()>0)
+			{
+				if(currentIndex>=otherList.size())
+					currentIndex=0;
+				currentTag="other";
+			}
+		}
+		else if(currentTag.equalsIgnoreCase("dust"))
+		{
+			if(otherList.size()>0)
+			{
+				if(currentIndex>=otherList.size())
+					currentIndex=0;
+				currentTag="other";
+			}
+			else if(fuelList.size()>0)
+			{
+				if(currentIndex>=fuelList.size())
+					currentIndex=0;
+				currentTag="fuel";
+			}
+		}
+		else if(currentTag.equalsIgnoreCase("other"))
+		{
+			if(fuelList.size()>0)
+			{
+				if(currentIndex>=fuelList.size())
+					currentIndex=0;
+				currentTag="fuel";
+			}
+			else if(dustList.size()>0)
+			{
+				if(currentIndex>=dustList.size())
+					currentIndex=0;
+				currentTag="dust";
+			}
+		}
+			
 	}
 
+	public int getCurrentCost()
+	{
+		String name = "";
+		if(currentTag.equalsIgnoreCase("fuel"))
+			name = fuelKeyList.get(currentIndex);
+		if(currentTag.equalsIgnoreCase("dust"))
+			name = dustKeyList.get(currentIndex);
+		if(currentTag.equalsIgnoreCase("other"))
+			name = otherKeyList.get(currentIndex);
+		return getPotentialTime(getCurrentItem(), name);
+	}
 	//return the scaled percentage of the progress bar
 	@SideOnly(Side.CLIENT)
 	public int getCooldownScaled(int i)
@@ -410,7 +528,7 @@ public class TileEntityFuelConverter extends TileEntity implements IInventory, n
 	
 	public double getFuelUsage()
 	{
-		return carbonization.BASEAUTOCRAFTFUEL*(fuelMultiplyer)*(1-((makeDust)?(1):(0))*0.25);
+		return carbonization.BASEAUTOCRAFTFUEL*(fuelMultiplyer)*(1-((currentTag.equalsIgnoreCase("fuel"))?(1):((currentTag.equalsIgnoreCase("dust"))?(0):(-0.4)))*0.25);
 	}
 
 	//add fuel
@@ -520,9 +638,9 @@ public class TileEntityFuelConverter extends TileEntity implements IInventory, n
 		nbt.setDouble("speedUpgrade", speedUpgrade);
 		nbt.setDouble("efficiencyUpgrade", efficiencyUpgrade);
 		nbt.setInteger("processTime", processTime);
-		nbt.setBoolean("makeDust", makeDust);
 		nbt.setInteger("currentIndex", currentIndex);
 		nbt.setDouble("potentialTank", potentialTank);
+		nbt.setString("currenttag", currentTag);
 
 		NBTTagList input = new NBTTagList();
 
@@ -576,9 +694,9 @@ public class TileEntityFuelConverter extends TileEntity implements IInventory, n
 		speedUpgrade = nbt.getDouble("speedUpgrade");
 		efficiencyUpgrade = nbt.getDouble("efficiencyUpgrade");
 		processTime = nbt.getInteger("processTime");
-		makeDust = nbt.getBoolean("makeDust");
 		currentIndex = nbt.getInteger("currentIndex");
 		potentialTank = nbt.getDouble("potentialTank");
+		currentTag = nbt.getString("currenttag");
 
 		NBTTagList input = nbt.getTagList("inputItems");
 		for (int i = 0; i < input.tagCount(); ++i)

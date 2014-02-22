@@ -71,20 +71,20 @@ public class TileEntityFuelCellFiller extends TileEntity implements IInventory, 
 					if(upgradeStacks[i].getItemDamage() < 1000)
 					{
 						double[] d = ItemStructureBlock.getTier(upgradeStacks[i].getItemDamage());
-						value += (d[0]+d[1])/6*Math.sqrt(upgradeStacks[i].stackSize);
+						value += (d[0]+d[1])/2*(1+2.5*(((double)upgradeStacks[i].stackSize)/((double)upgradeStacks[i].getMaxStackSize())));
 					}
 				}
 			}
 		}
 
-		speedUpgrade = value;
+		speedUpgrade = value/3+1;
 		calculateProcessTime();
 	}
 
 	public void activate(World world, int x, int y, int z,
 			EntityPlayer player) {
 		//System.out.println("Component Tiers: " + componentTiers[0] + ", " + componentTiers[1] +"; queue capacity: " + queue.maxJobs + "; activated: " + properlyActivated);
-		player.openGui(carbonization.instance, 4, world, x, y, z);
+		player.openGui(carbonization.instance, 2, world, x, y, z);
 	}
 
 	@Override
@@ -284,14 +284,14 @@ public class TileEntityFuelCellFiller extends TileEntity implements IInventory, 
 
 	public void calculateProcessTime()
 	{
-		processTime = (int)Math.floor(carbonization.MAXAUTOCRAFTTIME-(carbonization.MAXAUTOCRAFTTIME-carbonization.MINAUTOCRAFTTIME)*speedUpgrade/100);
-		if(processTime < 1)
-			processTime = 1;
+		processTime = (int)Math.floor(carbonization.MAXAUTOCRAFTTIME-(carbonization.MAXAUTOCRAFTTIME-carbonization.MINAUTOCRAFTTIME)*Math.log(speedUpgrade)/3);
+		if(processTime < carbonization.MINAUTOCRAFTTIME)
+			processTime = carbonization.MINAUTOCRAFTTIME;
 	}
 	
 	public double getBonusYield()
 	{
-		return 1+speedUpgrade/10;
+		return 1+speedUpgrade/5.72;
 	}
 
 	//sort the input stacks

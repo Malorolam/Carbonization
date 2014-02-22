@@ -245,9 +245,22 @@ public class ScannerUtil {
 		else
 			is = new ItemStack(carbonization.itemStructureBlock, 1, block.data);
 		
+		String s = "";
+		try
+		{
+			s = is.getDisplayName();
+		}
+		catch (NullPointerException e)
+		{
+			return;
+		}
+		
+		if(s==null || s=="")
+			return;
+		
 		if(map.containsKey(is.getDisplayName()))
 		{
-			int ov = map.get(is.getDisplayName());
+			int ov = map.get(s);
 			map.put(is.getDisplayName(), value+ov);
 		}
 		else

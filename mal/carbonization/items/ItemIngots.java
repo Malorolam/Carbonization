@@ -72,13 +72,13 @@ public class ItemIngots extends Item {
 		switch(is.getItemDamage())
 		{
 		case 0:
-			return "refinedIron";
+			return "item.refinedIron";
 		case 1:
-			return "pigIron";
+			return "item.pigIron";
 		case 2:
-			return "mildSteel";
+			return "item.mildSteel";
 		case 3:
-			return "steel";
+			return "item.steel";
 		default:
 			return "ItemIngot";
 		}

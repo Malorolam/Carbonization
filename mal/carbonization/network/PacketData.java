@@ -264,10 +264,11 @@ public class PacketData {
 		double effupgrade = data.readDouble();
 		double spupgrade = data.readDouble();
 		double pottank = data.readDouble();
-		boolean makeDust = data.readBoolean();
+		//boolean makeDust = data.readBoolean();
 		int process = data.readInt();
 		int cooldown = data.readInt();
 		int currentIndex = data.readInt();
+		String currentTag = data.readUTF();
 		
 		if(!type.equalsIgnoreCase("noinventory"))
 		{
@@ -289,8 +290,9 @@ public class PacketData {
 		te.potentialTank = pottank;
 		te.processTime = process;
 		te.craftingCooldown = cooldown;
-		te.makeDust = makeDust;
+		//te.makeDust = makeDust;
 		te.currentIndex = currentIndex;
+		te.currentTag = currentTag;
 		te.calculateProcessTime();
 	}
 	
@@ -499,8 +501,9 @@ public class PacketData {
 		double spupgrade = te.speedUpgrade;
 		int process = te.processTime;
 		int cooldown = te.craftingCooldown;
-		boolean makeDust = te.makeDust;
+		//boolean makeDust = te.makeDust;
 		int currentIndex = te.currentIndex;
+		String currentTag = te.currentTag;
 		
 		try
 		{
@@ -508,10 +511,11 @@ public class PacketData {
 			dos.writeDouble(effupgrade);
 			dos.writeDouble(spupgrade);
 			dos.writeDouble(pottank);
-			dos.writeBoolean(makeDust);
+			//dos.writeBoolean(makeDust);
 			dos.writeInt(process);
 			dos.writeInt(cooldown);
 			dos.writeInt(currentIndex);
+			dos.writeUTF(currentTag);
 			
 			if(!type.equalsIgnoreCase("noinventory"))
 			{

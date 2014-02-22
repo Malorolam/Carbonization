@@ -22,7 +22,7 @@ import net.minecraft.world.World;
 
 public class BlockFuel extends Block {
 
-	private Icon[] iconArray = new Icon[6];
+	private Icon[] iconArray = new Icon[12];
 	
 	public BlockFuel(int par1, int par2, Material par3Material) {
 		super(par1, par3Material);
@@ -39,6 +39,12 @@ public class BlockFuel extends Block {
 		iconArray[3] = ir.registerIcon("carbonization:bitTexture");
 		iconArray[4] = ir.registerIcon("carbonization:anthraciteTexture");
 		iconArray[5] = ir.registerIcon("carbonization:graphiteTexture");
+		iconArray[6] = ir.registerIcon("carbonization:peatBlockTexture");
+		iconArray[7] = ir.registerIcon("carbonization:ligniteBlockTexture");
+		iconArray[8] = ir.registerIcon("carbonization:sBitBlockTexture");
+		iconArray[9] = ir.registerIcon("carbonization:bitBlockTexture");
+		iconArray[10] = ir.registerIcon("carbonization:anthraciteBlockTexture");
+		iconArray[11] = ir.registerIcon("carbonization:graphiteBlockTexture");
 	}
 
 	@Override
@@ -86,6 +92,17 @@ public class BlockFuel extends Block {
 
 	public int idDropped(int par1, Random par2Random, int par3)
 	{
+		if(par1 > 5)
+		{
+			try
+			{
+				return carbonization.fuelBlock.blockID;
+			}
+			catch (Exception e)
+			{
+				return 0;
+			}
+		}
 		try 
 		{
 			return carbonization.fuel.itemID;
@@ -151,6 +168,13 @@ public class BlockFuel extends Block {
     	par3List.add(new ItemStack(par1, 1, 3));
     	par3List.add(new ItemStack(par1, 1, 4));
     	par3List.add(new ItemStack(par1, 1, 5));
+    	
+    	par3List.add(new ItemStack(par1, 1, 6));
+    	par3List.add(new ItemStack(par1, 1, 7));
+    	par3List.add(new ItemStack(par1, 1, 8));
+    	par3List.add(new ItemStack(par1, 1, 9));
+    	par3List.add(new ItemStack(par1, 1, 10));
+    	par3List.add(new ItemStack(par1, 1, 11));
     }
 
 }

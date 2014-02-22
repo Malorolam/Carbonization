@@ -87,7 +87,7 @@ public class ItemFuelCell extends Item implements IFuelContainer{
 	public void addInformation(ItemStack is, EntityPlayer ep, List list, boolean bool)
 	{
 		list.add(setTooltipData("A capsule of processed fuel.", ColorReference.DARKGREY));
-		list.add(setTooltipData("Stored Fuel Time: " + ((Keyboard.isKeyDown(42)) || (Keyboard.isKeyDown(54))?(getFuelValue(is)):(FormatReference.compressLong(getFuelValue(is)))), ColorReference.DARKGREY));
+		list.add(setTooltipData("Stored Fuel Time: " + ((Keyboard.isKeyDown(42)) || (Keyboard.isKeyDown(54))?(getFuelValue(is)):(FormatReference.compressLong(getFuelValue(is))))+"FT", ColorReference.DARKGREY));
 	}
 	
 	//The tool tip information

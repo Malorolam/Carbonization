@@ -29,6 +29,7 @@ import mal.carbonization.items.ItemRecipeCharm;
 import mal.carbonization.items.ItemStructureBlock;
 import mal.carbonization.network.PacketHandler;
 import mal.carbonization.tileentity.*;
+import mal.core.VersionInfo;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
@@ -64,7 +65,7 @@ import cpw.mods.fml.common.registry.LanguageRegistry;
 import ic2.api.item.*;
 import ic2.api.recipe.RecipeInputItemStack;
 
-@Mod(modid="carbonization", name="Carbonization", version="0.9.5", dependencies = "required-after:Forge@[9.11,);required-after:FML@[6.4.30,)")
+@Mod(modid="carbonization", name="Carbonization", version=VersionInfo.Version, dependencies = "required-after:Forge@[9.11,);required-after:FML@[6.4.30,)")
 @NetworkMod(clientSideRequired=true, channels={"CarbonizationChn", "CarbonItemChn"}, packetHandler = PacketHandler.class)
 public class carbonization {
 
@@ -73,6 +74,7 @@ public class carbonization {
 	public static int MINAUTOCRAFTTIME = 5;//minimum  amount of time to cooldown
 	public static int BASEAUTOCRAFTFUEL = 800;//maximum amount of fuel per craft
 	public static int MAXSCANNERDEPTH = 32;//maximum depth the scanner will scan
+	public static boolean VERBOSEMODE = false;//enable verbose logging of stuff like version info
 	public static ItemFuel fuel;
 	public static ItemDust dust;
 	public static ItemMisc misc;
@@ -251,7 +253,7 @@ public class carbonization {
     		
     		//Names
     		//Fuels
-    		LanguageRegistry.addName(new ItemStack(fuel,1,0), "Peat");
+/*    		LanguageRegistry.addName(new ItemStack(fuel,1,0), "Peat");
     		LanguageRegistry.addName(new ItemStack(fuel,1,1), "Lignite");
     		LanguageRegistry.addName(new ItemStack(fuel,1,2), "Sub-Bituminous Coal");
     		LanguageRegistry.addName(new ItemStack(fuel,1,3), "Bituminous Coal");
@@ -343,7 +345,7 @@ public class carbonization {
     		LanguageRegistry.instance().addStringLocalization("tile.furnaceBlock.steelfurnace.name", "Insulated Steel Furnace");
     		
     		LanguageRegistry.instance().addStringLocalization("tile.autocraftingBench.autocraftingbench.name", "Autocrafting Bench");
-    		LanguageRegistry.instance().addStringLocalization("tile.autocraftingBench.fuelconverter.name", "Fuel Conversion Bench");
+    		LanguageRegistry.instance().addStringLocalization("tile.autocraftingBench.fuelconverter.name", "Fuel Conversion Bench");*/
     		
     		prox.registerRenderThings();
     		
@@ -362,6 +364,8 @@ public class carbonization {
 		OreDictionary.registerOre("fuelBituminous", new ItemStack(fuel, 1, 3));
 		OreDictionary.registerOre("fuelAnthracite", new ItemStack(fuel, 1, 4));
 		OreDictionary.registerOre("fuelGraphite", new ItemStack(fuel, 1, 5));
+		OreDictionary.registerOre("fuelCoal", new ItemStack(Item.coal,1,0));
+		OreDictionary.registerOre("fuelCharcoal", new ItemStack(Item.coal,1,1));
 		OreDictionary.registerOre("dustCharcoal", new ItemStack(dust, 1, 0));
 		OreDictionary.registerOre("dustPeat", new ItemStack(dust, 1, 1));
 		OreDictionary.registerOre("dustLignite", new ItemStack(dust, 1, 2));
@@ -424,6 +428,8 @@ public class carbonization {
 		generateStructure(ft);
 		generateMultiblockFurnaceRecipes();
 		generateCarbonizationInfo();
+		
+		VersionInfo.doVersionCheck();
 	}
 	
 	private void generateMash()
@@ -533,7 +539,7 @@ public class carbonization {
 		
 		if(te)//thermal expansion recipes
 		{
-			//TODO: Fix when TE is out
+			//
 /*			try {
 				CraftingManagers.pulverizerManager.addRecipe(400, new ItemStack(fuel,1,0), new ItemStack(dust,1,1), false);
 				CraftingManagers.pulverizerManager.addRecipe(400, new ItemStack(fuel,1,1), new ItemStack(dust,1,2), false);
@@ -549,6 +555,37 @@ public class carbonization {
 				FMLLog.log(Level.INFO, "Oh dear, something broke with Thermal Expansion.  Prod Mal so he can fix it.");
 			}*/
 		}
+		
+		/*
+		 * Fuel Conversion Bench recipes
+		 * 
+		 */
+		CarbonizationRecipes.smelting().addFuelConversionOutput("fuelPeat", "fuelPeat", "fuel", 600);
+		CarbonizationRecipes.smelting().addFuelConversionOutput("fuelLignite", "fuelLignite", "fuel", 800);
+		CarbonizationRecipes.smelting().addFuelConversionOutput("fuelSubBituminous", "fuelSubBituminous", "fuel", 1000);
+		CarbonizationRecipes.smelting().addFuelConversionOutput("fuelBituminous", "fuelBituminous", "fuel", 1200);
+		CarbonizationRecipes.smelting().addFuelConversionOutput("fuelCoal", "fuelCoal", "fuel", 1600);
+		CarbonizationRecipes.smelting().addFuelConversionOutput("fuelCharcoal", "fuelCharcoal", "fuel", 1600);
+		CarbonizationRecipes.smelting().addFuelConversionOutput("fuelAnthracite", "fuelAnthracite", "fuel", 2000);
+		CarbonizationRecipes.smelting().addFuelConversionOutput("fuelGraphite", "fuelGraphite", "fuel", 333);
+		
+		CarbonizationRecipes.smelting().addFuelConversionOutput("dustPeat", "dustPeat", "dust", 600);
+		CarbonizationRecipes.smelting().addFuelConversionOutput("dustLignite", "dustLignite", "dust", 800);
+		CarbonizationRecipes.smelting().addFuelConversionOutput("dustSubBituminous", "dustSubBituminous", "dust", 1000);
+		CarbonizationRecipes.smelting().addFuelConversionOutput("dustBituminous", "dustBituminous", "dust", 1200);
+		CarbonizationRecipes.smelting().addFuelConversionOutput("dustCoal", "dustCoal", "dust", 1600);
+		CarbonizationRecipes.smelting().addFuelConversionOutput("dustCharcoal", "dustCharcoal", "dust", 1600);
+		CarbonizationRecipes.smelting().addFuelConversionOutput("dustAnthracite", "dustAnthracite", "dust", 2000);
+		CarbonizationRecipes.smelting().addFuelConversionOutput("dustGraphite", "dustGraphite", "dust", 333);
+		
+		CarbonizationRecipes.smelting().addFuelConversionOutput(new ItemStack(misc,1,3), "carbonChunk", "other", 2664);
+		CarbonizationRecipes.smelting().addFuelConversionOutput(new ItemStack(misc,1,12), "dustSmallGraphite", "other", 83);
+		CarbonizationRecipes.smelting().addFuelConversionOutput(new ItemStack(misc,1,13), "carbonFlake", "other", 666);
+		CarbonizationRecipes.smelting().addFuelConversionOutput(new ItemStack(misc,1,14), "carbonThread", "other", 999);
+		CarbonizationRecipes.smelting().addFuelConversionOutput(new ItemStack(misc,1,15), "carbonChunk", "other", 999);
+		CarbonizationRecipes.smelting().addFuelConversionOutput(new ItemStack(misc,1,16), "carbonNanoflake", "other", 664);
+		CarbonizationRecipes.smelting().addFuelConversionOutput(new ItemStack(misc,1,17), "carbonNanotube", "other", 996);
+		CarbonizationRecipes.smelting().addFuelConversionOutput(new ItemStack(Item.diamond), "itemDiamond", "other", 21312);
 	}
 	
 	private void generateTools(boolean ic, boolean gt, boolean ft)
@@ -607,6 +644,19 @@ public class carbonization {
 		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(misc,4,12), new Object[]{new ItemStack(dust,1,7)}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(dust,1,7), new Object[]{new ItemStack(misc,1,12), new ItemStack(misc,1,12), new ItemStack(misc,1,12), new ItemStack(misc,1,12)}));
 		
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(fuelBlock,1,6), new Object[]{"xxx","xxx","xxx",'x',"fuelPeat"}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(fuelBlock,1,7), new Object[]{"xxx","xxx","xxx",'x',"fuelLignite"}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(fuelBlock,1,8), new Object[]{"xxx","xxx","xxx",'x',"fuelSubBituminous"}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(fuelBlock,1,9), new Object[]{"xxx","xxx","xxx",'x',"fuelBituminous"}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(fuelBlock,1,10), new Object[]{"xxx","xxx","xxx",'x',"fuelAnthracite"}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(fuelBlock,1,11), new Object[]{"xxx","xxx","xxx",'x',"fuelGraphite"}));
+		
+		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(fuel,9,0), new Object[]{new ItemStack(fuelBlock,1,6)}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(fuel,9,1), new Object[]{new ItemStack(fuelBlock,1,7)}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(fuel,9,2), new Object[]{new ItemStack(fuelBlock,1,8)}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(fuel,9,3), new Object[]{new ItemStack(fuelBlock,1,9)}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(fuel,9,4), new Object[]{new ItemStack(fuelBlock,1,10)}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(fuel,9,5), new Object[]{new ItemStack(fuelBlock,1,11)}));
 		
 		if(ic)//IC2, so add in compressor recipes for the carbon chunk and alternate "cleansing" potion
 		{

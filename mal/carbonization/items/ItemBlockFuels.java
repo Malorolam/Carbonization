@@ -29,6 +29,18 @@ public class ItemBlockFuels extends ItemBlock {
 			return this.getUnlocalizedName()+"anthracite";
 		case 5:
 			return this.getUnlocalizedName()+"graphite";
+		case 6:
+			return this.getUnlocalizedName()+"peatblock";
+		case 7:
+			return this.getUnlocalizedName()+"ligniteblock";
+		case 8:
+			return this.getUnlocalizedName()+"sBitCoalblock";
+		case 9:
+			return this.getUnlocalizedName()+"bitCoalblock";
+		case 10:
+			return this.getUnlocalizedName()+"anthraciteblock";
+		case 11:
+			return this.getUnlocalizedName()+"graphiteblock";
 		default:
 			return this.getUnlocalizedName()+"BlockFuel";
 		}
@@ -61,6 +73,24 @@ public class ItemBlockFuels extends ItemBlock {
 			break;
 		case 5:
 			name = "graphite";
+			break;
+		case 6: 
+			name = "peatblock";
+			break;
+		case 7: 
+			name = "ligniteblock"; 
+			break;
+		case 8:
+			name = "sBituminousblock";
+			break;
+		case 9:
+			name = "bituminousblock";
+			break;
+		case 10:
+			name = "anthraciteblock";
+			break;
+		case 11:
+			name = "graphiteblock";
 			break;
 		default: name = "blarg";
 		}

@@ -13,8 +13,11 @@ import mal.carbonization.tileentity.TileEntityFurnaces;
 import mal.core.ColorReference;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.Icon;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
 
@@ -39,7 +42,7 @@ public class GuiFuelConverter extends GuiContainer {
 		
 		this.buttonList.add(this.upBtn = new GuiButton(1, this.width / 2 - 42, this.height / 2 -44, 32, 12, "Prev."));
 		this.buttonList.add(this.downBtn = new GuiButton(2, this.width / 2 + 9, this.height / 2 -44, 32, 12, "Next"));
-		this.buttonList.add(this.dustBtn = new GuiButton(3, this.width/2 -15, this.height/2-81, 32, 16, (bench.makeDust)?("Dust"):("Fuel")));
+		this.buttonList.add(this.dustBtn = new GuiButton(3, this.width/2 -15, this.height/2-81, 32, 16, bench.currentTag));
 	}
 
 	/**
@@ -56,8 +59,8 @@ public class GuiFuelConverter extends GuiContainer {
 			bench.changeTargetFuel(true);
         	break;
         case 3:
-        	bench.swapDustState();
-        	dustBtn.displayString = (bench.makeDust)?("Dust"):("Fuel");
+        	bench.swapTagState();
+        	dustBtn.displayString = bench.currentTag;
         	break;
         }
         bench.closeGui();
@@ -96,9 +99,23 @@ public class GuiFuelConverter extends GuiContainer {
         var7 = bench.getCooldownScaled(24);
         this.drawTexturedModalRect(var5+25, var6+29, 176, 0, 24-var7, 17);
         
-        var7 = bench.currentIndex;
+        //new code for item system
+        ItemStack is = bench.getCurrentItem();
+        Icon icon=null;
+        if(is!=null)
+        	icon = is.getIconIndex();
+
+        if (icon != null)
+        {
+            GL11.glDisable(GL11.GL_LIGHTING);
+            this.mc.getTextureManager().bindTexture(TextureMap.locationItemsTexture);
+            this.drawTexturedModelRectFromIcon(var5+52, var6+29, icon, 16, 16);
+            GL11.glEnable(GL11.GL_LIGHTING);
+        }
+        //old code for hardcoded toggle
+/*        var7 = bench.currentIndex;
         boolean dust = bench.makeDust;
-        this.drawTexturedModalRect(var5+51, var6+28, 200 + 18*((dust)?(1):(0)), 18*var7, 18, 18);
+        this.drawTexturedModalRect(var5+51, var6+28, 200 + 18*((dust)?(1):(0)), 18*var7, 18, 18);*/
     }
 
     @Override
@@ -112,7 +129,7 @@ public class GuiFuelConverter extends GuiContainer {
 			ArrayList list = new ArrayList();
 			
 			list.add(ColorReference.DARKCYAN.getCode() + "Stored Fuel Time:");
-			list.add(ColorReference.DARKGREY.getCode() + String.format("%.2f", bench.getFuelStack())+"/"+bench.maxFuelCapacity);
+			list.add(ColorReference.DARKGREY.getCode() + String.format("%.2f", bench.getFuelStack())+"/"+bench.maxFuelCapacity +"FT");
 			
 	        this.drawHoveringText(list, par1, par2, fontRenderer);
 		}
@@ -123,7 +140,7 @@ public class GuiFuelConverter extends GuiContainer {
 			ArrayList list = new ArrayList();
 			
 			list.add(ColorReference.DARKCYAN.getCode() + "Stored Potential Fuel:");
-			list.add(ColorReference.DARKGREY.getCode() + String.format("%.2f", bench.potentialTank)+"/"+bench.maxPotentialTank);
+			list.add(ColorReference.DARKGREY.getCode() + String.format("%.2f", bench.potentialTank)+"/"+bench.maxPotentialTank +"FT");
 			
 	        this.drawHoveringText(list, par1, par2, fontRenderer);
 		}
@@ -168,7 +185,7 @@ public class GuiFuelConverter extends GuiContainer {
 			list.add(ColorReference.DARKCYAN.getCode() + "Ticks until crafting: ");
 			list.add(bench.craftingCooldown + "/" + bench.processTime);
 			list.add(ColorReference.DARKCYAN.getCode() + "Fuel Usage per Job: ");
-			list.add(String.format("%.2f",bench.getFuelUsage()));
+			list.add(String.format("%.2f",bench.getFuelUsage()) + "FT");
 			//list.add(bench.efficiencyUpgrade + " " + bench.speedUpgrade);
 			
 	        this.drawHoveringText(list, par1, par2, fontRenderer);
@@ -179,8 +196,9 @@ public class GuiFuelConverter extends GuiContainer {
 		{
 			ArrayList list = new ArrayList();
 			
-			list.add(ColorReference.DARKCYAN.getCode() + "Current Fuel:");
-			list.add(ColorReference.DARKCYAN.getCode() + bench.getCurrentFuel(bench.currentIndex).getDisplayName() + ((bench.makeDust)?" Dust":""));
+			list.add(ColorReference.DARKCYAN.getCode() + "Current Output:");
+			list.add(ColorReference.DARKCYAN.getCode() + bench.getCurrentFuel(bench.currentIndex, bench.currentTag).getDisplayName());
+			list.add(ColorReference.DARKCYAN.getCode() + "Potential Cost: " + bench.getCurrentCost() +"FT");
 
 			this.drawHoveringText(list, par1, par2, fontRenderer);
 		}

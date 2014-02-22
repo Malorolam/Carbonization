@@ -84,7 +84,7 @@ public class GuiPortableScanner extends GuiContainer {
 			ArrayList list = new ArrayList();
 			
 			list.add(ColorReference.DARKCYAN.getCode() + "Stored Fuel Time:");
-			list.add(ColorReference.DARKGREY.getCode() + String.format("%.2f", ((ItemPortableScanner) scanner.getStack().getItem()).getFuelValue(scanner.getStack()))+"/3200");
+			list.add(ColorReference.DARKGREY.getCode() + String.format("%.2f", ((ItemPortableScanner) scanner.getStack().getItem()).getFuelValue(scanner.getStack()))+"/3200"+"FT");
 			
 	        this.drawHoveringText(list, par1, par2, fontRenderer);
 		}
@@ -95,7 +95,7 @@ public class GuiPortableScanner extends GuiContainer {
 			ArrayList list = new ArrayList();
 			
 			list.add(ColorReference.DARKCYAN.getCode() + "Current Fuel Usage:");
-			list.add(ColorReference.DARKGREY.getCode() + String.format("%.2f", ((ItemPortableScanner)scanner.getStack().getItem()).getFuelUsage(scanner.getStack())) + " units");
+			list.add(ColorReference.DARKGREY.getCode() + String.format("%.2f", ((ItemPortableScanner)scanner.getStack().getItem()).getFuelUsage(scanner.getStack())) + "FT/action");
 			
 	        this.drawHoveringText(list, par1, par2, fontRenderer);
 		}

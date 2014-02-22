@@ -123,50 +123,51 @@ public class ItemMisc extends Item{
 	@Override
 	public String getUnlocalizedName(ItemStack is)
 	{
+		String s = "item.";
 		switch(is.getItemDamage())
 		{
 		case 0:
-			return "Pencil";
+			return s+"Pencil";
 		case 1:
-			return "CleansingPotion";
+			return s+"CleansingPotion";
 		case 2:
-			return "pCleansingPotion";
+			return s+"pCleansingPotion";
 		case 3:
-			return "carbonChunk";
+			return s+"carbonChunk";
 		case 4:
-			return "glassInsulation";
+			return s+"glassInsulation";
 		case 5:
-			return "highDensityInsulation";
+			return s+"highDensityInsulation";
 		case 6:
-			return "ash";
+			return s+"ash";
 		case 7:
-			return "ironGear";
+			return s+"ironGear";
 		case 8:
-			return "refinedIronGear";
+			return s+"refinedIronGear";
 		case 9:
-			return "pigIronGear";
+			return s+"pigIronGear";
 		case 10:
-			return "mildSteelGear";
+			return s+"mildSteelGear";
 		case 11:
-			return "steelGear";
+			return s+"steelGear";
 		case 12:
-			return "smallCarbonPile";
+			return s+"smallCarbonPile";
 		case 13:
-			return "carbonFlake";
+			return s+"carbonFlake";
 		case 14:
-			return "carbonThread";
+			return s+"carbonThread";
 		case 15:
-			return "carbonFibre";
+			return s+"carbonFibre";
 		case 16:
-			return "carbonNanoflake";
+			return s+"carbonNanoflake";
 		case 17:
-			return "carbonNanotube";
+			return s+"carbonNanotube";
 		case 18:
-			return "coarseThreading";
+			return s+"coarseThreading";
 		case 19:
-			return "fineThreading";
+			return s+"fineThreading";
 		default:
-			return "ItemMisc";
+			return s+"ItemMisc";
 		}
 	}
 	
