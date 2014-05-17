@@ -121,7 +121,10 @@ public class TileEntityMultiblockInit extends TileEntity {
 	public void activate(int x, int y, int z, World world, EntityPlayer player)
 	{
 		//System.out.println("The tile entity is activated!");
-        player.openGui(carbonization.instance, 1, world, x, y, z);
+		if(type.equalsIgnoreCase("furnace"))
+			player.openGui(carbonization.instance, 0, world, x, y, z);
+		if(type.equalsIgnoreCase("bore"))
+			player.openGui(carbonization.instance, 1, world, x, y, z);
     }
 	
 	public void closeGui(EntityPlayer player, int xd, int yd, int zd, boolean activated)

@@ -2,27 +2,24 @@ package mal.carbonization.blocks;
 
 import java.util.Random;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import mal.carbonization.carbonization;
+import mal.carbonization.tileentity.TileEntityMultiblockBoreInit;
 import mal.carbonization.tileentity.TileEntityMultiblockInit;
-import mal.core.multiblock.MultiBlockInstantiator;
-import mal.core.multiblock.MultiBlockMatcher;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IconRegister;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Icon;
 import net.minecraft.world.World;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
-public class BlockFurnaceControl extends BlockContainer {
+public class BlockBoreControl extends BlockContainer{
 
 	private Icon[] icons = new Icon[2];
 	
-	public BlockFurnaceControl(int par1, Material par2Material) {
+	public BlockBoreControl(int par1, Material par2Material) {
 		super(par1, par2Material);
 		this.setResistance(100f);
 		this.setHardness(10f);
@@ -39,8 +36,8 @@ public class BlockFurnaceControl extends BlockContainer {
     @SideOnly(Side.CLIENT)
     public void registerIcons(IconRegister ir)
     {
-		icons[0] = ir.registerIcon("carbonization:multiblockFurnaceControlSideTexture");
-		icons[1] = ir.registerIcon("carbonization:multiblockFurnaceControlTopTexture");
+		icons[0] = ir.registerIcon("carbonization:multiblockBoreSideTexture");
+		icons[1] = ir.registerIcon("carbonization:multiblockBoreTopTexture");
     }
 	
 	@Override
@@ -57,7 +54,7 @@ public class BlockFurnaceControl extends BlockContainer {
 	{
 		try 
 		{
-			return carbonization.FurnaceControl.blockID;
+			return 0;//carbonization.boreControl.blockID;
 		}
 		catch (Exception e)
 		{
@@ -86,8 +83,8 @@ public class BlockFurnaceControl extends BlockContainer {
     			return false;
     		
     		TileEntity var10 = world.getBlockTileEntity(x, y, z);
-    		if(var10 instanceof TileEntityMultiblockInit)
-    			var10 = (TileEntityMultiblockInit)var10;
+    		if(var10 instanceof TileEntityMultiblockBoreInit)
+    			var10 = (TileEntityMultiblockBoreInit)var10;
     		else
     		{
     			world.setBlockTileEntity(x, y, z, var10 = this.createNewTileEntity(world));
@@ -97,7 +94,7 @@ public class BlockFurnaceControl extends BlockContainer {
             {
             	return false;
             }
-    		((TileEntityMultiblockInit)var10).activate(x, y, z, world, par5EntityPlayer);
+    		((TileEntityMultiblockBoreInit)var10).activate(x, y, z, world, par5EntityPlayer);
     		
     		
     		
@@ -107,7 +104,7 @@ public class BlockFurnaceControl extends BlockContainer {
 
 	@Override
 	public TileEntity createNewTileEntity(World world) {
-		return new TileEntityMultiblockInit("furnace");
+		return new TileEntityMultiblockBoreInit();
 	}
 }
 

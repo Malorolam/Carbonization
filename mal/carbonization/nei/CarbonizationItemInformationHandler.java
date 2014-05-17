@@ -168,7 +168,7 @@ public class CarbonizationItemInformationHandler extends TemplateRecipeHandler{
 		
 		//System.out.println("draw recipe index: " + index);
 		
-		GL11.glScalef(0.75f, 0.75f, 0.75f);
+		GL11.glScalef(0.7f, 0.7f, 0.7f);
 		for(int i = 0; i < list.size(); i++)
 		{
 			if(list.get(i) != null)

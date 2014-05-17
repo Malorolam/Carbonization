@@ -19,7 +19,7 @@ import cpw.mods.fml.relauncher.Side;
  */
 public class VersionInfo {
 	public static final String ModName = "Carbonization";
-	public static final String Version = "0.9.8";
+	public static final String Version = "1.0.1";
 	public static final String VersionURL = "https://dl.dropboxusercontent.com/s/gswvn9mq4afqfj2/carbonizationVersion.info?dl=1";
 	
 	boolean majorUpdate;

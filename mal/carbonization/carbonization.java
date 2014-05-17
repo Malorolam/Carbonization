@@ -6,27 +6,8 @@ import java.io.FileReader;
 import java.util.Random;
 import java.util.logging.Level;
 
-import mal.carbonization.blocks.BlockAutocraftingBench;
-import mal.carbonization.blocks.BlockFuel;
-import mal.carbonization.blocks.BlockFurnaceControl;
-import mal.carbonization.blocks.BlockFurnaces;
-import mal.carbonization.blocks.BlockMultiblockFurnaceControl;
-import mal.carbonization.blocks.BlockStructureBlock;
-import mal.carbonization.items.ItemBlockAutocraftingBench;
-import mal.carbonization.items.ItemBlockFuels;
-import mal.carbonization.items.ItemBlockFurnaces;
-import mal.carbonization.items.ItemBlockMultiblockFurnaceControl;
-import mal.carbonization.items.ItemDust;
-import mal.carbonization.items.ItemFuel;
-import mal.carbonization.items.ItemFuelCell;
-import mal.carbonization.items.ItemHHCompressor;
-import mal.carbonization.items.ItemHHPulverizer;
-import mal.carbonization.items.ItemHHPurifyer;
-import mal.carbonization.items.ItemIngots;
-import mal.carbonization.items.ItemMisc;
-import mal.carbonization.items.ItemPortableScanner;
-import mal.carbonization.items.ItemRecipeCharm;
-import mal.carbonization.items.ItemStructureBlock;
+import mal.carbonization.blocks.*;
+import mal.carbonization.items.*;
 import mal.carbonization.network.PacketHandler;
 import mal.carbonization.tileentity.*;
 import mal.core.VersionInfo;
@@ -75,6 +56,7 @@ public class carbonization {
 	public static int BASEAUTOCRAFTFUEL = 800;//maximum amount of fuel per craft
 	public static int MAXSCANNERDEPTH = 32;//maximum depth the scanner will scan
 	public static boolean VERBOSEMODE = false;//enable verbose logging of stuff like version info
+	public static boolean REPORTTOCHAT = false;//report some information to chat
 	public static ItemFuel fuel;
 	public static ItemDust dust;
 	public static ItemMisc misc;
@@ -89,10 +71,14 @@ public class carbonization {
 	public static BlockFurnaceControl FurnaceControl;
 	public static BlockMultiblockFurnaceControl multiblockFurnaceControl;
 	public static BlockStructureBlock structure;
+	public static BlockScaffolding scaffold;
+	public static BlockTunnelBore tunnelBore;
 	public static ItemStructureBlock itemStructureBlock;
 	public static BlockAutocraftingBench autocraftingBench;
 	public static ItemRecipeCharm recipeCharm;
 	public static ItemFuelCell fuelCell;
+	public static ItemScrewdriver screwdriver;
+	public static ItemUpgradeItems upgradeItems;
 	//public static TestBlock testBlock;
 	
 	int fuelID=9540;
@@ -113,6 +99,10 @@ public class carbonization {
 	int recipeCharmID = 9548;
 	int fuelCellID = 9549;
 	int scannerID = 9550;
+	int screwdriverID = 9551;
+	int upgradeID = 9552;
+	int scaffoldID = 1560;
+	int boreID;
 	
 	//Difficulty modifier, the higher the number, the more time the metals take to bake
 	private int difficultyMod = 10;
@@ -155,6 +145,8 @@ public class carbonization {
     		recipeCharmID = config.getItem("Recipe Charm ID", 9548).getInt();
     		fuelCellID = config.getItem("Fuel Cell ID", 9549).getInt();
     		scannerID = config.getItem("Portable Scanner ID", 9550).getInt();
+    		screwdriverID = config.getItem("Screwdriver ID", 9551).getInt();
+    		upgradeID = config.getItem("Upgrade Item ID", 9552).getInt();
     		blockID = config.getBlock("Block ID", 1560).getInt();
     		furnaceID = config.getBlock("Furnace ID", 1561).getInt();
     		furnaceID2 = config.getBlock("Active Furnace ID", 1562).getInt();
@@ -162,6 +154,8 @@ public class carbonization {
     		autocraftingBenchID = config.getBlock("Autocrafting Bench ID", 1564).getInt();
     		multiblockfurnaceID = config.getBlock("Multiblock Furnace ID", 1565).getInt();
     		multiblockfurnacecontrolID = config.getBlock("Multiblock Furnace Control ID", 1566).getInt();
+    		scaffoldID = config.getBlock("Scaffold ID", 1567).getInt();
+    		boreID = config.getBlock("Bore Control ID", 1568).getInt();
 
     		
     		difficultyMod = config.get("Modifiers", "Metal Cook Time", 10).getInt();
@@ -170,7 +164,7 @@ public class carbonization {
     			FMLLog.log(Level.WARNING, "Metal Cook time modifier is a invalid number, using the default value instead.");
     			difficultyMod = 10;
     		}
-    		MAXAUTOCRAFTTIME = config.get("Modifiers", "Max Autocrafting Cooldown Time", 300).getInt();
+    		MAXAUTOCRAFTTIME = config.get("Modifiers", "Max Machine Cooldown Time", 300).getInt();
     		if (MAXAUTOCRAFTTIME<=0)
     		{
     			FMLLog.log(Level.WARNING, "Max Autocrafting cooldown time modifier is a invalid number, using the default value instead.");
@@ -187,12 +181,14 @@ public class carbonization {
     			FMLLog.log(Level.WARNING, "Min Autocrafting cooldown less then Max, setting minimum value to maximum");
     			MINAUTOCRAFTTIME = MAXAUTOCRAFTTIME;
     		}
-    		BASEAUTOCRAFTFUEL = config.get("Modifiers", "Max Autocrafting Fuel Usage", 800).getInt();
+    		BASEAUTOCRAFTFUEL = config.get("Modifiers", "Max Machine Fuel Usage", 800).getInt();
     		if (BASEAUTOCRAFTFUEL<=0)
     		{
     			FMLLog.log(Level.WARNING, "Autocrafting fuel usage modifier is a invalid number, using the default value instead.");
     			difficultyMod = 800;
     		}
+    		
+    		REPORTTOCHAT = config.get("Options", "Report to Chat", true).getBoolean(true);
     		
     		config.save();
     		
@@ -211,8 +207,12 @@ public class carbonization {
     		RecipeCharm = new ItemStack(recipeCharm,1);
     		itemStructureBlock = new ItemStructureBlock(structureItemID);
     		fuelCell = new ItemFuelCell(fuelCellID);
+    		screwdriver = new ItemScrewdriver(screwdriverID);
+    		upgradeItems = new ItemUpgradeItems(upgradeID);
     		portableScanner = new ItemPortableScanner(scannerID);
     		fuelBlock = new BlockFuel(blockID,0,Material.rock).setStepSound(Block.soundStoneFootstep).setHardness(3F).setResistance(1.0F);
+    		scaffold = new BlockScaffolding(scaffoldID,Material.rock);
+    		tunnelBore = new BlockTunnelBore(boreID, Material.iron);
     		furnaceBlock = new BlockFurnaces(furnaceID,false);
     		furnaceBlockActive = new BlockFurnaces(furnaceID2, true);
     		FurnaceControl = new BlockFurnaceControl(multiblockfurnaceID, Material.iron);
@@ -241,111 +241,18 @@ public class carbonization {
     		GameRegistry.registerTileEntity(TileEntityAutocraftingBench.class, "TileEntityAutocraftingBench");
     		GameRegistry.registerTileEntity(TileEntityFuelConverter.class,"TileEntityFuelConverter");
     		GameRegistry.registerTileEntity(TileEntityFuelCellFiller.class,"TileEntityFuelCellFiller");
+    		GameRegistry.registerTileEntity(TileEntityTunnelBore.class, "TileEntityTunnelBore");
     		
     		
     		GameRegistry.registerBlock(fuelBlock, ItemBlockFuels.class, "fuelBlock");
     		GameRegistry.registerBlock(FurnaceControl, ItemBlockMultiblockFurnaceControl.class, "furnacecontrol");
     		GameRegistry.registerBlock(multiblockFurnaceControl, "multiblockfurnacecontrol");
     		GameRegistry.registerBlock(autocraftingBench, ItemBlockAutocraftingBench.class, "autocraftingbench");
+    		GameRegistry.registerBlock(scaffold, ItemBlockScaffold.class, "scaffold");
+    		GameRegistry.registerBlock(tunnelBore, ItemBlockTunnelBore.class, "tunnelbore");
     		GameRegistry.registerItem(itemStructureBlock, "itemStructureBlock");
     		GameRegistry.registerItem(fuelCell, "fuelCell");
     		GameRegistry.registerItem(portableScanner, "portableScanner");
-    		
-    		//Names
-    		//Fuels
-/*    		LanguageRegistry.addName(new ItemStack(fuel,1,0), "Peat");
-    		LanguageRegistry.addName(new ItemStack(fuel,1,1), "Lignite");
-    		LanguageRegistry.addName(new ItemStack(fuel,1,2), "Sub-Bituminous Coal");
-    		LanguageRegistry.addName(new ItemStack(fuel,1,3), "Bituminous Coal");
-    		LanguageRegistry.addName(new ItemStack(fuel,1,4), "Anthracite");
-    		LanguageRegistry.addName(new ItemStack(fuel,1,5), "Graphite");
-    		
-    		//Dusts
-    		LanguageRegistry.addName(new ItemStack(dust,1,0), "Charcoal Dust");
-    		LanguageRegistry.addName(new ItemStack(dust,1,1), "Peat Clumps");
-    		LanguageRegistry.addName(new ItemStack(dust,1,2), "Lignite Clumps");
-    		LanguageRegistry.addName(new ItemStack(dust,1,3), "Sub-Bituminous Coal Dust");
-    		LanguageRegistry.addName(new ItemStack(dust,1,4), "Bituminous Coal Dust");
-    		LanguageRegistry.addName(new ItemStack(dust,1,5), "Coal Dust");
-    		LanguageRegistry.addName(new ItemStack(dust,1,6), "Anthracite Dust");
-    		LanguageRegistry.addName(new ItemStack(dust,1,7), "Graphite Dust");
-    		LanguageRegistry.addName(new ItemStack(dust,1,8), "Activated Charcoal");
-    				
-    		//Deposits
-    		LanguageRegistry.addName(new ItemStack(fuelBlock,1,0), "Peat Deposit");
-    		LanguageRegistry.addName(new ItemStack(fuelBlock,1,1), "Lignite Deposit");
-    		LanguageRegistry.addName(new ItemStack(fuelBlock,1,2), "Sub-Bituminous Coal Deposit");
-    		LanguageRegistry.addName(new ItemStack(fuelBlock,1,3), "Bituminous Coal Deposit");
-    		LanguageRegistry.addName(new ItemStack(fuelBlock,1,4), "Anthracite Deposit");
-    		LanguageRegistry.addName(new ItemStack(fuelBlock,1,5), "Graphite Cluster");
-    		
-    		//Ingots
-    		LanguageRegistry.addName(new ItemStack(ingots,1,0), "Refined Iron");
-    		LanguageRegistry.addName(new ItemStack(ingots,1,1), "Pig Iron");
-    		LanguageRegistry.addName(new ItemStack(ingots,1,2), "Mild Steel");
-    		LanguageRegistry.addName(new ItemStack(ingots,1,3), "Steel");
-    		
-    		//Tools
-    		LanguageRegistry.addName(HHPulv, "Handheld Pulverizer");
-    		LanguageRegistry.addName(HHComp, "Handheld Compressor");
-    		LanguageRegistry.addName(HHPure, "Handheld Purifyer");
-    		
-    		LanguageRegistry.addName(new ItemStack(misc, 1, 0), "Pencil");
-    		LanguageRegistry.addName(new ItemStack(misc, 1, 1), "Cleansing Potion");
-    		LanguageRegistry.addName(new ItemStack(misc, 1, 2), "\"Cleansing\" Potion");
-    		LanguageRegistry.addName(new ItemStack(misc, 1, 3), "Carbon Chunk");
-    		LanguageRegistry.addName(new ItemStack(misc, 1, 4), "Glass Fibre Insulation");
-    		LanguageRegistry.addName(new ItemStack(misc, 1, 5), "High Density Insulation");
-    		LanguageRegistry.addName(new ItemStack(misc, 1, 6), "Ash");
-    		LanguageRegistry.addName(new ItemStack(misc, 1, 7), "Iron Gears");
-    		LanguageRegistry.addName(new ItemStack(misc, 1, 8), "Refined Iron Gears");
-    		LanguageRegistry.addName(new ItemStack(misc, 1, 9), "Pig Iron Gears");
-    		LanguageRegistry.addName(new ItemStack(misc, 1, 10), "Mild Steel Gears");
-    		LanguageRegistry.addName(new ItemStack(misc, 1, 11), "Steel Gears");
-    		LanguageRegistry.addName(new ItemStack(misc, 1, 12), "Small Pile of Graphite Dust");
-    		LanguageRegistry.addName(new ItemStack(misc, 1, 13), "Carbon Flake");
-    		LanguageRegistry.addName(new ItemStack(misc, 1, 14), "Carbon Thread");
-    		LanguageRegistry.addName(new ItemStack(misc, 1, 15), "Carbon Fibre");
-    		LanguageRegistry.addName(new ItemStack(misc, 1, 16), "Carbon Nanoflake");
-    		LanguageRegistry.addName(new ItemStack(misc, 1, 17), "Carbon Nanotube");
-    		LanguageRegistry.addName(new ItemStack(misc, 1, 18), "Coarse Threading");
-    		LanguageRegistry.addName(new ItemStack(misc, 1, 19), "Fine Threading");
-    		LanguageRegistry.addName(RecipeCharm, "Recipe Charm");
-    		LanguageRegistry.addName(fuelCell, "Fuel Cell");
-    		LanguageRegistry.addName(portableScanner, "Portable Scanner");
-    		
-    		//Machines
-    		LanguageRegistry.addName(new ItemStack(furnaceBlock,1,0), "Iron Furnace");
-    		LanguageRegistry.addName(new ItemStack(furnaceBlock,1,1), "Insulated Iron Furnace");
-    		LanguageRegistry.addName(new ItemStack(furnaceBlock,1,2), "Insulated Steel Furnace");
-    		LanguageRegistry.addName(new ItemStack(autocraftingBench,1,0), "Autocrafting Bench");
-    		LanguageRegistry.addName(new ItemStack(autocraftingBench,1,1), "Fuel Conversion Bench");
-    		LanguageRegistry.addName(new ItemStack(autocraftingBench,1,2), "Fuel Cell Filler");
-    		//Multiblock controls
-    		LanguageRegistry.addName(new ItemStack(FurnaceControl), "Furnace Control System");
-    		LanguageRegistry.addName(new ItemStack(multiblockFurnaceControl), "Furnace Control System");
-    		
-    		LanguageRegistry.instance().addStringLocalization("itemGroup.tabStructure", "en_US", "Carbonization Structure Blocks");
-    		LanguageRegistry.instance().addStringLocalization("itemGroup.tabMachine", "en_US", "Carbonization Blocks");
-    		LanguageRegistry.instance().addStringLocalization("itemGroup.tabItems", "en_US", "Carbonization Items");
-    		
-    		//Structure
-    		addStructureLanguage();
-    		
-    		//Localizations
-    		LanguageRegistry.instance().addStringLocalization("tile.fuelBlock.peat.name", "Peat Deposit");
-    		LanguageRegistry.instance().addStringLocalization("tile.fuelBlock.lignite.name", "Lignite Deposit");
-    		LanguageRegistry.instance().addStringLocalization("tile.fuelBlock.sBituminous.name", "Sub-Bituminous Coal Deposit");
-    		LanguageRegistry.instance().addStringLocalization("tile.fuelBlock.bituminous.name", "Bituminous Coal Deposit");
-    		LanguageRegistry.instance().addStringLocalization("tile.fuelBlock.anthracite.name", "Anthracite Deposit");
-    		LanguageRegistry.instance().addStringLocalization("tile.fuelBlock.graphite.name", "Graphite Cluster");
-    		
-    		LanguageRegistry.instance().addStringLocalization("tile.furnaceBlock.ironfurnace.name", "Iron Furnace");
-    		LanguageRegistry.instance().addStringLocalization("tile.furnaceBlock.refinedironfurnace.name", "Insulated Iron Furnace");
-    		LanguageRegistry.instance().addStringLocalization("tile.furnaceBlock.steelfurnace.name", "Insulated Steel Furnace");
-    		
-    		LanguageRegistry.instance().addStringLocalization("tile.autocraftingBench.autocraftingbench.name", "Autocrafting Bench");
-    		LanguageRegistry.instance().addStringLocalization("tile.autocraftingBench.fuelconverter.name", "Fuel Conversion Bench");*/
     		
     		prox.registerRenderThings();
     		
@@ -399,6 +306,7 @@ public class carbonization {
 		boolean ic=false;
 		boolean gt = false;
 		boolean ft = false;
+		boolean rotarycraft = false;;
 
 		//some mod checking 
 		if(Loader.isModLoaded("gregtech_addon"))
@@ -420,8 +328,11 @@ public class carbonization {
 				ic=true;
 		}
 		
+		if(Loader.isModLoaded("RotaryCraft"))
+			rotarycraft = true;
+		
 		generateMash();
-		generateTools(ic, gt, ft);
+		generateTools(ic, gt, ft, rotarycraft);
 		generateSmithing(ic);
 		generateConversions(ic, te);
 		generateMachines(ic);
@@ -432,6 +343,9 @@ public class carbonization {
 		VersionInfo.doVersionCheck();
 	}
 	
+	//TODO:Make this less of a mess
+	//TODO:Make this less of a mess
+	//TODO:Make this less of a mess
 	private void generateMash()
 	{
 		//handheld fuel to dust
@@ -459,6 +373,7 @@ public class carbonization {
 	{
 		//iron into refined iron
 		FurnaceRecipes.smelting().addSmelting(new ItemStack(Item.ingotIron).itemID, new ItemStack(ingots,1,0), 5);
+		CarbonizationRecipes.smelting().addSmelting(new ItemStack(Item.ingotIron), new ItemStack(ingots,1,0), 5, (25*difficultyMod), 1);
 
 		//refined iron into pig iron
 		CarbonizationRecipes.smelting().addSmelting("ingotCRefinedIron", new ItemStack(ingots,1,1), 5, (50*difficultyMod), 1);//TODO: fix later
@@ -588,7 +503,7 @@ public class carbonization {
 		CarbonizationRecipes.smelting().addFuelConversionOutput(new ItemStack(Item.diamond), "itemDiamond", "other", 21312);
 	}
 	
-	private void generateTools(boolean ic, boolean gt, boolean ft)
+	private void generateTools(boolean ic, boolean gt, boolean ft, boolean rotarycraft)
 	{
 		//Handheld tools
 		if(!gt)
@@ -600,6 +515,7 @@ public class carbonization {
 		
 		if(gt || ft || ic)
 			CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(RecipeCharm, new Object[]{"  A", " I ", "A  ", 'A', Item.coal, 'I', "ingotPigIron"}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(screwdriver), new Object[]{"  I", " I ", "G  ", 'I', "ingotPigIron", 'G', "fuelGraphite"}));
 		
 		//Simple Recipes
 		GameRegistry.addRecipe(new ItemStack(misc,1,0), new Object[]{"S","G", 'S', Item.stick, 'G', new ItemStack(fuel,1,5)});
@@ -658,6 +574,35 @@ public class carbonization {
 		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(fuel,9,4), new Object[]{new ItemStack(fuelBlock,1,10)}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(fuel,9,5), new Object[]{new ItemStack(fuelBlock,1,11)}));
 		
+		//bit
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(misc,1,20), new Object[]{" D ", "DSD", " S ", 'D', Item.diamond, 'S', new ItemStack(itemStructureBlock,1,15)}));
+		//casing
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(misc,1,21), new Object[]{"SSS", "S S", "SSS", 'S', new ItemStack(itemStructureBlock,1,15)}));
+		//circuit
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(misc,1,22), new Object[]{"RGR", "LEL", "RGR", 'R', Item.redstone, 'G', Item.ingotGold, 'L', "dyeBlue", 'E', Item.emerald}));
+		//core
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(misc,1,23), new Object[]{"MCM", "CRC", "MCM", 'M', new ItemStack(itemStructureBlock,1,2015), 'C', new ItemStack(misc,1,21), 'R', new ItemStack(misc,1,22)}));
+		
+		//upgrade items
+		addUpgradeRecipe(new ItemStack(upgradeItems,1,0), Item.glowstone, Item.ingotGold, new ItemStack(itemStructureBlock,1,15));
+		addUpgradeRecipe(new ItemStack(upgradeItems,1,1), Block.glowStone, new ItemStack(upgradeItems,1,0), new ItemStack(itemStructureBlock,1,15));
+		addUpgradeRecipe(new ItemStack(upgradeItems,1,2), Block.blockGold, new ItemStack(upgradeItems,1,1), new ItemStack(itemStructureBlock,1,15));
+		
+		addUpgradeRecipe(new ItemStack(upgradeItems,1,3), "dyeBlue", Item.ingotGold, new ItemStack(itemStructureBlock,1,15));
+		addUpgradeRecipe(new ItemStack(upgradeItems,1,4), Block.blockLapis, new ItemStack(upgradeItems,1,3), new ItemStack(itemStructureBlock,1,15));
+		addUpgradeRecipe(new ItemStack(upgradeItems,1,5), Block.blockLapis, new ItemStack(upgradeItems,1,4), new ItemStack(itemStructureBlock,1,15));
+		
+		addUpgradeRecipe(new ItemStack(upgradeItems,1,6), Item.redstone, Item.ingotGold, new ItemStack(itemStructureBlock,1,15));
+		addUpgradeRecipe(new ItemStack(upgradeItems,1,7), Block.blockRedstone, new ItemStack(upgradeItems,1,6), new ItemStack(itemStructureBlock,1,15));
+		addUpgradeRecipe(new ItemStack(upgradeItems,1,8), Block.blockRedstone, new ItemStack(upgradeItems,1,7), new ItemStack(itemStructureBlock,1,15));
+		addUpgradeRecipe(new ItemStack(upgradeItems,1,9), new ItemStack(misc,1,22), new ItemStack(upgradeItems,1,8), new ItemStack(itemStructureBlock,1,15));
+		
+		addUpgradeRecipe(new ItemStack(upgradeItems,1,10), Block.blockEmerald, Item.ingotGold, new ItemStack(itemStructureBlock,1,15));
+		
+		addUpgradeRecipe(new ItemStack(upgradeItems,1,11), new ItemStack(itemStructureBlock,1,18), Block.blockDiamond, new ItemStack(itemStructureBlock,1,15));
+		if(rotarycraft)
+			addUpgradeRecipe(new ItemStack(upgradeItems,1,11), Block.bedrock, "RotaryCraft:ingotBedrock", new ItemStack(itemStructureBlock,1,15));
+		
 		if(ic)//IC2, so add in compressor recipes for the carbon chunk and alternate "cleansing" potion
 		{
 			try
@@ -694,16 +639,6 @@ public class carbonization {
 				new Object[]{"III", "IFI", "BBB", 'I' ,"ingotCRefinedIron", 'F', new ItemStack(furnaceBlock,1,0), 'B', Block.brick}));//TODO: rawr
 		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(furnaceBlock,1,2), 
 				new Object[]{"SSS", "SFS", "SSS", 'S' ,"ingotSteel", 'F', new ItemStack(furnaceBlock,1,1)}));
-	}
-
-	private void generateControlBlocks()
-	{
-		//Furnace Control
-		for(int i = 0; i<19; i++)
-		{
-			CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(FurnaceControl, 1), new Object[]
-					{"SSS", "SFS", "SSS", 'S', new ItemStack(itemStructureBlock,1,1000+i), 'F', new ItemStack(furnaceBlock,1,1)}));
-		}
 		
 		//Autocrafting Bench
 		for(int i = 0; i<19; i++)
@@ -714,6 +649,20 @@ public class carbonization {
 					{"SSS", "PUC", "SFS", 'S', new ItemStack(itemStructureBlock,1,2000+i), 'P', HHPulv, 'U', HHPure, 'C', HHComp, 'F', new ItemStack(furnaceBlock,1,2)}));
 			CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(autocraftingBench,1,2), new Object[]
 					{"SSS", "PUP", "SDS", 'S', new ItemStack(itemStructureBlock,1,i), 'P', new ItemStack(itemStructureBlock,1,2000+i), 'U', Item.diamond, 'D', new ItemStack(fuelCell)}));
+		}
+		
+		//Tunnel Bore
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(tunnelBore,1,0), new Object[]
+				{"CBC", "CRC", "CFC", 'C', new ItemStack(misc,1,21), 'B', new ItemStack(misc,1,20), 'R', new ItemStack(misc,1,23), 'F', new ItemStack(furnaceBlock,1,2)}));
+	}
+
+	private void generateControlBlocks()
+	{
+		//Furnace Control
+		for(int i = 0; i<19; i++)
+		{
+			CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(FurnaceControl, 1), new Object[]
+					{"SSS", "SFS", "SSS", 'S', new ItemStack(itemStructureBlock,1,1000+i), 'F', new ItemStack(furnaceBlock,1,1)}));
 		}
 	}
 	
@@ -794,7 +743,7 @@ public class carbonization {
 				}
 	}
 	
-	private void addStructureLanguage()
+	/*private void addStructureLanguage()
 	{
 		for(int base = 0; base < 19; base++)
 		{
@@ -880,7 +829,7 @@ public class carbonization {
 						break;
 					}
 					
-/*					if(sec > 0)
+					if(sec > 0)
 						name += " with ";
 					switch(sec)
 					{
@@ -896,13 +845,13 @@ public class carbonization {
 					case 4:
 						name += "Fine Threading";
 						break;
-					}*/
+					}
 					
 					LanguageRegistry.addName(new ItemStack(itemStructureBlock,1,base+sec*100+purp*1000), name);
 				}
 			}
 		}
-	}
+	}*/
 	
 	//TODO: Remember to update this when other things come out
 	private void generateCarbonizationInfo()
@@ -935,7 +884,7 @@ public class carbonization {
 		for(int i = 0; i<4; i++)
 			CarbonizationRecipes.smelting().addInfoItem(new ItemStack(ingots, 1, i), 0);
 		
-		for(int i = 0; i<20; i++)
+		for(int i = 0; i<25; i++)
 			CarbonizationRecipes.smelting().addInfoItem(new ItemStack(misc, 1, i), 0);
 		
 		
@@ -957,6 +906,18 @@ public class carbonization {
 		}
 		
 		CarbonizationRecipes.smelting().addInfoItem(new ItemStack(recipeCharm), 15);
+		
+		for(int i = 0; i < 11; i++)
+		{
+			CarbonizationRecipes.smelting().addInfoItem(new ItemStack(upgradeItems,1,i), 21);
+			CarbonizationRecipes.smelting().addInfoItem(new ItemStack(upgradeItems,1,i), 22);
+			CarbonizationRecipes.smelting().addInfoItem(new ItemStack(upgradeItems,1,i), 23);
+			CarbonizationRecipes.smelting().addInfoItem(new ItemStack(upgradeItems,1,i), 24);
+		}
+		CarbonizationRecipes.smelting().addInfoItem(new ItemStack(tunnelBore), 21);
+		CarbonizationRecipes.smelting().addInfoItem(new ItemStack(tunnelBore), 22);
+		CarbonizationRecipes.smelting().addInfoItem(new ItemStack(tunnelBore), 23);
+		CarbonizationRecipes.smelting().addInfoItem(new ItemStack(tunnelBore), 24);
 	}
 	
 	private void generateMultiblockFurnaceRecipes()
@@ -1074,6 +1035,15 @@ public class carbonization {
 			}
 		}
 
+	}
+	
+	/**
+	 * Follows the pattern "FSF", "FMF", "FSF"
+	 * should be itemstacks or strings
+	 */
+	private void addUpgradeRecipe(ItemStack output, Object mainItem, Object secondaryItem, Object fillerItem)
+	{
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(output,new Object[]{"FSF", "FMF", "FSF", 'F', fillerItem, 'S', secondaryItem, 'M', mainItem}));
 	}
 }
 

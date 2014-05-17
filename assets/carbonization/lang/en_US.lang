@@ -1,4 +1,5 @@
-item.peat.name=Peat
+﻿
+item.Peat.name=Peat
 item.lignite.name=Lignite
 item.sBitCoal.name=Sub-Bituminous Coal
 item.bitCoal.name=Bituminous Coal
@@ -42,11 +43,26 @@ item.refinedIron.name=Refined Iron
 item.pigIron.name=Pig Iron
 item.mildSteel.name=High Carbon Steel
 item.steel.name=Medium Carbon Steel
+item.diamondbit.name=Diamond Bit
+item.steelcasing.name=Steel Casing
+item.circuit.name=Circuit
+item.steelcore.name=Steel Core
 item.recipeCharm.name=Recipe Charm
 item.FuelCell.name=Fuel Cell
 item.PortableScanner.name=Portable Scanner
-
-
+item.screwdriver.name=Screwdriver
+item.upgrade.efficiency1.name=Tier 1 Efficiency Upgrade
+item.upgrade.efficiency2.name=Tier 2 Efficiency Upgrade
+item.upgrade.efficiency3.name=Tier 3 Efficiency Upgrade
+item.upgrade.fortune1.name=Tier 1 Fortune Upgrade
+item.upgrade.fortune2.name=Tier 2 Fortune Upgrade
+item.upgrade.fortune3.name=Tier 3 Fortune Upgrade
+item.upgrade.haste1.name=Tier 1 Haste Upgrade
+item.upgrade.haste2.name=Tier 2 Haste Upgrade
+item.upgrade.haste3.name=Tier 3 Haste Upgrade
+item.upgrade.haste4.name=Tier 4 Haste Upgrade
+item.upgrade.silktouch1.name=Silktouch Upgrade
+item.upgrade.hardness1.name=Hardness Upgrade
 
 item.nullstructureice.name=Ice Structure Block
 item.nullstructurewood.name=Wood Structure Block
@@ -355,8 +371,8 @@ item.nullmachinefinewitheredend.name=Withered End Machine Structure Block
 
 tile.BlockFuelpeat.name=Peat Deposit
 tile.BlockFuellignite.name=Lignite Deposit
-tile.BlockFuelsBit.name=Sub-Bituminous Coal Deposit
-tile.BlockFuelbit.name=Bituminous Coal Deposit
+tile.BlockFuelsBitCoal.name=Sub-Bituminous Coal Deposit
+tile.BlockFuelbitCoal.name=Bituminous Coal Deposit
 tile.BlockFuelanthracite.name=Anthracite Deposit
 tile.BlockFuelgraphite.name=Graphite Deposit
 tile.BlockFuelpeatblock.name=Peat Block
@@ -374,6 +390,8 @@ tile.fuelconverter.name=Fuel Conversion Bench
 tile.fuelcellfiller.name=Fuel Cell Filler
 tile.null.furnacecontrol.name=Furnace Instantiator
 tile.carbonization:multiblockfurnacecontrol.name=Furnace Controller
+tile.blockTunnelBore.name=Industrial Tunnel Bore
+tile.blockScaffolding.name=Industrial Bore Scaffold
 
 itemGroup.tabItems=Carbonization Items
 itemGroup.tabMachine=Carbonization Machines

@@ -32,6 +32,24 @@ public class FuelHandler implements IFuelHandler {
 				return 0;
 			}
 		}
+		else if(fuel.itemID == carbonization.fuelBlock.blockID)
+		{
+			switch(fuel.getItemDamage())
+			{
+			case 6:
+				return 6000;
+			case 7:
+				return 8000;
+			case 8:
+				return 10000;
+			case 9:
+				return 12000;
+			case 10:
+				return 20000;
+			case 11:
+				return 3330;
+			}
+		}
 		else
 		{
 			int i = fuel.getItem().itemID;

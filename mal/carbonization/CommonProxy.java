@@ -34,6 +34,10 @@ public class CommonProxy implements IGuiHandler
         	return new ContainerFuelConverter(player.inventory, (TileEntityFuelConverter)tileEntity);
         if(tileEntity instanceof TileEntityFuelCellFiller)
         	return new ContainerFuelCellFiller(player.inventory, (TileEntityFuelCellFiller)tileEntity);
+        if(tileEntity instanceof TileEntityMultiblockBoreInit)
+        	return new ContainerBorerInit(player.inventory, (TileEntityMultiblockBoreInit)tileEntity);
+        if(tileEntity instanceof TileEntityTunnelBore)
+        	return new ContainerTunnelBore(player.inventory, (TileEntityTunnelBore)tileEntity);
         if(ID==4 && player.getCurrentEquippedItem() != null && player.getCurrentEquippedItem().getItem().itemID == carbonization.portableScanner.itemID)
         	return new ContainerPortableScanner(player.inventory, new PortableScannerWrapper(player.getCurrentEquippedItem()));
 		return null;

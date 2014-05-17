@@ -395,6 +395,53 @@ public class MultiBlockMatcher {
 		return true;
 	}
 	
+	//Build a hollow rectangular solid where one face is a different block
+	public boolean buildFacedHollowSolid(int minX, int minY, int minZ, int maxX, int maxY, int maxZ, int blockID1, int data1, int blockID2, int data2, int wallThickness, int side)
+	{
+		/*Side:
+		 * 0: xpos, 1: xneg, 2: ypos, 3: yneg, 4: zpos, 5: zneg
+		 */
+		
+		if(blockID1==blockID2 && data1==data2)
+			return buildHollowSolid(minX, minY, minZ, maxX, maxY, maxZ, blockID1, data1, wallThickness);
+		
+		boolean succ = buildHollowSolid(minX, minY, minZ, maxX, maxY, maxZ, blockID1, data1, wallThickness);
+		if(!succ)
+		{
+			System.err.println("Build Process Failed Pass 1: Previous process failed.");
+			return false;
+		}
+		
+		switch(side)
+		{
+			case 0:
+				succ = buildSolid(maxX, minY, minZ, maxX, maxY, maxZ, blockID2, data2);
+				break;
+			case 1:
+				succ = buildSolid(minX, minY, minZ, minX, maxY, maxZ, blockID2, data2);
+				break;
+			case 2:
+				succ = buildSolid(minX, maxY, minZ, maxX, maxY, maxZ, blockID2, data2);
+				break;
+			case 3:
+				succ = buildSolid(minX, minY, minZ, maxX, minY, maxZ, blockID2, data2);
+				break;
+			case 4:
+				succ = buildSolid(minX, minY, maxZ, maxX, maxY, maxZ, blockID2, data2);
+				break;
+			case 5:
+				succ = buildSolid(minX, minY, minZ, maxX, maxY, minZ, blockID2, data2);
+				break;
+		}
+		
+		if(!succ)
+		{
+			System.err.println("Build Process Failed Pass 2: Previous process failed.");
+			return false;
+		}
+		return true;
+	}
+	
 	/*
 	 * set a specific location in the pattern to be a certain id
 	 */

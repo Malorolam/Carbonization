@@ -258,7 +258,7 @@ public class MultiBlockInstantiator {
 				for(int j=0;j<pattern[0].length;j++) {
 					for(int k=0;k<pattern[0][0].length;k++)
 					{
-						world.setBlock(x-offset[0]+i, y-offset[1]+j, z-offset[2]+k, block.blockID, 0, 2);
+						world.setBlock(x-offset[0]+i, y-offset[1]+j, z-offset[2]+k, (block==null)?(0):(block.blockID), 0, 2);
 					}
 				}
 			}
@@ -270,6 +270,17 @@ public class MultiBlockInstantiator {
 		int[] offset = new int[3];
 		offset[0]=offset[1]=offset[2]=0;
 		return createTestArea(mbMatch,x,y,z,world,offset,block);
+	}
+	
+	public static boolean createSingleBlock(int x, int y, int z, World world, Block block)
+	{
+		if(Side.SERVER == FMLCommonHandler.instance().getEffectiveSide())
+		{
+			world.setBlock(x, y, z, (block==null)?(0):(block.blockID), 0, 2);
+			return true;
+		}
+		
+		return false;
 	}
 	
 	/*

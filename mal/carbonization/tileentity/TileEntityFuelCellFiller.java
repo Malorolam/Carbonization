@@ -8,6 +8,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 import mal.carbonization.carbonization;
 import mal.carbonization.items.ItemStructureBlock;
+import mal.core.UtilReference;
 import mal.api.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -549,7 +550,12 @@ public class TileEntityFuelCellFiller extends TileEntity implements IInventory, 
 
 	@Override
 	public boolean canInsertItem(int i, ItemStack itemstack, int j) {
-		return ((i < inputStacks.length) && getItemBurnTime(itemstack)>0);
+		if(itemstack.getItem() instanceof IFuelContainer)
+			return (i==inputStacks.length);
+		else if(UtilReference.getItemBurnTime(itemstack, 1, false)>0)
+			return (i<inputStacks.length);
+		else
+			return false;
 	}
 
 	@Override

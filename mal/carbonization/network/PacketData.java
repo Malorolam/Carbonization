@@ -4,17 +4,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.logging.Level;
 
 import com.google.common.io.ByteArrayDataInput;
 
+import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.network.Player;
 
-import mal.carbonization.tileentity.TileEntityAutocraftingBench;
-import mal.carbonization.tileentity.TileEntityFuelCellFiller;
-import mal.carbonization.tileentity.TileEntityFuelConverter;
-import mal.carbonization.tileentity.TileEntityFurnaces;
-import mal.carbonization.tileentity.TileEntityMultiblockFurnace;
-import mal.carbonization.tileentity.TileEntityMultiblockInit;
+import mal.carbonization.tileentity.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.network.INetworkManager;
@@ -32,12 +29,12 @@ public class PacketData {
 		//Basic stuff in every packet to identify it
 		ByteArrayOutputStream bos = new ByteArrayOutputStream(140);
 		DataOutputStream dos = new DataOutputStream(bos);
-		
+
 		int x = te.xCoord;
 		int y = te.yCoord;
 		int z = te.zCoord;
 		int metadata = te.blockMetadata;
-		
+
 		try
 		{
 			dos.writeInt(x);
@@ -45,89 +42,118 @@ public class PacketData {
 			dos.writeInt(z);
 			dos.writeInt(metadata);
 			dos.writeUTF(type);
+			dos.writeUTF(te.toString().split("@")[0]);
 			//System.out.println("Write: " + te.toString() + ": " + type);
+
+
+			//tile entity specific things
+			if(te instanceof TileEntityFurnaces)
+				getFurnacePacket((TileEntityFurnaces)te, type, dos);
+			if(te instanceof TileEntityMultiblockInit)
+				getMultiblockInitPacket((TileEntityMultiblockInit)te, type, dos);
+			if(te instanceof TileEntityMultiblockFurnace)
+				getMultiblockFurnacePacket((TileEntityMultiblockFurnace)te, type, dos);
+			if(te instanceof TileEntityAutocraftingBench)
+				getAutocraftingBenchPacket((TileEntityAutocraftingBench)te, type, dos);
+			if(te instanceof TileEntityFuelConverter)
+				getFuelConverterPacket((TileEntityFuelConverter)te, type, dos);
+			if(te instanceof TileEntityFuelCellFiller)
+				getFuelCellFillerPacket((TileEntityFuelCellFiller)te, type, dos);
+			if(te instanceof TileEntityTunnelBore)
+				getTunnelBorePacket((TileEntityTunnelBore)te, type, dos);
+
+
+
+			Packet250CustomPayload pak = new Packet250CustomPayload();
+			pak.channel = "CarbonizationChn";
+			pak.data = bos.toByteArray();
+			pak.length = bos.size();
+			pak.isChunkDataPacket = true;
+
+			if(pak.data == null)
+			{
+				System.out.println("ERROR ERROR DATA NULL!");
+			}
+			//System.out.println("happy packet is happy.");
+			return pak;
+
 		}
 		catch (IOException e)
 		{
 			System.out.println("UNPOSSIBLE!");
 		}
-		
-		//tile entity specific things
-		if(te instanceof TileEntityFurnaces)
-			getFurnacePacket((TileEntityFurnaces)te, type, dos);
-		if(te instanceof TileEntityMultiblockInit)
-			getMultiblockInitPacket((TileEntityMultiblockInit)te, type, dos);
-		if(te instanceof TileEntityMultiblockFurnace)
-			getMultiblockFurnacePacket((TileEntityMultiblockFurnace)te, type, dos);
-		if(te instanceof TileEntityAutocraftingBench)
-			getAutocraftingBenchPacket((TileEntityAutocraftingBench)te, type, dos);
-		if(te instanceof TileEntityFuelConverter)
-			getFuelConverterPacket((TileEntityFuelConverter)te, type, dos);
-		if(te instanceof TileEntityFuelCellFiller)
-			getFuelCellFillerPacket((TileEntityFuelCellFiller)te, type, dos);
-		
-		
-		
-		Packet250CustomPayload pak = new Packet250CustomPayload();
-		pak.channel = "CarbonizationChn";
-		pak.data = bos.toByteArray();
-		pak.length = bos.size();
-		pak.isChunkDataPacket = true;
-		
-		if(pak.data == null)
-		{
-			System.out.println("ERROR ERROR DATA NULL!");
-		}
-		//System.out.println("happy packet is happy.");
-		return pak;
+
+		return null;
 	}
-	
+
 	public void processPacket(ByteArrayDataInput data, Player player)
 	{
-		int x = data.readInt();
-		int y = data.readInt();
-		int z = data.readInt();
-		int metadata = data.readInt();
-		String type = data.readUTF();
-		
-		World world = ((EntityPlayer) player).worldObj;
-		TileEntity te = world.getBlockTileEntity(x, y, z);
-		//System.out.println("Read: " + te.toString() + ": " + type);
-		
-		//tile entity specific things
-		if(te instanceof TileEntityFurnaces)
-			setFurnacePacket((TileEntityFurnaces)te, data, player, metadata, type);
-		if(te instanceof TileEntityMultiblockInit)
-			setMultiblockInitPacket((TileEntityMultiblockInit)te, data, player, metadata, type);
-		if(te instanceof TileEntityMultiblockFurnace)
-			setMultiblockFurnacePacket((TileEntityMultiblockFurnace)te, data, player, metadata, type);
-		if(te instanceof TileEntityAutocraftingBench)
-			setAutocraftingBenchPacket((TileEntityAutocraftingBench)te, data, player, metadata, type);
-		if(te instanceof TileEntityFuelConverter)
-			setFuelConverterPacket((TileEntityFuelConverter)te, data, player, metadata, type);
-		if(te instanceof TileEntityFuelCellFiller)
-			setFuelCellFillerPacket((TileEntityFuelCellFiller)te, data, player, metadata, type);
+		try {
+
+			int x = data.readInt();
+			int y = data.readInt();
+			int z = data.readInt();
+			int metadata = data.readInt();
+			String type = data.readUTF();
+			String name = data.readUTF();
+
+			World world = ((EntityPlayer) player).worldObj;
+			TileEntity te = world.getBlockTileEntity(x, y, z);
+			String rname = te.toString().split("@")[0];
+			//System.out.println("Read: " + te.toString() + ": " + type);
+			if(name.equals(rname))
+			{
+
+				//tile entity specific things
+				if(te instanceof TileEntityFurnaces)
+					setFurnacePacket((TileEntityFurnaces)te, data, player, metadata, type);
+				if(te instanceof TileEntityMultiblockInit)
+					setMultiblockInitPacket((TileEntityMultiblockInit)te, data, player, metadata, type);
+				if(te instanceof TileEntityMultiblockFurnace)
+					setMultiblockFurnacePacket((TileEntityMultiblockFurnace)te, data, player, metadata, type);
+				if(te instanceof TileEntityAutocraftingBench)
+					setAutocraftingBenchPacket((TileEntityAutocraftingBench)te, data, player, metadata, type);
+				if(te instanceof TileEntityFuelConverter)
+					setFuelConverterPacket((TileEntityFuelConverter)te, data, player, metadata, type);
+				if(te instanceof TileEntityFuelCellFiller)
+					setFuelCellFillerPacket((TileEntityFuelCellFiller)te, data, player, metadata, type);
+				if(te instanceof TileEntityTunnelBore)
+					setTunnelBorePacket((TileEntityTunnelBore)te, data, player, metadata, type);
+
+			}
+			else
+			{
+				FMLLog.log(Level.WARNING, "Packet expecting tile entity of type: " + name + " and found tile entity of type: " + rname + " at location" +
+						x + ", " + y + ", " + z +".  Don't be alarmed unless this is happening a lot.");
+			}
+		}
+		catch(Exception e)
+		{
+			//FMLLog.log(Level.SEVERE, "Carbonization Packet Broke Somewhere.  If this persists, contact Mal about it.");
+
+		}
+
 	}
-	
+
 	private void setFurnacePacket(TileEntityFurnaces te, ByteArrayDataInput data, Player player, int metadata, String type)
 	{
 		int burntime = data.readInt();
 		int cooktime = data.readInt();
 		byte facing = data.readByte();
 		double multiplyer = data.readDouble();
-		
 
-			byte hasValue = data.readByte();
-			int[] items = new int[0];
-			if(hasValue == 1)
+
+		byte hasValue = data.readByte();
+		int[] items = new int[0];
+		if(hasValue == 1)
+		{
+			items = new int[9];
+			for(int i = 0; i < items.length; i++)
 			{
-				items = new int[9];
-				for(int i = 0; i < items.length; i++)
-				{
-					items[i] = data.readInt();
-				}
+				items[i] = data.readInt();
 			}
-			te.handlePacketData(items);
+		}
+		te.handlePacketData(items);
 		//System.out.println("And it's ours!");
 		te.setFacing(facing);
 		te.blockMetadata = metadata;
@@ -135,7 +161,7 @@ public class PacketData {
 		te.furnaceCookTime = cooktime;
 		te.furnaceCookTimeMultiplyer = multiplyer;
 	}
-	
+
 	private void setMultiblockInitPacket(TileEntityMultiblockInit te, ByteArrayDataInput data, Player player, int metadata, String type)
 	{
 		//System.out.println("MultiblockInit packet recieved!");
@@ -143,7 +169,7 @@ public class PacketData {
 		int ydiff = data.readInt();
 		int zdiff = data.readInt();
 		boolean activated = data.readBoolean();
-		
+
 		te.blockMetadata = metadata;
 		te.activated = activated;
 		te.xdiff = xdiff;
@@ -154,7 +180,7 @@ public class PacketData {
 			te.processFunction();
 		}
 	}
-	
+
 	private void setMultiblockFurnacePacket(TileEntityMultiblockFurnace te, ByteArrayDataInput data, Player player, int metadata, String type)
 	{
 		//System.out.println("Recieved MultiblockFurnace packet");
@@ -172,13 +198,13 @@ public class PacketData {
 			double[] comptT = new double[2];
 			comptT[0] = data.readDouble();
 			comptT[1] = data.readDouble();
-		
+
 			float fuelTime = data.readFloat();
 			int slagVolume = data.readInt();
-		
+
 			int grossCookTime = data.readInt();
 			int grossMaxCookTime = data.readInt();
-			
+
 			te.xsize = xsize;
 			te.ysize = ysize;
 			te.zsize = zsize;
@@ -190,9 +216,9 @@ public class PacketData {
 			te.setGrossMaxCookTime(grossMaxCookTime);
 			te.calculateData();
 		}
-		
+
 		boolean passFuel = data.readBoolean();
-		
+
 		if(!type.equalsIgnoreCase("passonly"))
 		{
 			int mapSize = data.readInt();
@@ -205,15 +231,15 @@ public class PacketData {
 			}
 
 			te.setOreMap(oreSlagInQueue);
-		
+
 			if(!type.equalsIgnoreCase("noinventory"))
 			{
 				int short1 = data.readInt();
 				byte[] abyte = new byte[short1];
 				data.readFully(abyte);
-			
+
 				try {
-				te.loadInventory(CompressedStreamTools.decompress(abyte));
+					te.loadInventory(CompressedStreamTools.decompress(abyte));
 				}
 				catch(Exception e)
 				{
@@ -221,11 +247,11 @@ public class PacketData {
 				}
 			}
 		}
-		
-		
+
+
 		te.passFuel = passFuel;
 	}
-	
+
 	private void setAutocraftingBenchPacket(TileEntityAutocraftingBench te, ByteArrayDataInput data, Player player, int metadata, String type)
 	{
 		double fueltank = data.readDouble();
@@ -233,7 +259,7 @@ public class PacketData {
 		double upgrade = data.readDouble();
 		int process = data.readInt();
 		int cooldown = data.readInt();
-		
+
 		if(!type.equalsIgnoreCase("noinventory"))
 		{
 			int short1 = data.readInt();
@@ -247,9 +273,9 @@ public class PacketData {
 				System.out.println("ERROR ERROR WILL ROBINSON!");
 			}
 		}
-		
+
 		te.updating = true;
-		
+
 		te.fuelTank = fueltank;
 		te.fuelUsePercent = fueluse;
 		te.upgradeTier = upgrade;
@@ -257,7 +283,7 @@ public class PacketData {
 		te.craftingCooldown = cooldown;
 		te.updating = false;
 	}
-	
+
 	private void setFuelConverterPacket(TileEntityFuelConverter te, ByteArrayDataInput data, Player player, int metadata, String type)
 	{
 		double fueltank = data.readDouble();
@@ -269,21 +295,21 @@ public class PacketData {
 		int cooldown = data.readInt();
 		int currentIndex = data.readInt();
 		String currentTag = data.readUTF();
-		
+
 		if(!type.equalsIgnoreCase("noinventory"))
 		{
 			int short1 = data.readInt();
 			byte[] abyte = new byte[short1];
 			data.readFully(abyte);
 			try {
-			te.loadInventory(CompressedStreamTools.decompress(abyte));
+				te.loadInventory(CompressedStreamTools.decompress(abyte));
 			}
 			catch(Exception e)
 			{
-				
+
 			}
 		}
-		
+
 		te.fuelTank = fueltank;
 		te.efficiencyUpgrade = effupgrade;
 		te.speedUpgrade = spupgrade;
@@ -295,15 +321,15 @@ public class PacketData {
 		te.currentTag = currentTag;
 		te.calculateProcessTime();
 	}
-	
+
 	private void setFuelCellFillerPacket(TileEntityFuelCellFiller te, ByteArrayDataInput data, Player player, int metadata, String type)
 	{
 		int craftingcooldown = data.readInt();
 		int processtime = data.readInt();
 		double speedupgrade = data.readDouble();
-		
+
 		TileEntityFuelCellFiller ate = (TileEntityFuelCellFiller) te;
-		
+
 		if(!type.equalsIgnoreCase("noinventory"))
 		{
 			int itemSize = data.readInt();
@@ -315,13 +341,42 @@ public class PacketData {
 			catch(Exception e)
 			{}
 		}
-		
+
 		ate.craftingCooldown = craftingcooldown;
 		ate.processTime = processtime;
 		ate.speedUpgrade = speedupgrade;
 		ate.calculateProcessTime();
 	}
-	
+
+	private void setTunnelBorePacket(TileEntityTunnelBore te, ByteArrayDataInput data, Player player, int metadata, String type)
+	{
+		//TODO:Finish
+		//System.out.println("packet set");
+		te.xSize = data.readInt();
+		te.ySize = data.readInt();
+		te.cycles = data.readInt();
+		te.digCooldown = data.readInt();
+		te.digFortuneLevel = data.readInt();
+		te.maxDigCooldown = data.readInt();
+		te.fuelTime = data.readDouble();
+		te.fuelMultiplyer = data.readDouble();
+		te.hollowScaffold = data.readBoolean();
+		te.digSilkTouch = data.readBoolean();
+		te.digIgnoreHardness = data.readBoolean();
+
+		if(!type.equalsIgnoreCase("noinventory"))
+		{
+			int itemSize = data.readInt();
+			byte[] abyte = new byte[itemSize];
+			data.readFully(abyte);
+			try {
+				te.loadInventory(CompressedStreamTools.decompress(abyte));
+			}
+			catch(Exception e)
+			{}
+		}
+	}
+
 	private void getFurnacePacket(TileEntityFurnaces te, String type, DataOutputStream dos)
 	{
 		int burntime = te.furnaceBurnTime;
@@ -329,7 +384,7 @@ public class PacketData {
 		double multiplyer = te.furnaceCookTimeMultiplyer;
 		byte facing = te.getFacing();
 		int[] items = te.buildIntList();
-		
+
 		try
 		{
 			dos.writeInt(burntime);
@@ -350,14 +405,14 @@ public class PacketData {
 			System.out.println("HERPA DERPA");
 		}
 	}
-	
+
 	private void getMultiblockInitPacket(TileEntityMultiblockInit te, String type, DataOutputStream dos)
 	{
 		int xdiff = te.xdiff;
 		int ydiff = te.ydiff;
 		int zdiff = te.zdiff;
 		boolean activate = te.activated;
-		
+
 		try
 		{
 			dos.writeInt(xdiff);
@@ -370,7 +425,7 @@ public class PacketData {
 			System.out.println("HURRR DURRR");
 		}
 	}
-	
+
 	/*
 	 * types:
 	 * passonly: only send passFuel value
@@ -389,15 +444,15 @@ public class PacketData {
 
 		double ctx = fte.componentTiers[0];
 		double cty = fte.componentTiers[1];
-		
+
 		float fuelStack = fte.getFuelStack();
 		int slagVolume = fte.slagTank;
-		
+
 		int grossCookTime = fte.getGrossCookTime();
 		int grossMaxCookTime = fte.getGrossMaxCookTime();
-		
+
 		boolean passFuel = fte.passFuel;
-		
+
 		String[] slagTypes = new String[fte.getOreMap().keySet().size()];
 		for(int i = 0; i < slagTypes.length; i++)
 		{
@@ -409,7 +464,7 @@ public class PacketData {
 			slagValues[j] = (Integer) fte.getOreMap().values().toArray()[j];
 		}
 		//System.out.println("Out: " + grossCookTime + "/" + grossMaxCookTime);
-		
+
 		try
 		{
 			if(!type.equalsIgnoreCase("passonly"))
@@ -427,9 +482,9 @@ public class PacketData {
 				dos.writeInt(grossCookTime);
 				dos.writeInt(grossMaxCookTime);
 			}
-			
+
 			dos.writeBoolean(passFuel);
-			
+
 			if(!type.equalsIgnoreCase("passonly"))
 			{
 				dos.writeInt(slagTypes.length);
@@ -438,7 +493,7 @@ public class PacketData {
 					dos.writeUTF(slagTypes[j]);
 					dos.writeInt(slagValues[j]);
 				}
-			
+
 				if(!type.equalsIgnoreCase("noinventory"))
 				{
 					byte[] abyte = CompressedStreamTools.compress(fte.saveInventory());
@@ -452,7 +507,7 @@ public class PacketData {
 			System.out.println("HODOR HODOR");
 		}
 	}
-	
+
 	/*
 	 * types:
 	 * noinventory: no inventory
@@ -465,7 +520,7 @@ public class PacketData {
 		double upgrade = te.upgradeTier;
 		int process = te.processTime;
 		int cooldown = te.craftingCooldown;
-		
+
 		try
 		{
 			dos.writeDouble(fueltank);
@@ -473,7 +528,7 @@ public class PacketData {
 			dos.writeDouble(upgrade);
 			dos.writeInt(process);
 			dos.writeInt(cooldown);
-			
+
 			if(!type.equalsIgnoreCase("noinventory"))
 			{
 				byte[] abyte = CompressedStreamTools.compress(te.saveInventory());
@@ -485,10 +540,10 @@ public class PacketData {
 		{
 			System.out.println("RAAWR");
 		}
-		
+
 		te.updating = false;
 	}
-	
+
 	/*
 	 * types:
 	 * noinventory: no inventories
@@ -504,7 +559,7 @@ public class PacketData {
 		//boolean makeDust = te.makeDust;
 		int currentIndex = te.currentIndex;
 		String currentTag = te.currentTag;
-		
+
 		try
 		{
 			dos.writeDouble(fueltank);
@@ -516,7 +571,7 @@ public class PacketData {
 			dos.writeInt(cooldown);
 			dos.writeInt(currentIndex);
 			dos.writeUTF(currentTag);
-			
+
 			if(!type.equalsIgnoreCase("noinventory"))
 			{
 				byte[] abyte = CompressedStreamTools.compress(te.saveInventory());
@@ -529,7 +584,7 @@ public class PacketData {
 			System.out.println("RAAWR");
 		}
 	}
-	
+
 	/*
 	 * types:
 	 * noinventory: no inventories
@@ -539,14 +594,14 @@ public class PacketData {
 		int craftingcooldown = te.craftingCooldown;
 		int processtime = te.processTime;
 		double speedupgrade = te.speedUpgrade;
-		
+
 		try
 		{
 			dos.writeInt(craftingcooldown);
 			dos.writeInt(processtime);
 			dos.writeDouble(speedupgrade);
-			
-			if(type.equalsIgnoreCase("noinventory"))
+
+			if(!type.equalsIgnoreCase("noinventory"))
 			{
 				byte[] abyte = CompressedStreamTools.compress(te.saveInventory());
 				dos.writeInt(abyte.length);
@@ -558,12 +613,43 @@ public class PacketData {
 			System.out.println("RAWR.RAR");
 		}
 	}
+
+	private void getTunnelBorePacket(TileEntityTunnelBore te, String type, DataOutputStream dos)
+	{
+		//TODO: finish
+		//System.out.println("packet get");
+		try
+		{
+			dos.writeInt(te.xSize);
+			dos.writeInt(te.ySize);
+			dos.writeInt(te.cycles);
+			dos.writeInt(te.digCooldown);
+			dos.writeInt(te.digFortuneLevel);
+			dos.writeInt(te.maxDigCooldown);
+			dos.writeDouble(te.fuelTime);
+			dos.writeDouble(te.fuelMultiplyer);
+			dos.writeBoolean(te.hollowScaffold);
+			dos.writeBoolean(te.digSilkTouch);
+			dos.writeBoolean(te.digIgnoreHardness);
+
+			if(!type.equalsIgnoreCase("noinventory"))
+			{
+				byte[] abyte = CompressedStreamTools.compress(te.saveInventory());
+				dos.writeInt(abyte.length);
+				dos.write(abyte);
+			}
+		}
+		catch(IOException e)
+		{
+			System.out.println("RAR.RAWR");
+		}
+	}
 }
 /*******************************************************************************
-* Copyright (c) 2014 Malorolam.
-* 
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the included license, which is also
-* available at http://carbonization.wikispaces.com/License
-* 
-*********************************************************************************/
+ * Copyright (c) 2014 Malorolam.
+ * 
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the included license, which is also
+ * available at http://carbonization.wikispaces.com/License
+ * 
+ *********************************************************************************/

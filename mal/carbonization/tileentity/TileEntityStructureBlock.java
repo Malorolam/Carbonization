@@ -120,7 +120,7 @@ public class TileEntityStructureBlock extends TileEntity implements ITileEntityM
 		{
 			//System.out.println("Master Entity " + masterEntity.toString() + " at: " + masterEntity.getX() + ", " + masterEntity.getY() + ", " + masterEntity.getZ());
 			if(this.isUseableByPlayer(par5EntityPlayer))
-				masterEntity.activate(world, masterEntity.getX(), masterEntity.getY(), masterEntity.getZ(), par5EntityPlayer);
+				masterEntity.activate(world, this.getX()+mx, this.getY()+my, this.getZ()+mz, par5EntityPlayer);
 		}
 	}
 	
@@ -149,9 +149,9 @@ public class TileEntityStructureBlock extends TileEntity implements ITileEntityM
 	public void initilize(Object[] params) {
 		//System.out.println("Dummy Initilized");
 		masterEntity = (ITileEntityMultiblock) params[0];
-		mx = masterEntity.getX();
-		my = masterEntity.getY();
-		mz = masterEntity.getZ();
+		mx = masterEntity.getX() - this.getX();
+		my = masterEntity.getY() - this.getY();
+		mz = masterEntity.getZ() - this.getZ();
 
 		loaded = true;
 	}
@@ -163,7 +163,7 @@ public class TileEntityStructureBlock extends TileEntity implements ITileEntityM
 		
 		if(worldObj != null && !loaded)
 		{
-			TileEntity te = worldObj.getBlockTileEntity(mx, my, mz);
+			TileEntity te = worldObj.getBlockTileEntity(this.getX()+mx, this.getY()+my, this.getZ()+mz);
 			if(te instanceof ITileEntityMultiblock)
 			{
 				this.masterEntity = (ITileEntityMultiblock) te;
@@ -228,13 +228,9 @@ public class TileEntityStructureBlock extends TileEntity implements ITileEntityM
     	nbt.setDouble("insulationTier", InsulationTier);
     	nbt.setDouble("conductionTier", ConductionTier);
 
-		//save the location of the master entity, so we can try to recover it
-		if(this.masterEntity instanceof TileEntity)
-		{
-			nbt.setInteger("masterEntityx", ((TileEntity)this.masterEntity).xCoord);
-			nbt.setInteger("masterEntityy", ((TileEntity)this.masterEntity).yCoord);
-			nbt.setInteger("masterEntityz", ((TileEntity)this.masterEntity).zCoord);
-		}
+		nbt.setInteger("masterEntityx", mx);
+		nbt.setInteger("masterEntityy", my);
+		nbt.setInteger("masterEntityz", mz);
 		
     	//System.out.println("Writing Data: " + baseMaterial + ", " + secondaryMaterial + ", " + purpose + "; " + InsulationTier + ", " + ConductionTier);
     }

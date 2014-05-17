@@ -1,17 +1,20 @@
 package mal.core;
 
+import cpw.mods.fml.common.network.Player;
 import cpw.mods.fml.common.registry.GameRegistry;
 import mal.api.IFuelContainer;
 import mal.carbonization.carbonization;
 import mal.carbonization.items.ItemStructureBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemHoe;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 import net.minecraft.item.ItemTool;
+import net.minecraft.world.World;
 
 /**
  * @author Mal
@@ -125,6 +128,24 @@ public class UtilReference {
 	public static double getTier(ItemStack item)
 	{
 		return getTier(item, true, false);
+	}
+	
+	public static void sendMessageToAllPlayers(World world, String message)
+	{
+		for(Object p: world.playerEntities)
+		{
+			if(p instanceof EntityPlayer)
+			{
+				((EntityPlayer)p).addChatMessage(message);
+			}
+		}
+	}
+	
+	public static void sendMessageToClosestPlayer(World world, String message, int x, int y, int z)
+	{
+		EntityPlayer p = world.getClosestPlayer(x, y, z, 32);
+		if(p != null)
+			p.addChatMessage(message);
 	}
 }
 /*******************************************************************************

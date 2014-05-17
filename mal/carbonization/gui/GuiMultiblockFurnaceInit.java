@@ -30,7 +30,7 @@ import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.StatCollector;
 
 @SideOnly(Side.CLIENT)
-public class GuiMultiblockInit extends GuiScreen
+public class GuiMultiblockFurnaceInit extends GuiScreen
 {
     private TileEntityMultiblockInit test;
     
@@ -41,7 +41,7 @@ public class GuiMultiblockInit extends GuiScreen
     private GuiButton closeBtn;
     private GuiButton makeBtn;
 
-    public GuiMultiblockInit(TileEntityMultiblockInit par2TileEntityTest, EntityPlayer player)
+    public GuiMultiblockFurnaceInit(TileEntityMultiblockInit par2TileEntityTest, EntityPlayer player)
     {
         this.test = par2TileEntityTest;
         this.player = player;

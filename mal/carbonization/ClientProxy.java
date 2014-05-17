@@ -2,21 +2,10 @@ package mal.carbonization;
 
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.client.registry.RenderingRegistry;
-import mal.carbonization.gui.GuiAutocraftingBench;
-import mal.carbonization.gui.GuiFuelCellFiller;
-import mal.carbonization.gui.GuiFuelConverter;
-import mal.carbonization.gui.GuiFurnaces;
-import mal.carbonization.gui.GuiMultiblockFurnace;
-import mal.carbonization.gui.GuiMultiblockInit;
-import mal.carbonization.gui.GuiPortableScanner;
+import mal.carbonization.gui.*;
 import mal.carbonization.items.ItemPortableScanner;
 import mal.carbonization.network.PortableScannerWrapper;
-import mal.carbonization.tileentity.TileEntityAutocraftingBench;
-import mal.carbonization.tileentity.TileEntityFuelCellFiller;
-import mal.carbonization.tileentity.TileEntityFuelConverter;
-import mal.carbonization.tileentity.TileEntityFurnaces;
-import mal.carbonization.tileentity.TileEntityMultiblockFurnace;
-import mal.carbonization.tileentity.TileEntityMultiblockInit;
+import mal.carbonization.tileentity.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
@@ -50,9 +39,13 @@ public class ClientProxy extends CommonProxy {
         if(tileEntity instanceof TileEntityFurnaces){
                 return new GuiFurnaces(player.inventory, (TileEntityFurnaces) tileEntity);
         }
-        if(tileEntity instanceof TileEntityMultiblockInit){
-        	//System.out.println("got to make the gui client side");
-        	return new GuiMultiblockInit((TileEntityMultiblockInit)tileEntity, player);
+        if(tileEntity instanceof TileEntityMultiblockInit)
+        {
+        	return new GuiMultiblockFurnaceInit((TileEntityMultiblockInit)tileEntity, player);
+        }
+        if(tileEntity instanceof TileEntityMultiblockBoreInit)
+        {
+        	return new GuiBorerInit((TileEntityMultiblockBoreInit)tileEntity,player);
         }
         if(tileEntity instanceof TileEntityMultiblockFurnace){
         	//System.out.println("got to make the gui client side");
@@ -68,6 +61,8 @@ public class ClientProxy extends CommonProxy {
         }
         if(tileEntity instanceof TileEntityFuelCellFiller)
         	return new GuiFuelCellFiller(player.inventory, (TileEntityFuelCellFiller)tileEntity);
+        if(tileEntity instanceof TileEntityTunnelBore)
+        	return new GuiTunnelBore(player.inventory, (TileEntityTunnelBore)tileEntity);
         
         if(id == 4 && player.getCurrentEquippedItem() != null && player.getCurrentEquippedItem().getItem().itemID == carbonization.portableScanner.itemID)
         {

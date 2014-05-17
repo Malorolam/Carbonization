@@ -469,15 +469,15 @@ public class TileEntityFurnaces extends TileEntity implements IInventory, net.mi
             ItemStack var1 = FurnaceRecipes.smelting().getSmeltingResult(this.furnaceItemStacks[0]);
         	ItemStack var2 = CarbonizationRecipes.smelting().getSmeltingResult(this.furnaceItemStacks[0]);
 
-            if(var1 != null)
+            if(var2 != null)
 	        {
 	            if (this.furnaceItemStacks[2] == null)
 	            {
-	                this.furnaceItemStacks[2] = var1.copy();
+	                this.furnaceItemStacks[2] = var2.copy();
 	            }
-	            else if (this.furnaceItemStacks[2].isItemEqual(var1))
+	            else if (this.furnaceItemStacks[2].isItemEqual(var2))
 	            {
-	                furnaceItemStacks[2].stackSize += var1.stackSize;
+	                furnaceItemStacks[2].stackSize += var2.stackSize;
 	            }
 	
 	            --this.furnaceItemStacks[0].stackSize;
@@ -487,12 +487,12 @@ public class TileEntityFurnaces extends TileEntity implements IInventory, net.mi
 	                this.furnaceItemStacks[0] = null;
 	            }
 	        }
-            else if(var2 != null)
+            else if(var1 != null)
         	{
 	        	if (this.furnaceItemStacks[2] == null)
-	        		this.furnaceItemStacks[2] = var2.copy();
-	        	else if (this.furnaceItemStacks[2].isItemEqual(var2))
-	        		furnaceItemStacks[2].stackSize += var2.stackSize;
+	        		this.furnaceItemStacks[2] = var1.copy();
+	        	else if (this.furnaceItemStacks[2].isItemEqual(var1))
+	        		furnaceItemStacks[2].stackSize += var1.stackSize;
 	        	
 	        	--this.furnaceItemStacks[0].stackSize;
 	        	

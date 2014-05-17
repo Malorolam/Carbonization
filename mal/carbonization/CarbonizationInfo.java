@@ -55,6 +55,14 @@ public class CarbonizationInfo {
 			return portableScannerInfo2();
 		case 20://portable scanner page 3
 			return portableScannerInfo3();
+		case 21://bore page 1
+			return boreInfo1();
+		case 22://bore page 2
+			return boreInfo2();
+		case 23://bore page 3
+			return boreInfo3();
+		case 24://bore page 4
+			return boreInfo4();
 		default:
 			return defaultInfo();
 		}
@@ -458,6 +466,103 @@ public class CarbonizationInfo {
 		list.add("blocks in the volume and how many of");
 		list.add("each there are.  The fuel usage for");
 		list.add("Extended mode is higher as well.");
+		
+		return list;
+	}
+	
+	private static List<String> boreInfo1()
+	{
+		List<String> list = new ArrayList<String>();
+		
+		list.add("Industrial Tunnel Bore:");
+		list.add("");
+		list.add("The Industrial Tunnel Bore is a machine ");
+		list.add("designed with one purpose in mind, to ");
+		list.add("remove large sections of the world and ");
+		list.add("deposit them for further processing.  The ");
+		list.add("energy requirements to this are rather high ");
+		list.add("and dependent on the blocks in the way of ");
+		list.add("the dig head.  The size of the dig head ");
+		list.add("is scalable, from 1x1 to 15x15, with any ");
+		list.add("odd dimension in between, with the width ");
+		list.add("and height being separate.  This size is ");
+		list.add("controlled from within the GUI, where the ");
+		list.add("two left slots accept structure blocks and ");
+		list.add("increase the width and height respectively.  ");
+		list.add("As the bore digs, it leaves behind a fragile ");
+		
+		return list;
+	}
+	
+	private static List<String> boreInfo2()
+	{
+		List<String> list = new ArrayList<String>();
+		
+		list.add("Industrial Tunnel Bore:");
+		list.add("");
+		list.add("scaffolding to maintain the integrity of the ");
+		list.add("tunnel and prevent the undesired \"hall'o'mobs\" ");
+		list.add("left behind other such methods.  This scaffold ");
+		list.add("can be toggled to either solid or hollow, ");
+		list.add("the only difference being the additional ");
+		list.add("cpu load on the server with the more ");
+		list.add("complicated pattern.  The bore requires an ");
+		list.add("inventory to be directly behind it, on the ");
+		list.add("face with the single hole, or the internal ");
+		list.add("buffer fills and the bore will jam.  A redstone ");
+		list.add("signal is also needed.  The bore will also jam ");
+		list.add("if there is insufficient fuel to break the ");
+		list.add("next block in the dig pattern or it encounters ");
+		list.add("an indestructible block.  Should the Industrial ");
+		
+		return list;
+	}
+	
+	private static List<String> boreInfo3()
+	{
+		List<String> list = new ArrayList<String>();
+		
+		list.add("Industrial Tunnel Bore:");
+		list.add("");
+		list.add("Bore be unable to dig for whatever reason, ");
+		list.add("the closest player will be informed every ");
+		list.add("dig cycle.  If this is found to be unbearably ");
+		list.add("irritating, the messages can be disabled in ");
+		list.add("the config file.  ");
+		list.add("");
+		list.add("The Industrial Tunnel Bore can be upgraded ");
+		list.add("using a series of upgrade items.  First is ");
+		list.add("the haste upgrades, which decrease the ");
+		list.add("operation delay by a flat amount depending ");
+		list.add("on the tier, up to a minimum of 5 ticks.  ");
+		list.add("Then there is the fortune upgrades, which ");
+		list.add("add levels of fortune to the dig head.  ");
+		list.add("Third there is efficiency upgrades, which ");
+
+		
+		return list;
+	}
+	
+	private static List<String> boreInfo4()
+	{
+		List<String> list = new ArrayList<String>();
+		
+		list.add("Industrial Tunnel Bore:");
+		list.add("");
+		list.add("reduce the fuel consumption by a percentage.  ");
+		list.add("Finally there is the silk touch upgrade, which ");
+		list.add("adds the silk touch effect to the dig head, ");
+		list.add("and the hardness upgrade, which makes the ");
+		list.add("bore ignore block hardness when it determines ");
+		list.add("fuel consumption and if it can break the ");
+		list.add("block or not.  You can only use three ");
+		list.add("upgrades and most will stack with each other.  ");
+		list.add("Obviously one cannot silk touch or ignore ");
+		list.add("hardness any more than once, so stacking ");
+		list.add("those upgrades does nothing useful.  The base ");
+		list.add("fuel usage and cooldown time is set in the ");
+		list.add("config, under fuel usage and max cooldown ");
+		list.add("time respectively.  ");
 		
 		return list;
 	}

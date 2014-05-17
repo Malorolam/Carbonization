@@ -76,7 +76,7 @@ public class ItemFuel extends Item {
 		switch(is.getItemDamage())
 		{
 		case 0:
-			return "item.peat";
+			return "item.Peat";
 		case 1:
 			return "item.lignite";
 		case 2:
@@ -146,7 +146,7 @@ public class ItemFuel extends Item {
 			r="carbonization.graphite";
 			break;
 		default:
-			r="carbonization.peat";
+			r="carbonization.bloop";
 			break;
 		}
 		

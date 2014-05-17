@@ -18,7 +18,7 @@ import net.minecraft.world.World;
 
 public class ItemMisc extends Item{
 
-	private Icon[] iconArray = new Icon[21];
+	private Icon[] iconArray = new Icon[25];
 	
 	public ItemMisc(int par1) {
 		super(par1);
@@ -106,6 +106,18 @@ public class ItemMisc extends Item{
 		case 19://fine threading
 			list.add(setTooltipData("Fine Steel threading to improve conduction.", ColorReference.LIGHTGREEN));
 			break;
+		case 20://bit
+			list.add(setTooltipData("A diamond-tipped bit.", ColorReference.LIGHTGREEN));
+			break;
+		case 21://Casing
+			list.add(setTooltipData("A steel machine casing.", ColorReference.LIGHTGREEN));
+			break;
+		case 22://circuit
+			list.add(setTooltipData("A small circuit board.", ColorReference.LIGHTGREEN));
+			break;
+		case 23://core
+			list.add(setTooltipData("A machine core made from steel.", ColorReference.LIGHTGREEN));
+			break;
 		default:
 			list.add(setTooltipData("This isn't even an item!",ColorReference.DARKRED));
 			list.add(setTooltipData("Tell Mal about it so he can fix it.", ColorReference.LIGHTRED));
@@ -166,6 +178,14 @@ public class ItemMisc extends Item{
 			return s+"coarseThreading";
 		case 19:
 			return s+"fineThreading";
+		case 20:
+			return s+"diamondbit";
+		case 21:
+			return s+"steelcasing";
+		case 22:
+			return s+"circuit";
+		case 23:
+			return s+"steelcore";
 		default:
 			return s+"ItemMisc";
 		}
@@ -199,6 +219,10 @@ public class ItemMisc extends Item{
 		iconArray[17] = ir.registerIcon("carbonization:carbonNanotubeTexture");
 		iconArray[18] = ir.registerIcon("carbonization:coarseThreadingTexture");
 		iconArray[19] = ir.registerIcon("carbonization:fineThreadingTexture");
+		iconArray[20] = ir.registerIcon("carbonization:diamondBitTexture");
+		iconArray[21] = ir.registerIcon("carbonization:steelCasingTexture");
+		iconArray[22] = ir.registerIcon("carbonization:circuitTexture");
+		iconArray[23] = ir.registerIcon("carbonization:steelCoreTexture");
 	}
 	
 	public Icon getIconFromDamage(int value)
@@ -285,6 +309,18 @@ public class ItemMisc extends Item{
 		case 19:
 			r="finethreading";
 			break;
+		case 20:
+			r="diamondbit";
+			break;
+		case 21:
+			r="steelcasing";
+			break;
+		case 22:
+			r="circuit";
+			break;
+		case 23:
+			r="steelcore";
+			break;
 		default:
 			r="blaarg";
 			break;
@@ -319,6 +355,10 @@ public class ItemMisc extends Item{
         par3List.add(new ItemStack(par1, 1, 17));
         par3List.add(new ItemStack(par1, 1, 18));
         par3List.add(new ItemStack(par1, 1, 19));
+        par3List.add(new ItemStack(par1, 1, 20));
+        par3List.add(new ItemStack(par1, 1, 21));
+        par3List.add(new ItemStack(par1, 1, 22));
+        par3List.add(new ItemStack(par1, 1, 23));
     }
 	
     public ItemStack onEaten(ItemStack par1ItemStack, World par2World, EntityPlayer par3EntityPlayer)

@@ -134,6 +134,19 @@ public class Multiblock {
 		ItemStack is = new ItemStack(blockID,1,data);
 		return is.getDisplayName();
 	}
+	
+	public Block toBlock()
+	{
+		return Block.blocksList[blockID];
+	}
+	
+	/*
+	 * Returns the block as an itemstack for silk touch purposes
+	 */
+	public ItemStack toItemStack()
+	{
+		return new ItemStack(blockID,1,data);
+	}
 }
 
 /*******************************************************************************
