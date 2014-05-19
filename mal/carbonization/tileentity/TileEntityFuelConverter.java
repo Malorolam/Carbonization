@@ -36,7 +36,7 @@ import net.minecraft.world.World;
 public class TileEntityFuelConverter extends TileEntity implements IInventory, net.minecraft.inventory.ISidedInventory{
 
 	//TODO: make this not hardcoded...
-	public enum FuelTypes {
+	/*public enum FuelTypes {
 		CHARCOAL(new ItemStack(Item.coal,1,1), new ItemStack(carbonization.dust,1,0), 0),
 		PEAT(new ItemStack(carbonization.fuel,1,0), new ItemStack(carbonization.dust,1,1), 1),
 		LIGNITE(new ItemStack(carbonization.fuel,1,1), new ItemStack(carbonization.dust,1,2), 2),
@@ -71,7 +71,7 @@ public class TileEntityFuelConverter extends TileEntity implements IInventory, n
 		{
 			return index;
 		}
-	}
+	}*/
 	
 	//new system, using the recipes
 	private ArrayList<ItemStack> fuelList = new ArrayList<ItemStack>();
@@ -1345,28 +1345,9 @@ public class TileEntityFuelConverter extends TileEntity implements IInventory, n
 		}
 		//fuel
 		double tempFuel = getFuelStack();
-		int numCoal = 0;
-		int numPeat = 0;
-		while (tempFuel > 0)
-		{   
-			if(tempFuel>=1600)
-			{
-				//add in a coal
-				tempFuel -= 1600;
-				numCoal++;
-			}
-			else if(tempFuel>=600)
-			{
-				//add in a peat
-				tempFuel -= 600;
-				numPeat++;
-			}
-			else//not enough fuel anymore
-			{
-				tempFuel = -1;
-				setFuelStack(0);
-			}
-		}
+		int numCoal = (int) Math.floor(tempFuel/1600);
+		tempFuel = tempFuel % 1600;
+		int numPeat = (int) Math.floor(tempFuel/600);
 
 		var10 = this.furnaceRand.nextFloat() * 0.8F + 0.1F;
 		var11 = this.furnaceRand.nextFloat() * 0.8F + 0.1F;

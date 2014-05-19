@@ -1005,28 +1005,9 @@ public class TileEntityTunnelBore extends TileEntity implements ISidedInventory,
 		
 		//fuel
 		double tempFuel = fuelTime;
-		int numCoal = 0;
-		int numPeat = 0;
-		while (tempFuel > 0)
-		{   
-			if(tempFuel>=1600)
-			{
-				//add in a coal
-				tempFuel -= 1600;
-				numCoal++;
-			}
-			else if(tempFuel>=600)
-			{
-				//add in a peat
-				tempFuel -= 600;
-				numPeat++;
-			}
-			else//not enough fuel anymore
-			{
-				tempFuel = -1;
-				fuelTime = 0;
-			}
-		}
+		int numCoal = (int) Math.floor(tempFuel/1600);
+		tempFuel = tempFuel % 1600;
+		int numPeat = (int) Math.floor(tempFuel/600);
 
 		var10 = this.furnaceRand.nextFloat() * 0.8F + 0.1F;
 		var11 = this.furnaceRand.nextFloat() * 0.8F + 0.1F;

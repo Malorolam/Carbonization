@@ -334,7 +334,11 @@ public class BlockFurnaces extends BlockContainer
     {
         if (!keepFurnaceInventory)
         {
-            TileEntityFurnaces var7 = (TileEntityFurnaces)par1World.getBlockTileEntity(par2, par3, par4);
+        	TileEntity te = par1World.getBlockTileEntity(par2, par3, par4);
+        	TileEntityFurnaces var7 = null;
+        	if(te instanceof TileEntityFurnaces)
+        		var7 = (TileEntityFurnaces)te;
+        		
 
             if (var7 != null)
             {

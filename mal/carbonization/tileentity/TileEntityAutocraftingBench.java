@@ -912,7 +912,13 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
 		}
 		//fuel
 		double tempFuel = getFuelStack();
-		int numCoal = 0;
+		int numCoal = (int) Math.floor(tempFuel/1600);
+		tempFuel = tempFuel % 1600;
+		int numPeat = (int) Math.floor(tempFuel/600);
+		
+		
+		//old stuff
+/*		int numCoal = 0;
 		int numPeat = 0;
 		while (tempFuel > 0)
 		{   
@@ -934,7 +940,7 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
 				setFuelStack(0);
 			}
 		}
-
+*/
 		var10 = this.furnaceRand.nextFloat() * 0.8F + 0.1F;
 		var11 = this.furnaceRand.nextFloat() * 0.8F + 0.1F;
 		var12 = this.furnaceRand.nextFloat() * 0.8F + 0.1F;
