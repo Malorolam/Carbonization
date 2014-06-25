@@ -6,9 +6,14 @@ import net.minecraft.item.ItemStack;
 import mal.carbonization.block.*;
 import mal.carbonization.item.*;
 import mal.carbonization.network.CarbonizationPacketHandler;
+import mal.carbonization.network.CommonProxy;
+import mal.carbonization.world.FuelHandler;
+import mal.carbonization.world.WorldgeneratorCarbonization;
 import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -25,6 +30,9 @@ public class carbonization {
 	public static int MAXSCANNERDEPTH = 32;//maximum depth the scanner will scan
 	public static boolean VERBOSEMODE = false;//enable verbose logging of stuff like version info
 	public static boolean REPORTTOCHAT = false;//report some information to chat
+	
+	@SidedProxy(clientSide = "mal.carbonization.network.ClientProxy", serverSide = "mal.carbonization.network.CommonProxy")
+	public static CommonProxy prox;
 	
 	/*
 	public static ItemDust dust;
@@ -49,16 +57,7 @@ public class carbonization {
 	public static ItemScrewdriver screwdriver;
 	public static ItemUpgradeItems upgradeItems;
     
-	public static CreativeTabs tabStructure = new CreativeTabs("tabStructure"){
-		public ItemStack getIconItemStack() { return new ItemStack(itemStructureBlock,1,0);}
 
-		@Override
-		@SideOnly(Side.CLIENT)
-		public Item getTabIconItem() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-	};
 	public static CreativeTabs tabMachine = new CreativeTabs("tabMachine"){
 		public ItemStack getIconItemStack() { return new ItemStack(autocraftingBench,1,0);}
 
@@ -70,7 +69,18 @@ public class carbonization {
 		}
 	};*/
 	public static CreativeTabs tabItems = new CreativeTabs("tabItems"){
-		public ItemStack getIconItemStack() { return new ItemStack(carbonizationItems.fuel,1,5);}
+		public ItemStack getIconItemStack() { return new ItemStack(carbonizationItems.fuel,1,2);}
+
+		@Override
+		@SideOnly(Side.CLIENT)
+		public Item getTabIconItem() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+	};
+	
+	public static CreativeTabs tabStructure = new CreativeTabs("tabStructure"){
+		public ItemStack getIconItemStack() { return new ItemStack(carbonizationItems.structureItem,1,0);}
 
 		@Override
 		@SideOnly(Side.CLIENT)
@@ -85,7 +95,13 @@ public class carbonization {
     {
     	CarbonizationPacketHandler.init();
     	
+		GameRegistry.registerFuelHandler(new FuelHandler());
+		GameRegistry.registerWorldGenerator(new WorldgeneratorCarbonization(), 0);
+		
     	carbonizationItems.init();
     	carbonizationBlocks.init();
+    	carbonizationTileEntities.init();
+    	
+		prox.setCustomRenderers();
     }
 }

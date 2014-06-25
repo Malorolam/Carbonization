@@ -17,7 +17,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 public class ItemFuel extends Item {
 
-	private IIcon[] iconArray = new IIcon[6];
+	private IIcon[] iconArray = new IIcon[3];
 	
 	public ItemFuel()
 	{
@@ -37,22 +37,10 @@ public class ItemFuel extends Item {
 			list.add(setTooltipData("in wet areas.", ColorReference.DARKGREY));
 			break;
 		case 1:
-			list.add(setTooltipData("A low-value fuel found",ColorReference.DARKGREY));
-			list.add(setTooltipData("in upper layers of soil.", ColorReference.DARKGREY));
-			break;
-		case 2:
-			list.add(setTooltipData("A medium-value fuel found",ColorReference.DARKGREY));
-			list.add(setTooltipData("in middle stone layers.", ColorReference.DARKGREY));
-			break;
-		case 3:
-			list.add(setTooltipData("A medium-value fuel found",ColorReference.DARKGREY));
-			list.add(setTooltipData("in middle stone layers.", ColorReference.DARKGREY));
-			break;
-		case 4:
 			list.add(setTooltipData("A high-value fuel found",ColorReference.DARKGREY));
 			list.add(setTooltipData("in deep stone layers.", ColorReference.DARKGREY));
 			break;
-		case 5:
+		case 2:
 			list.add(setTooltipData("A solid chunk of carbon found",ColorReference.DARKGREY));
 			list.add(setTooltipData("deep in the earth.", ColorReference.DARKGREY));
 			break;
@@ -76,16 +64,10 @@ public class ItemFuel extends Item {
 		switch(is.getItemDamage())
 		{
 		case 0:
-			return "item.Peat";
+			return "item.peat";
 		case 1:
-			return "item.lignite";
-		case 2:
-			return "item.sBitCoal";
-		case 3:
-			return "item.bitCoal";
-		case 4:
 			return "item.anthracite";
-		case 5:
+		case 2:
 			return "item.graphite";
 		default:
 			return "item.ItemFuel";
@@ -96,11 +78,8 @@ public class ItemFuel extends Item {
 	public void registerIcons(IIconRegister ir)
 	{
 		iconArray[0] = ir.registerIcon("carbonization:peatBarTexture");
-		iconArray[1] = ir.registerIcon("carbonization:ligniteBarTexture");
-		iconArray[2] = ir.registerIcon("carbonization:sBitBarTexture");
-		iconArray[3] = ir.registerIcon("carbonization:bitBarTexture");
-		iconArray[4] = ir.registerIcon("carbonization:anthraciteBarTexture");
-		iconArray[5] = ir.registerIcon("carbonization:graphiteBarTexture");
+		iconArray[1] = ir.registerIcon("carbonization:anthraciteBarTexture");
+		iconArray[2] = ir.registerIcon("carbonization:graphiteBarTexture");
 	}
 	
 	public IIcon getIconFromDamage(int value)
@@ -131,18 +110,9 @@ public class ItemFuel extends Item {
 			r="carbonization.peat";
 			break;
 		case 1:
-			r="carbonization.lignite";
-			break;
-		case 2:
-			r="carbonization.sbituminous";
-			break;
-		case 3:
-			r="carbonization.bituminous";
-			break;
-		case 4:
 			r="carbonization.anthracite";
 			break;
-		case 5:
+		case 2:
 			r="carbonization.graphite";
 			break;
 		default:
@@ -163,9 +133,6 @@ public class ItemFuel extends Item {
         par3List.add(new ItemStack(item, 1, 0));
         par3List.add(new ItemStack(item, 1, 1));
         par3List.add(new ItemStack(item, 1, 2));
-        par3List.add(new ItemStack(item, 1, 3));
-        par3List.add(new ItemStack(item, 1, 4));
-        par3List.add(new ItemStack(item, 1, 5));
     }
 }
 

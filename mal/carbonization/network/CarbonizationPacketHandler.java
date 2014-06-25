@@ -12,6 +12,7 @@ public static final SimpleNetworkWrapper instance = NetworkRegistry.INSTANCE.new
 	public static void init()
 	{
 		instance.registerMessage(MultiblockInitMessage.class, MultiblockInitMessage.class, 0, Side.CLIENT);
+		instance.registerMessage(StructureBlockMessage.class, StructureBlockMessage.class, 1, Side.CLIENT);
 	}
 
 }

@@ -4,9 +4,9 @@ import net.minecraft.block.Block;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 
-public class ItemBlockFuels extends ItemBlock {
+public class ItemBlockFuelBlock extends ItemBlock{
 
-	public ItemBlockFuels(Block block) {
+	public ItemBlockFuelBlock(Block block) {
 		super(block);
 		this.setUnlocalizedName("ItemBlockFuels");
 		this.setHasSubtypes(true);
@@ -18,11 +18,11 @@ public class ItemBlockFuels extends ItemBlock {
 		switch(is.getItemDamage())
 		{
 		case 0:
-			return this.getUnlocalizedName()+"peat";
+			return this.getUnlocalizedName()+"peatblock";
 		case 1:
-			return this.getUnlocalizedName()+"anthracite";
+			return this.getUnlocalizedName()+"anthraciteblock";
 		case 2:
-			return this.getUnlocalizedName()+"graphite";
+			return this.getUnlocalizedName()+"graphiteblock";
 		default:
 			return this.getUnlocalizedName()+"BlockFuel";
 		}
@@ -38,14 +38,14 @@ public class ItemBlockFuels extends ItemBlock {
 		String name = "";
 		switch(itemstack.getItemDamage()) 
 		{
-		case 0: 
-			name = "peat";
+		case 0:
+			name = "peatblock";
 			break;
 		case 1:
-			name = "anthracite";
+			name = "anthraciteblock";
 			break;
 		case 2:
-			name = "graphite";
+			name = "graphiteblock";
 			break;
 		default: name = "blarg";
 		}
