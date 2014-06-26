@@ -9,6 +9,7 @@ import mal.carbonization.network.CarbonizationPacketHandler;
 import mal.carbonization.network.CommonProxy;
 import mal.carbonization.world.FuelHandler;
 import mal.carbonization.world.WorldgeneratorCarbonization;
+import mal.core.util.ModList;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -21,7 +22,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class carbonization {
     public static final String MODID = "Carbonization";
     public static final String VERSION = "1.1.0";
-    public static final String VersionURL = "https://www.dropbox.com/s/ao6p1iye6w2suec/malcoreVersion.info?dl=1";
+    public static final String VersionURL = "https://dl.dropboxusercontent.com/s/gswvn9mq4afqfj2/carbonizationVersion.info?dl=1";
     
 	public static int ORESLAGRATIO = 300;//number of millibuckets needed for an item
 	public static int MAXAUTOCRAFTTIME = 600;//maximum amount of time to cooldown
@@ -103,5 +104,6 @@ public class carbonization {
     	carbonizationTileEntities.init();
     	
 		prox.setCustomRenderers();
+		ModList.addMod(this.MODID, this.VERSION, VersionURL);
     }
 }

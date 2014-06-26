@@ -9,6 +9,7 @@ import mal.carbonization.carbonization;
 import mal.carbonization.carbonizationBlocks;
 import mal.carbonization.tileentity.TileEntityStructureBlock;
 import mal.core.reference.ColorReference;
+import mal.core.util.MalLogger;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
@@ -31,8 +32,8 @@ public class ItemStructureBlock extends Item{
 	 * zz: base material, 00-19
 	 */
 	
-	public IIcon[] baseIcon = new IIcon[19];
-	public IIcon[] secondaryIcon = new IIcon[5];
+	public IIcon[] baseIcon = new IIcon[10];
+	public IIcon[] secondaryIcon = new IIcon[3];
 	public IIcon[] purposeIcon = new IIcon[3];
 	
 	public ItemStructureBlock() {
@@ -69,18 +70,10 @@ public class ItemStructureBlock extends Item{
 		switch(value[1])
 		{
 		case 1:
-			line3 += "Basic Insulation.";
-			flag = true;
-			break;
-		case 2:
 			line3 += "High Density Insulation.";
 			flag = true;
 			break;
-		case 3:
-			line3 += "Coarse Threading.";
-			flag = true;
-			break;
-		case 4:
+		case 2:
 			line3 += "Fine Threading.";
 			flag = true;
 			break;
@@ -89,61 +82,34 @@ public class ItemStructureBlock extends Item{
 		switch(value[2])
 		{
 		case 0:
-			line2 += "ice";
-			break;
-		case 1:
-			line2 += "wood";
-			break;
-		case 2:
 			line2 += "stone";
 			break;
-		case 3:
+		case 1:
+			line2 += "ice";
+			break;
+		case 2:
 			line2 += "iron";
 			break;
+		case 3:
+			line2 += "brick";
+			break;
 		case 4:
-			line2 += "carbon flake";
-			break;
-		case 5:
-			line2 += "carbon-plated iron";
-			break;
-		case 6:
-			line2 += "refined iron";
-			break;
-		case 7:
-			line2 += "carbon thread";
-			break;
-		case 8:
-			line2 += "carbon rebar";
-			break;
-		case 9:
-			line2 += "pig iron";
-			break;
-		case 10:
-			line2 += "carbon fibre";
-			break;
-		case 11:
-			line2 += "refined carbon fibre";
-			break;
-		case 12:
-			line2 += "high carbon steel";
-			break;
-		case 13:
-			line2 += "carbon nanoflake";
-			break;
-		case 14:
-			line2 += "carbon-plated steel";
-			break;
-		case 15:
 			line2 += "steel";
 			break;
-		case 16:
-			line2 += "carbon nanotube";
+		case 5:
+			line2 += "carbon fibre";
 			break;
-		case 17:
-			line2 += "refined carbon nanotube";
+		case 6:
+			line2 += "titanium";
 			break;
-		case 18:
+		case 7:
+			line2 += "carbon nanaotube";
+			break;
+		case 8:
 			line2 += "withered end";
+			break;
+		case 9:
+			line2 += "cobalt chrome";
 			break;
 		}
 		
@@ -155,53 +121,18 @@ public class ItemStructureBlock extends Item{
 		//Extra tooltip information that is precise material specific
 		switch(is.getItemDamage())
 		{
-		case 0://ice structure ids
-		case 100:
-		case 200:
-		case 300:
-		case 400:
-		case 1000:
-		case 1100:
-		case 1200:
-		case 1300:
-		case 1400:
-		case 2000:
-		case 2100:
-		case 2200:
-		case 2300:
-		case 2400:
-			list.add(setTooltipData("Dwarven engineering allows ", ColorReference.ORANGE));
-			list.add(setTooltipData("for unmelting ice, even in ", ColorReference.ORANGE));
-			list.add(setTooltipData("the hottest of temperatures.", ColorReference.ORANGE));
-			break;
-			
-		case 1://wood structure ids
+		case 1://ice structure ids
 		case 101:
 		case 201:
-		case 301:
-		case 401:
 		case 1001:
 		case 1101:
 		case 1201:
-		case 1301:
-		case 1401:
 		case 2001:
 		case 2101:
 		case 2201:
-		case 2301:
-		case 2401:
 			list.add(setTooltipData("Dwarven engineering allows ", ColorReference.ORANGE));
-			list.add(setTooltipData("for nonflammable wood, even", ColorReference.ORANGE));
-			list.add(setTooltipData("in the hottest of temperatures.", ColorReference.ORANGE));
-			break;
-			
-		case 2009://pig iron machine, any insulation
-		case 2109:
-		case 2209:
-		case 2309:
-		case 2409:
-			list.add(setTooltipData("A machine that is appropriate", ColorReference.PINK));
-			list.add(setTooltipData("for those in the Suidae family.", ColorReference.PINK));
+			list.add(setTooltipData("for unmelting ice, even in ", ColorReference.ORANGE));
+			list.add(setTooltipData("the hottest of temperatures.", ColorReference.ORANGE));
 			break;
 		}
 		
@@ -229,80 +160,44 @@ public class ItemStructureBlock extends Item{
 		switch(baseMaterial)
 		{
 		case 0:
-			InsTier=1;
-			ConTier=0;
+			InsTier=2;
+			ConTier=1;
 			break;
 		case 1:
-			InsTier=0.5;
-			ConTier=0.5;
-			break;
-		case 2:
-			InsTier=0;
-			ConTier=1;
-			break;
-		case 3:
-			InsTier=0.5;
-			ConTier=1.5;
-			break;
-		case 4:
-			InsTier=1.5;
-			ConTier=0.5;
-			break;
-		case 5:
 			InsTier=1;
-			ConTier=1;
-			break;
-		case 6:
-			InsTier=1.5;
-			ConTier=2.5;
-			break;
-		case 7:
-			InsTier=2.5;
-			ConTier=1.5;
-			break;
-		case 8:
-			InsTier=2;
 			ConTier=2;
 			break;
-		case 9:
-			InsTier=2.5;
-			ConTier=3.5;
-			break;
-		case 10:
-			InsTier=3.5;
-			ConTier=2.5;
-			break;
-		case 11:
-			InsTier=3;
-			ConTier=3;
-			break;
-		case 12:
-			InsTier=3.5;
-			ConTier=4.5;
-			break;
-		case 13:
-			InsTier=4.5;
-			ConTier=3.5;
-			break;
-		case 14:
+		case 2:
 			InsTier=4;
+			ConTier=2;
+			break;
+		case 3:
+			InsTier=2;
 			ConTier=4;
 			break;
-		case 15:
-			InsTier=4.5;
-			ConTier=5.5;
+		case 4:
+			InsTier=8;
+			ConTier=4;
 			break;
-		case 16:
-			InsTier=5.5;
-			ConTier=4.5;
+		case 5:
+			InsTier=4;
+			ConTier=8;
 			break;
-		case 17:
-			InsTier=5;
-			ConTier=5;
+		case 6:
+			InsTier=16;
+			ConTier=8;
 			break;
-		case 18:
-			InsTier=10;
-			ConTier=10;
+		case 7:
+			InsTier=8;
+			ConTier=16;
+			break;
+		case 8:
+			InsTier=32;
+			ConTier=16;
+			break;
+		case 9:
+			InsTier=16;
+			ConTier=32;
 			break;
 		}
 		
@@ -312,20 +207,12 @@ public class ItemStructureBlock extends Item{
 		case 0:
 			break;
 		case 1:
-			InsTier += InsTier*0.6;
-			ConTier -= ConTier*0.5;
-			break;
-		case 2:
 			InsTier += InsTier;
 			ConTier -= ConTier*0.5;
 			break;
-		case 3:
-			ConTier += ConTier*0.6;
+		case 2:
 			InsTier -= InsTier*0.5;
-			break;
-		case 4:
 			ConTier += ConTier;
-			InsTier -= InsTier*0.5;
 			break;
 		}
 		
@@ -486,8 +373,8 @@ public class ItemStructureBlock extends Item{
     public void getSubItems(Item item, CreativeTabs par2CreativeTabs, List par3List)
     {
 		for(int i = 0; i<3; i++)
-			for(int j = 0; j<5; j++)
-				for(int k = 0; k<19; k++)
+			for(int j = 0; j<3; j++)
+				for(int k = 0; k<10; k++)
 				{
 					par3List.add(new ItemStack(item, 1, i*1000+j*100+k));
 				}
@@ -518,68 +405,41 @@ public class ItemStructureBlock extends Item{
 	
 	public void registerIcons(IIconRegister ir)
 	{
-		for(int i = 0; i<19; i++)
+		for(int i = 0; i<10; i++)
 		{
 			String baseMatName = "carbonization:";
 		
 			switch(i)
 			{
 			case 0:
-				baseMatName += "ice";
-				break;
-			case 1:
-				baseMatName += "wood";
-				break;
-			case 2:
 				baseMatName += "stone";
 				break;
-			case 3:
+			case 1:
+				baseMatName += "ice";
+				break;
+			case 2:
 				baseMatName += "iron";
 				break;
+			case 3:
+				baseMatName += "brick";
+				break;
 			case 4:
-				baseMatName += "carbonFlake";
-				break;
-			case 5:
-				baseMatName += "cIron";
-				break;
-			case 6:
-				baseMatName += "refIron";
-				break;
-			case 7:
-				baseMatName += "carbonThread";
-				break;
-			case 8:
-				baseMatName += "cRebar";
-				break;
-			case 9:
-				baseMatName += "pigIron";
-				break;
-			case 10:
-				baseMatName += "carbonFibre";
-				break;
-			case 11:
-				baseMatName += "refCarbonFibre";
-				break;
-			case 12:
-				baseMatName += "hcSteel";
-				break;
-			case 13:
-				baseMatName += "carbonNanoflake";
-				break;
-			case 14:
-				baseMatName += "cSteel";
-				break;
-			case 15:
 				baseMatName += "steel";
 				break;
-			case 16:
+			case 5:
+				baseMatName += "carbonFibre";
+				break;
+			case 6:
+				baseMatName += "titanium";
+				break;
+			case 7:
 				baseMatName += "carbonNanotube";
 				break;
-			case 17:
-				baseMatName += "refCarbonNanotube";
-				break;
-			case 18:
+			case 8:
 				baseMatName += "witheredEnd";
+				break;
+			case 9:
+				baseMatName += "cobaltChrome";
 				break;
 			}
 			baseMatName += "StructureTexture";
@@ -587,22 +447,16 @@ public class ItemStructureBlock extends Item{
 			baseIcon[i] = ir.registerIcon(baseMatName);
 		}
 		
-		for(int i = 1; i < 5; i++)
+		for(int i = 1; i < 3; i++)
 		{
 			String secondaryMatName = null;
 			
 			switch(i)
 			{
 			case 1:
-				secondaryMatName = "carbonization:basicInsulationLayerTexture";
-				break;
-			case 2:
 				secondaryMatName = "carbonization:highDensityInsulationLayerTexture";
 				break;
-			case 3:
-				secondaryMatName = "carbonization:coarseThreadingLayerTexture";
-				break;
-			case 4:
+			case 2:
 				secondaryMatName = "carbonization:fineThreadingLayerTexture";
 				break;
 			}
@@ -652,15 +506,9 @@ public class ItemStructureBlock extends Item{
 		switch(value[1])
 		{
 		case 1:
-			s += "basic";
-			break;
-		case 2:
 			s += "highdensity";
 			break;
-		case 3:
-			s += "coarse";
-			break;
-		case 4:
+		case 2:
 			s += "fine";
 			break;
 		}
@@ -668,61 +516,34 @@ public class ItemStructureBlock extends Item{
 		switch(value[2])
 		{
 		case 0:
-			s += "ice";
-			break;
-		case 1:
-			s += "wood";
-			break;
-		case 2:
 			s += "stone";
 			break;
-		case 3:
+		case 1:
+			s += "ice";
+			break;
+		case 2:
 			s += "iron";
 			break;
+		case 3:
+			s += "brick";
+			break;
 		case 4:
-			s += "cflake";
-			break;
-		case 5:
-			s += "ciron";
-			break;
-		case 6:
-			s += "refiron";
-			break;
-		case 7:
-			s += "cthread";
-			break;
-		case 8:
-			s += "crebar";
-			break;
-		case 9:
-			s += "pigiron";
-			break;
-		case 10:
-			s += "cfibre";
-			break;
-		case 11:
-			s += "refcfibre";
-			break;
-		case 12:
-			s += "hcsteel";
-			break;
-		case 13:
-			s += "cnanoflake";
-			break;
-		case 14:
-			s += "csteel";
-			break;
-		case 15:
 			s += "steel";
 			break;
-		case 16:
-			s += "cnanotube";
+		case 5:
+			s += "carbonfibre";
 			break;
-		case 17:
-			s += "refcnanotube";
+		case 6:
+			s += "titanium";
 			break;
-		case 18:
+		case 7:
+			s += "carbonnanotube";
+			break;
+		case 8:
 			s += "witheredend";
+			break;
+		case 9:
+			s += "cobaltchrome";
 			break;
 		}
 		
@@ -731,100 +552,7 @@ public class ItemStructureBlock extends Item{
 	
 	public String getItemNameIS(ItemStack is) 
 	{
-		int[] value = deconstructDamage(is.getItemDamage());
-		String s = "";
-		
-		switch(value[0])
-		{
-		case 0:
-			s += "structure";
-			break;
-		case 1:
-			s+= "furnace";
-			break;
-		case 2:
-			s+= "machine";
-			break;
-		}
-		
-		switch(value[1])
-		{
-		case 1:
-			s += "basic";
-			break;
-		case 2:
-			s += "highdensity";
-			break;
-		case 3:
-			s += "coarse";
-			break;
-		case 4:
-			s += "fine";
-			break;
-		}
-		
-		switch(value[2])
-		{
-		case 0:
-			s += "ice";
-			break;
-		case 1:
-			s += "wood";
-			break;
-		case 2:
-			s += "stone";
-			break;
-		case 3:
-			s += "iron";
-			break;
-		case 4:
-			s += "cflake";
-			break;
-		case 5:
-			s += "ciron";
-			break;
-		case 6:
-			s += "refiron";
-			break;
-		case 7:
-			s += "cthread";
-			break;
-		case 8:
-			s += "crebar";
-			break;
-		case 9:
-			s += "pigiron";
-			break;
-		case 10:
-			s += "cfibre";
-			break;
-		case 11:
-			s += "refcfibre";
-			break;
-		case 12:
-			s += "hcsteel";
-			break;
-		case 13:
-			s += "cnanoflake";
-			break;
-		case 14:
-			s += "csteel";
-			break;
-		case 15:
-			s += "steel";
-			break;
-		case 16:
-			s += "cnanotube";
-			break;
-		case 17:
-			s += "refcnanotube";
-			break;
-		case 18:
-			s += "witheredend";
-			break;
-		}
-		
-		return s;
+		return getUnlocalizedName(is);
 	}
 }
 

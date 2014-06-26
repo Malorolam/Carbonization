@@ -20,14 +20,15 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
+import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
 public class BlockStructureBlock extends BlockContainer{
 
-	public IIcon[] baseIcon = new IIcon[19];
-	public IIcon[] secondaryIcon = new IIcon[5];
+	public IIcon[] baseIcon = new IIcon[10];
+	public IIcon[] secondaryIcon = new IIcon[3];
 	public IIcon[] purposeIcon = new IIcon[3];
 	
 	public BlockStructureBlock(Material par2Material) {
@@ -36,74 +37,48 @@ public class BlockStructureBlock extends BlockContainer{
 		this.setStepSound(Block.soundTypeMetal);
 		this.setHardness(3.0f);
 		this.setResistance(25.0f);
-		this.setCreativeTab(carbonization.tabStructure);
+		//this.setCreativeTab(carbonization.tabStructure);
 		this.setLightOpacity(15);
 	}
 
-	public void registerIcons(IIconRegister ir)
+	@Override
+	public void registerBlockIcons(IIconRegister ir)
 	{
-		for(int i = 0; i<19; i++)
+		for(int i = 0; i<10; i++)
 		{
 			String baseMatName = "carbonization:";
 		
 			switch(i)
 			{
 			case 0:
-				baseMatName += "ice";
-				break;
-			case 1:
-				baseMatName += "wood";
-				break;
-			case 2:
 				baseMatName += "stone";
 				break;
-			case 3:
+			case 1:
+				baseMatName += "ice";
+				break;
+			case 2:
 				baseMatName += "iron";
 				break;
+			case 3:
+				baseMatName += "brick";
+				break;
 			case 4:
-				baseMatName += "carbonFlake";
-				break;
-			case 5:
-				baseMatName += "cIron";
-				break;
-			case 6:
-				baseMatName += "refIron";
-				break;
-			case 7:
-				baseMatName += "carbonThread";
-				break;
-			case 8:
-				baseMatName += "cRebar";
-				break;
-			case 9:
-				baseMatName += "pigIron";
-				break;
-			case 10:
-				baseMatName += "carbonFibre";
-				break;
-			case 11:
-				baseMatName += "refCarbonFibre";
-				break;
-			case 12:
-				baseMatName += "hcSteel";
-				break;
-			case 13:
-				baseMatName += "carbonNanoflake";
-				break;
-			case 14:
-				baseMatName += "cSteel";
-				break;
-			case 15:
 				baseMatName += "steel";
 				break;
-			case 16:
+			case 5:
+				baseMatName += "carbonFibre";
+				break;
+			case 6:
+				baseMatName += "titanium";
+				break;
+			case 7:
 				baseMatName += "carbonNanotube";
 				break;
-			case 17:
-				baseMatName += "refCarbonNanotube";
-				break;
-			case 18:
+			case 8:
 				baseMatName += "witheredEnd";
+				break;
+			case 9:
+				baseMatName += "cobaltChrome";
 				break;
 			}
 			baseMatName += "StructureTexture";
@@ -111,22 +86,16 @@ public class BlockStructureBlock extends BlockContainer{
 			baseIcon[i] = ir.registerIcon(baseMatName);
 		}
 		
-		for(int i = 1; i < 5; i++)
+		for(int i = 1; i < 3; i++)
 		{
 			String secondaryMatName = null;
 			
 			switch(i)
 			{
 			case 1:
-				secondaryMatName = "carbonization:basicInsulationLayerTexture";
-				break;
-			case 2:
 				secondaryMatName = "carbonization:highDensityInsulationLayerTexture";
 				break;
-			case 3:
-				secondaryMatName = "carbonization:coarseThreadingLayerTexture";
-				break;
-			case 4:
+			case 2:
 				secondaryMatName = "carbonization:fineThreadingLayerTexture";
 				break;
 			}
@@ -202,12 +171,12 @@ public class BlockStructureBlock extends BlockContainer{
 			return null;
 		
 		if(pass == 0)
-			if(data < 19)
+			if(data < 10)
 				return baseIcon[data];
 			else
 				return null;
 		else if(pass == 1)
-			if(data < 5)
+			if(data < 3)
 				return secondaryIcon[data];
 			else
 				return null;
@@ -328,6 +297,18 @@ public class BlockStructureBlock extends BlockContainer{
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	/**
+     * Called when a user uses the creative pick block button on this block
+     *
+     * @param target The full target the player is looking at
+     * @return A ItemStack to add to the player's inventory, Null if nothing should be added.
+     */
+	@Override
+    public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z)
+    {
+    	return null;
+    }
 
 /*	@Override
 	public int getRenderBlockPass()

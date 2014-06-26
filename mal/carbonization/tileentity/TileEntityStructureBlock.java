@@ -23,31 +23,20 @@ public class TileEntityStructureBlock extends TileEntityMultiblockSlave implemen
 	/*Materials List
 	 * Base:
 	 * 0:Ice
-	 * 1:Wood
-	 * 2:Stone
-	 * 3:Iron
-	 * 4:Carbon Flake
-	 * 5:Carbon-plated Iron
-	 * 6:Refined Iron
-	 * 7:Carbon Thread
-	 * 8:Carbon-infused Rebar
-	 * 9:Pig Iron
-	 * 10:Carbon Fibre
-	 * 11:Reinforced Carbon Fibre
-	 * 12:HC Steel
-	 * 13:Carbon Nanoflake
-	 * 14:Carbon-plated Steel
-	 * 15:Steel
-	 * 16:Carbon Nanotube
-	 * 17:Reinforced Carbon Nanotube
-	 * 18:Withered End
+	 * 1:Stone
+	 * 2:Iron
+	 * 3:Brick
+	 * 4:Steel
+	 * 5:Carbon Fibre
+	 * 6:Titanium
+	 * 7:Carbon Nanotube
+	 * 8:Withered End
+	 * 9:Cobalt Chrome
 	 * 
 	 * Secondary:
 	 * 0:No Insulation
-	 * 1:Basic Insulation
-	 * 2:High Density Insulation
-	 * 3:Coarse Threading
-	 * 4:Fine Threading
+	 * 1:High Density Insulation
+	 * 2:Fine Threading
 	 * 
 	 * Purpose:
 	 * 0:Structure
@@ -55,8 +44,8 @@ public class TileEntityStructureBlock extends TileEntityMultiblockSlave implemen
 	 * 2:Machine
 	 */
 	
-	public int baseMaterial;//0-19 for base materials
-	public int secondaryMaterial;//0-4 for secondary materials
+	public int baseMaterial;//0-9 for base materials
+	public int secondaryMaterial;//0-2 for secondary materials
 	public int purpose;//0-2 for purpose
 	
 	private double InsulationTier;
@@ -209,80 +198,44 @@ public class TileEntityStructureBlock extends TileEntityMultiblockSlave implemen
 		switch(baseMaterial)
 		{
 		case 0:
-			InsTier=1;
-			ConTier=0;
+			InsTier=2;
+			ConTier=1;
 			break;
 		case 1:
-			InsTier=0.5;
-			ConTier=0.5;
-			break;
-		case 2:
-			InsTier=0;
-			ConTier=1;
-			break;
-		case 3:
-			InsTier=0.5;
-			ConTier=1.5;
-			break;
-		case 4:
-			InsTier=1.5;
-			ConTier=0.5;
-			break;
-		case 5:
 			InsTier=1;
-			ConTier=1;
-			break;
-		case 6:
-			InsTier=1.5;
-			ConTier=2.5;
-			break;
-		case 7:
-			InsTier=2.5;
-			ConTier=1.5;
-			break;
-		case 8:
-			InsTier=2;
 			ConTier=2;
 			break;
-		case 9:
-			InsTier=2.5;
-			ConTier=3.5;
-			break;
-		case 10:
-			InsTier=3.5;
-			ConTier=2.5;
-			break;
-		case 11:
-			InsTier=3;
-			ConTier=3;
-			break;
-		case 12:
-			InsTier=3.5;
-			ConTier=4.5;
-			break;
-		case 13:
-			InsTier=4.5;
-			ConTier=3.5;
-			break;
-		case 14:
+		case 2:
 			InsTier=4;
+			ConTier=2;
+			break;
+		case 3:
+			InsTier=2;
 			ConTier=4;
 			break;
-		case 15:
-			InsTier=4.5;
-			ConTier=5.5;
+		case 4:
+			InsTier=8;
+			ConTier=4;
 			break;
-		case 16:
-			InsTier=5.5;
-			ConTier=4.5;
+		case 5:
+			InsTier=4;
+			ConTier=8;
 			break;
-		case 17:
-			InsTier=5;
-			ConTier=5;
+		case 6:
+			InsTier=16;
+			ConTier=8;
 			break;
-		case 18:
-			InsTier=10;
-			ConTier=10;
+		case 7:
+			InsTier=8;
+			ConTier=16;
+			break;
+		case 8:
+			InsTier=32;
+			ConTier=16;
+			break;
+		case 9:
+			InsTier=16;
+			ConTier=32;
 			break;
 		}
 		
@@ -292,20 +245,12 @@ public class TileEntityStructureBlock extends TileEntityMultiblockSlave implemen
 		case 0:
 			break;
 		case 1:
-			InsTier += InsTier*0.6;
-			ConTier -= ConTier*0.5;
-			break;
-		case 2:
 			InsTier += InsTier;
 			ConTier -= ConTier*0.5;
 			break;
-		case 3:
-			ConTier += ConTier*0.6;
+		case 2:
 			InsTier -= InsTier*0.5;
-			break;
-		case 4:
 			ConTier += ConTier;
-			InsTier -= InsTier*0.5;
 			break;
 		}
 		

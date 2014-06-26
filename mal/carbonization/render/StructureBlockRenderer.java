@@ -2,6 +2,7 @@ package mal.carbonization.render;
 
 import mal.carbonization.tileentity.TileEntityStructureBlock;
 import mal.carbonization.block.BlockStructureBlock;
+import mal.core.util.MalLogger;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderBlocks;
@@ -34,6 +35,9 @@ public class StructureBlockRenderer implements ISimpleBlockRenderingHandler {
 			Block block, int modelId, RenderBlocks renderer) {
         
 		Tessellator tessellator = Tessellator.instance;
+		
+		tessellator.draw();
+		tessellator.startDrawingQuads();
         
 		//int lightValue = Block.blocksList[Block.stone.blockID].getMixedBrightnessForBlock(world, x, y, z);
 		//tessellator.setBrightness(lightValue);
@@ -58,6 +62,8 @@ public class StructureBlockRenderer implements ISimpleBlockRenderingHandler {
 			
 			return false;
 		}
+		
+		//MalLogger.addLogMessage("Damage: " + dte.baseMaterial + "/" + dte.secondaryMaterial + "/" + dte.purpose + ".");
 
 		if(block instanceof BlockStructureBlock && dte != null)
 		{
@@ -72,9 +78,6 @@ public class StructureBlockRenderer implements ISimpleBlockRenderingHandler {
 		}
 
 		IIcon icon = null;
-		
-		tessellator.draw();
-		tessellator.startDrawingQuads();
 
 		for(int i = 0; i<3; i++)
 		{
