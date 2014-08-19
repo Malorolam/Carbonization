@@ -29,6 +29,9 @@ public class carbonizationOreDictionary {
 		OreDictionary.registerOre("ingotCobalt", new ItemStack(carbonizationItems.ingots,1,7));
 		OreDictionary.registerOre("ingotChromium", new ItemStack(carbonizationItems.ingots,1,8));
 		OreDictionary.registerOre("ingotAluminum", new ItemStack(carbonizationItems.ingots,1,9));
+		OreDictionary.registerOre("blockPeat", new ItemStack(carbonizationBlocks.blockFuelBlock,1,0));
+		OreDictionary.registerOre("blockAnthracite", new ItemStack(carbonizationBlocks.blockFuelBlock,1,1));
+		OreDictionary.registerOre("blockGraphite", new ItemStack(carbonizationBlocks.blockFuelBlock,1,2));
 	}
 }
 /*******************************************************************************

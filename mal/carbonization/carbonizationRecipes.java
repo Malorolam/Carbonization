@@ -152,6 +152,18 @@ public class carbonizationRecipes {
 		//ejection
 		addUpgradeRecipe(new ItemStack(carbonizationItems.upgradeItem,1,22), new ItemStack(Blocks.hopper), new ItemStack(carbonizationItems.structureItem,1,2004), new ItemStack(carbonizationItems.structureItem,1,4));
 		addUpgradeRecipe(new ItemStack(carbonizationItems.upgradeItem,1,22), new ItemStack(Blocks.hopper), new ItemStack(carbonizationItems.structureItem,1,2005), new ItemStack(carbonizationItems.structureItem,1,5));
+		
+		addUpgradeRecipe(new ItemStack(carbonizationItems.upgradeItem,1,23), new ItemStack(Blocks.hopper), new ItemStack(carbonizationItems.structureItem,1,2004), new ItemStack(carbonizationItems.structureItem,1,4));
+		addUpgradeRecipe(new ItemStack(carbonizationItems.upgradeItem,1,23), new ItemStack(Blocks.hopper), new ItemStack(carbonizationItems.structureItem,1,2005), new ItemStack(carbonizationItems.structureItem,1,5));
+		addUpgradeRecipe(new ItemStack(carbonizationItems.upgradeItem,1,24), new ItemStack(Blocks.hopper), new ItemStack(carbonizationItems.structureItem,1,2004), new ItemStack(carbonizationItems.structureItem,1,4));
+		addUpgradeRecipe(new ItemStack(carbonizationItems.upgradeItem,1,24), new ItemStack(Blocks.hopper), new ItemStack(carbonizationItems.structureItem,1,2005), new ItemStack(carbonizationItems.structureItem,1,5));
+		addUpgradeRecipe(new ItemStack(carbonizationItems.upgradeItem,1,25), new ItemStack(Blocks.hopper), new ItemStack(carbonizationItems.structureItem,1,2004), new ItemStack(carbonizationItems.structureItem,1,4));
+		addUpgradeRecipe(new ItemStack(carbonizationItems.upgradeItem,1,25), new ItemStack(Blocks.hopper), new ItemStack(carbonizationItems.structureItem,1,2005), new ItemStack(carbonizationItems.structureItem,1,5));
+		addUpgradeRecipe(new ItemStack(carbonizationItems.upgradeItem,1,26), new ItemStack(Blocks.hopper), new ItemStack(carbonizationItems.structureItem,1,2004), new ItemStack(carbonizationItems.structureItem,1,4));
+		addUpgradeRecipe(new ItemStack(carbonizationItems.upgradeItem,1,26), new ItemStack(Blocks.hopper), new ItemStack(carbonizationItems.structureItem,1,2005), new ItemStack(carbonizationItems.structureItem,1,5));
+		addUpgradeRecipe(new ItemStack(carbonizationItems.upgradeItem,1,27), new ItemStack(Blocks.hopper), new ItemStack(carbonizationItems.structureItem,1,2004), new ItemStack(carbonizationItems.structureItem,1,4));
+		addUpgradeRecipe(new ItemStack(carbonizationItems.upgradeItem,1,27), new ItemStack(Blocks.hopper), new ItemStack(carbonizationItems.structureItem,1,2005), new ItemStack(carbonizationItems.structureItem,1,5));
+		
 		//silk touch
 		addUpgradeRecipe(new ItemStack(carbonizationItems.upgradeItem,1,28), new ItemStack(Items.emerald), new ItemStack(carbonizationItems.structureItem,1,2006), new ItemStack(carbonizationItems.structureItem,1,6));
 		addUpgradeRecipe(new ItemStack(carbonizationItems.upgradeItem,1,28), new ItemStack(Items.emerald), new ItemStack(carbonizationItems.structureItem,1,2007), new ItemStack(carbonizationItems.structureItem,1,7));
@@ -211,13 +223,13 @@ public class carbonizationRecipes {
 		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(carbonizationItems.miscItem,2,12), new Object[]{new ItemStack(carbonizationItems.dust,1,4)}));
 		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(carbonizationItems.dust,1,4), new Object[]{new ItemStack(carbonizationItems.miscItem,1,12), new ItemStack(carbonizationItems.miscItem,1,12), new ItemStack(carbonizationItems.miscItem,1,12), new ItemStack(carbonizationItems.miscItem,1,12)}));
 
-		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(carbonizationBlocks.fuelBlock,1,0), new Object[]{"xxx","xxx","xxx",'x',"fuelPeat"}));
-		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(carbonizationBlocks.fuelBlock,1,1), new Object[]{"xxx","xxx","xxx",'x',"fuelAnthracite"}));
-		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(carbonizationBlocks.fuelBlock,1,2), new Object[]{"xxx","xxx","xxx",'x',"fuelGraphite"}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(carbonizationBlocks.blockFuelBlock,1,0), new Object[]{"xxx","xxx","xxx",'x',"fuelPeat"}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(carbonizationBlocks.blockFuelBlock,1,1), new Object[]{"xxx","xxx","xxx",'x',"fuelAnthracite"}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(carbonizationBlocks.blockFuelBlock,1,2), new Object[]{"xxx","xxx","xxx",'x',"fuelGraphite"}));
 
-		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(carbonizationItems.fuel,9,0), new Object[]{new ItemStack(carbonizationBlocks.fuelBlock,1,0)}));
-		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(carbonizationItems.fuel,9,1), new Object[]{new ItemStack(carbonizationBlocks.fuelBlock,1,1)}));
-		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(carbonizationItems.fuel,9,2), new Object[]{new ItemStack(carbonizationBlocks.fuelBlock,1,2)}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(carbonizationItems.fuel,9,0), new Object[]{new ItemStack(carbonizationBlocks.blockFuelBlock,1,0)}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(carbonizationItems.fuel,9,1), new Object[]{new ItemStack(carbonizationBlocks.blockFuelBlock,1,1)}));
+		CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(new ItemStack(carbonizationItems.fuel,9,2), new Object[]{new ItemStack(carbonizationBlocks.blockFuelBlock,1,2)}));
 
 		//bit
 		CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(new ItemStack(carbonizationItems.miscItem,1,15), new Object[]{" D ", "DSD", " S ", 'D', Items.diamond, 'S', new ItemStack(carbonizationItems.structureItem,1,4)}));
@@ -246,8 +258,10 @@ public class carbonizationRecipes {
 		CarbonizationRecipeHandler.smelting().addFuelConversionOutput("fuelAnthracite", 2400);
 		CarbonizationRecipeHandler.smelting().addFuelConversionOutput("dustAnthracite", 2400);
 		CarbonizationRecipeHandler.smelting().addFuelConversionOutput(new ItemStack(carbonizationItems.miscItem,1,3), 8000);
+		CarbonizationRecipeHandler.smelting().addFuelConversionOutput("blockGraphite", 9000);
+		CarbonizationRecipeHandler.smelting().addFuelConversionOutput("blockPeat", 10800);
+		CarbonizationRecipeHandler.smelting().addFuelConversionOutput("blockAnthracite", 21600);
 		CarbonizationRecipeHandler.smelting().addFuelConversionOutput(new ItemStack(Items.diamond,1,0), 64000);
-
 	}
 
 	public static void furnaceRecipes()
@@ -385,7 +399,7 @@ public class carbonizationRecipes {
 								for(int j = 0; j<16; j++)
 								{
 									ItemStack is = new ItemStack((Block)bb, 1, j); 
-									if(is != null && ((Block)bb).damageDropped(j) == j && !UtilReference.areItemStacksEqualItem(is, new ItemStack(Blocks.fire)))
+									if(is != null && ((Block)bb).damageDropped(j) == j && !UtilReference.areItemStacksEqualItem(is, new ItemStack(Blocks.fire), true, true))
 									{
 										CarbonizationRecipeHandler.smelting().addMultiblockSmelting(is, 100, 100, "ashSlag");
 									}
@@ -394,7 +408,7 @@ public class carbonizationRecipes {
 							else
 							{
 								ItemStack is = new ItemStack((Block)bb);
-								if(is != null && is.getItem() != null && !UtilReference.areItemStacksEqualItem(is, new ItemStack(Blocks.fire)))
+								if(is != null && is.getItem() != null && !UtilReference.areItemStacksEqualItem(is, new ItemStack(Blocks.fire), false, true))
 									CarbonizationRecipeHandler.smelting().addMultiblockSmelting(is, 100, 100, "ashSlag");
 							}
 							//System.out.println("Added recipe for block: " + ((Block)bb).getLocalizedName());

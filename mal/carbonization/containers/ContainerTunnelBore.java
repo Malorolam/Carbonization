@@ -29,7 +29,7 @@ public class ContainerTunnelBore extends Container {
 		for(int i = 0; i<3; i++)
 			this.addSlotToContainer(new Slot(bore, i, 116, 10+18*i));
 		//dimension
-		for(int i = 0; i<2; i++)
+		for(int i = 0; i<3; i++)
 			this.addSlotToContainer(new Slot(bore, 3+i, 8+18*i, 11));
 		
 		//fuel

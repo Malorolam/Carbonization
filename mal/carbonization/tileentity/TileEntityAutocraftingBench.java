@@ -280,7 +280,7 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
     		{
     			//do nada
     		}
-    		else if(lookforcrafting && hasOutputSpace(recipeStacks[9])!= -1)//there is a valid recipe and space
+    		else if(lookforcrafting && (hasOutputSpace(recipeStacks[9])!= -1||voidUpgrade))//there is a valid recipe and space
     		{
     			//look for items that match the rest of the recipe and store the itemstacks
     			for(int j = 0; j<9; j++)
@@ -563,7 +563,7 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
   			if((outputStacks[i].getItem() == input.getItem() && outputStacks[i].getItemDamage()== input.getItemDamage()) && outputStacks[i].stackSize+input.stackSize <= outputStacks[i].getMaxStackSize())
   				return i;
   		}
-  		return (voidUpgrade)?(-2):-1;
+  		return -1;
   	}
   	
   	/**
@@ -636,7 +636,7 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
   		if(item != null)
   		{
   			int slot = hasOutputSpace(item);
-  			if(slot == -1 || voidUpgrade)//there is no slot free, so just dump it
+  			if(slot == -1)//there is no slot free, so just dump it
   			{
   				//void upgrade will dump stuff into the VOID dun Dun DUNNN!!
   				if(voidUpgrade)

@@ -252,13 +252,13 @@ public class TileEntityTunnelBore extends TileEntity implements ISidedInventory,
 					else
 						dimensionStack[2] = null;
 				}
-			}
-			else if(dimensionStack[2].getItem() instanceof IFuelContainer)
-			{
-				if(((IFuelContainer)dimensionStack[2].getItem()).getFuelValue(dimensionStack[2])<=0)
+				else if(dimensionStack[2].getItem() instanceof IFuelContainer)
 				{
-					addItem(dimensionStack[2].copy());
-					dimensionStack[2] = null;
+					if(((IFuelContainer)dimensionStack[2].getItem()).getFuelValue(dimensionStack[2])<=0)
+					{
+						addItem(dimensionStack[2].copy());
+						dimensionStack[2] = null;
+					}
 				}
 			}
 		}

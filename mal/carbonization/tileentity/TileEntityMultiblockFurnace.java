@@ -952,16 +952,8 @@ public class TileEntityMultiblockFurnace extends TileEntityMultiblockMaster impl
     	if(inputStacks == null || outputStacks == null)
     		return action;
     	
-    	List<ItemStack> finJob = this.tickJobs();
-    	
-    	if(finJob != null)//jobs have finished
-    	{
-    		for(ItemStack item:finJob)
-    		{
-    			this.insertOutputItem(item, -1);
-    		}
-    		action++;
-    	}
+    	tickJobs();
+    	action++;
     	
 		//System.out.println(this.getGrossCookTime() + "/" + this.grossMaxCookTime);
     	return action;
@@ -970,10 +962,10 @@ public class TileEntityMultiblockFurnace extends TileEntityMultiblockMaster impl
   //tick each job and remove finished ones
   	//finished jobs are returned as a list of the input items so they can be removed elsewhere
   	//the current fuel is passed in to ensure that the job can be ticked
-  	public List<ItemStack> tickJobs()
+  	public void tickJobs()
   	{
   		if(queue == null)
-  			return tickSlag();
+  			return;
   		
   		List<MultiblockWorkQueueItem> doneItems = new ArrayList();
     	this.setGrossCookTime(0);
@@ -1004,64 +996,52 @@ public class TileEntityMultiblockFurnace extends TileEntityMultiblockMaster impl
   					MalLogger.addLogMessage(Level.FATAL, "Queue Job mismanaged.");
   			}
   		}
-
-  		return tickSlag();
+  		
+  		tickSlag();
   	}
   	
   	/*
   	 * Attempt number 2 at outputting the correct items in the correct quantities
   	 */
-  	private List<ItemStack> tickSlag()
+  	private void tickSlag()
   	{
-  		List<ItemStack> ret = new ArrayList();
-  		HashMap<String, Integer> outputCounts = new HashMap<String, Integer>();
-  		List<String> SlagChanged = new ArrayList();
   		
   		//find all the slag types with enough stuff to make something and put the output values in a map
+  		HashMap<String, Integer> cslag = new HashMap<String, Integer>();
   		for(String s: oreSlagInQueue.keySet())
   		{
   			//System.out.println("Slag type: " + s + " with value of: " + oreSlagInQueue.get(s));
-  			if(oreSlagInQueue.get(s) >= carbonization.ORESLAGRATIO && hasOutputSpace(new ItemStack(CarbonizationRecipeHandler.smelting().getOreSlagOutput(s).getItem(), 1, CarbonizationRecipeHandler.smelting().getOreSlagOutput(s).getItemDamage())) != -1)
+  			if(oreSlagInQueue.get(s) >= carbonization.ORESLAGRATIO)
   			{
   				int i = (int)Math.floor(oreSlagInQueue.get(s)/carbonization.ORESLAGRATIO);
-  				if(i>64)
-  					i=64;
-  				int value = CarbonizationRecipeHandler.smelting().getOreSlagOutput(s).stackSize * i;
-  				if(outputCounts.containsKey(s))
-  				{
-  					int ov = outputCounts.get(s);
-  					outputCounts.put(s, value+ov);
-  				}
-  				else
-  					outputCounts.put(s, value);
+  				int outputSize =CarbonizationRecipeHandler.smelting().getOreSlagOutput(s).stackSize; 
+  				if(i>Math.floor(64/outputSize))
+  					i=(int) Math.floor(64/outputSize);
+  				int value = outputSize * i;
   				
-  				SlagChanged.add(s);
+  	  			Item id = CarbonizationRecipeHandler.smelting().getOreSlagOutput(s).getItem();
+  	  			int damage = CarbonizationRecipeHandler.smelting().getOreSlagOutput(s).getItemDamage();
+  	  			
+  	  			if(insertOutputItem(new ItemStack(id, value, damage), -1))
+  	  			{
+  	  				if(cslag.containsKey(s))
+  	  					cslag.put(s, cslag.get(s)+carbonization.ORESLAGRATIO*i);
+  	  				else
+  	  					cslag.put(s, carbonization.ORESLAGRATIO*i);
+  	  			}
   				
   				//System.out.println("Adding item: " + value + "x" + CarbonizationRecipes.smelting().getOreSlagOutput(s).getDisplayName());
   			}
-  		}
-  		
-  		for(String s: SlagChanged)
-  		{
-				int i = (int)Math.floor(oreSlagInQueue.get(s)/carbonization.ORESLAGRATIO);
-				if(i>64)
-					i=64;
-				if(oreSlagInQueue.get(s) > carbonization.ORESLAGRATIO)
-  					oreSlagInQueue.put(s, oreSlagInQueue.get(s)-carbonization.ORESLAGRATIO*i);
-  				else
-  					oreSlagInQueue.remove(s);
-  		}
-  		
-  		//take the map and add the correct itemstacks in the correct stack counts
-  		for(String s: outputCounts.keySet())
-  		{
-  			Item id = CarbonizationRecipeHandler.smelting().getOreSlagOutput(s).getItem();
-  			int size = outputCounts.get(s);
-  			int damage = CarbonizationRecipeHandler.smelting().getOreSlagOutput(s).getItemDamage();
   			
-  			ret.add(new ItemStack(id, size, damage));
   		}
-  		return ret;
+  		
+  		for(String s: cslag.keySet())
+		{
+			if(oreSlagInQueue.get(s) > cslag.get(s))
+  				oreSlagInQueue.put(s, oreSlagInQueue.get(s)-cslag.get(s));
+  			else
+  				oreSlagInQueue.remove(s);
+		}
   	}
   	
 	//remove the successfully added finished job from the queue
