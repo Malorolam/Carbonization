@@ -41,3 +41,11 @@ public class carbonizationBlocks {
 		fluidFuelPotential.setUnlocalizedName(blockFuelPotential.getUnlocalizedName()).setStillIcon(blockFuelPotential.getIcon(0, 0)).setFlowingIcon(blockFuelPotential.getIcon(2, 0));
 	}
 }
+/*******************************************************************************
+* Copyright (c) 2014 Malorolam.
+* 
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the included license, which is also
+* available at http://carbonization.wikispaces.com/License
+* 
+*********************************************************************************/

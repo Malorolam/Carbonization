@@ -5,6 +5,8 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import mal.carbonization.CarbonizationRecipeHandler;
 import mal.carbonization.network.PortableScannerWrapper;
+import mal.carbonization.gui.slot.FuelSlot;
+import mal.carbonization.gui.slot.StructureBlockSlot;
 import mal.carbonization.item.ItemPortableScanner;
 import mal.core.reference.UtilReference;
 import net.minecraft.entity.player.EntityPlayer;
