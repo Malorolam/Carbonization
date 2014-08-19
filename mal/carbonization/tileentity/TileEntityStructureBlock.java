@@ -6,9 +6,11 @@ import mal.carbonization.carbonizationBlocks;
 import mal.carbonization.network.CarbonizationPacketHandler;
 import mal.carbonization.network.MultiblockInitMessage;
 import mal.carbonization.network.StructureBlockMessage;
+import mal.core.api.ITieredItem;
 import mal.core.api.ITileEntityMultiblock;
 import mal.core.multiblock.Multiblock;
-import mal.core.tileentity.TileEntityMultiblockSlave;
+import mal.core.tileentity.ITileEntityMultiblockSlave;
+import mal.core.tileentity.TileEntityMultiblockMaster;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -17,8 +19,13 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.Packet;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidTankInfo;
+import net.minecraftforge.fluids.IFluidHandler;
 
-public class TileEntityStructureBlock extends TileEntityMultiblockSlave implements IInventory, net.minecraft.inventory.ISidedInventory{
+public class TileEntityStructureBlock extends TileEntity implements IInventory, net.minecraft.inventory.ISidedInventory, ITileEntityMultiblockSlave, ITieredItem, ITileEntityMultiblock, IFluidHandler{
 
 	/*Materials List
 	 * Base:
@@ -53,10 +60,15 @@ public class TileEntityStructureBlock extends TileEntityMultiblockSlave implemen
 	
 	private boolean revert=false;//prevent revert chains
 	private int mastercheckFail=0;//flag to delay revert a little while just in case stuff didn't load properly
+	private ITileEntityMultiblock masterEntity;
+	public boolean loaded=true;
+	public int mx,my,mz;
+	protected int data;
 	
 	public TileEntityStructureBlock()
 	{
 		//System.out.println("Plonked down the TE");
+		masterEntity = null;
 	}
 	
 	public TileEntityStructureBlock(int baseMaterial, int secondaryMaterial, int purpose)
@@ -73,7 +85,7 @@ public class TileEntityStructureBlock extends TileEntityMultiblockSlave implemen
 	/*
 	 * Initilize the structure block and identify what kind it is
 	 */
-	public void initilize(int baseMaterial, int secondaryMaterial, int purpose)
+	public void materialInitilize(int baseMaterial, int secondaryMaterial, int purpose)
 	{
 		this.baseMaterial = baseMaterial;
 		this.secondaryMaterial = secondaryMaterial;
@@ -104,7 +116,7 @@ public class TileEntityStructureBlock extends TileEntityMultiblockSlave implemen
 	
 	public void activate(World world, int x, int y, int z, EntityPlayer par5EntityPlayer)
 	{
-		if(masterEntity != null)
+		if(masterEntity != null && (mx!=0||my!=0||mz!=0))
 		{
 			//System.out.println("Master Entity " + masterEntity.toString() + " at: " + masterEntity.getX() + ", " + masterEntity.getY() + ", " + masterEntity.getZ());
 			if(this.isUseableByPlayer(par5EntityPlayer))
@@ -115,6 +127,9 @@ public class TileEntityStructureBlock extends TileEntityMultiblockSlave implemen
 	public void InitMultiblock(ITileEntityMultiblock master)
 	{
 		this.masterEntity = master;
+		mx = masterEntity.getX() - this.xCoord;
+		my = masterEntity.getY() - this.yCoord;
+		mz = masterEntity.getZ() - this.zCoord;
 	}
 	
 	@Override
@@ -125,7 +140,7 @@ public class TileEntityStructureBlock extends TileEntityMultiblockSlave implemen
 		if(worldObj != null && !loaded)
 		{
 			TileEntity te = worldObj.getTileEntity(this.getX()+mx, this.getY()+my, this.getZ()+mz);
-			if(te instanceof ITileEntityMultiblock)
+			if(te instanceof ITileEntityMultiblock && (mx!=0||my!=0||mz!=0))
 			{
 				this.masterEntity = (ITileEntityMultiblock) te;
 				loaded = true;
@@ -167,7 +182,11 @@ public class TileEntityStructureBlock extends TileEntityMultiblockSlave implemen
     	this.purpose = nbt.getInteger("purpose");
     	this.InsulationTier = nbt.getDouble("insulationTier");
     	this.ConductionTier = nbt.getDouble("conductionTier");
+		mx = nbt.getInteger("masterX");
+		my = nbt.getInteger("masterY");
+		mz = nbt.getInteger("masterZ");
 		
+		loaded = false;
     	//System.out.println("Reading Data: " + baseMaterial + ", " + secondaryMaterial + ", " + purpose + "; " + InsulationTier + ", " + ConductionTier);
     }
     
@@ -181,6 +200,9 @@ public class TileEntityStructureBlock extends TileEntityMultiblockSlave implemen
     	nbt.setInteger("purpose", purpose);
     	nbt.setDouble("insulationTier", InsulationTier);
     	nbt.setDouble("conductionTier", ConductionTier);
+		nbt.setInteger("masterX", mx);
+		nbt.setInteger("masterY", my);
+		nbt.setInteger("masterZ", mz);
 		
     	//System.out.println("Writing Data: " + baseMaterial + ", " + secondaryMaterial + ", " + purpose + "; " + InsulationTier + ", " + ConductionTier);
     }
@@ -260,56 +282,56 @@ public class TileEntityStructureBlock extends TileEntityMultiblockSlave implemen
 	
 	@Override
 	public int[] getAccessibleSlotsFromSide(int var1) {
-		if(masterEntity == null)
-			return new int[0];
-		return masterEntity.getAccessibleSlotsFromSide(var1);
+		if(masterEntity != null && (mx!=0||my!=0||mz!=0))
+			return masterEntity.getAccessibleSlotsFromSide(var1);
+		return new int[0];
 	}
 
 	@Override
 	public boolean canInsertItem(int i, ItemStack itemstack, int j) {
-		if(masterEntity == null)
-			return false;
-		return masterEntity.canInsertItem(i, itemstack, j);
+		if(masterEntity != null && (mx!=0||my!=0||mz!=0))
+			return masterEntity.canInsertItem(i, itemstack, j);
+		return false;
 	}
 
 	@Override
 	public boolean canExtractItem(int i, ItemStack itemstack, int j) {
-		if(masterEntity == null)
-			return false;
-		return masterEntity.canExtractItem(i, itemstack, j);
+		if(masterEntity != null && (mx!=0||my!=0||mz!=0))
+			return masterEntity.canExtractItem(i, itemstack, j);
+		return false;
 	}
 
 	@Override
 	public int getSizeInventory() {
-		if(masterEntity == null)
-			return 0;
-		return masterEntity.getSizeInventory();
+		if(masterEntity != null && (mx!=0||my!=0||mz!=0))
+			return masterEntity.getSizeInventory();
+		return 0;
 	}
 
 	@Override
 	public ItemStack getStackInSlot(int i) {
-		if(masterEntity == null)
-			return null;
-		return masterEntity.getStackInSlot(i);
+		if(masterEntity != null && (mx!=0||my!=0||mz!=0))
+			return masterEntity.getStackInSlot(i);
+		return null;
 	}
 
 	@Override
 	public ItemStack decrStackSize(int i, int j) {
-		if(masterEntity == null)
-			return null;
-		return masterEntity.decrStackSize(i, j);
+		if(masterEntity != null && (mx!=0||my!=0||mz!=0))
+			return masterEntity.decrStackSize(i, j);
+		return null;
 	}
 
 	@Override
 	public ItemStack getStackInSlotOnClosing(int i) {
-		if(masterEntity == null)
-			return null;
-		return masterEntity.getStackInSlotOnClosing(i);
+		if(masterEntity != null && (mx!=0||my!=0||mz!=0))
+			return masterEntity.getStackInSlotOnClosing(i);
+		return null;
 	}
 
 	@Override
 	public void setInventorySlotContents(int i, ItemStack itemstack) {
-		if(masterEntity != null)
+		if(masterEntity != null && (mx!=0||my!=0||mz!=0))
 			masterEntity.setInventorySlotContents(i, itemstack);
 	}
 
@@ -366,20 +388,106 @@ public class TileEntityStructureBlock extends TileEntityMultiblockSlave implemen
 
 	@Override
 	public void openInventory() {
-		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void closeInventory() {
-		// TODO Auto-generated method stub
-		
+	
 	}
 
 	@Override
 	public double[] getTier(int damage) {
-		// TODO Auto-generated method stub
-		return null;
+		double[] d = new double[2];
+		d[1] = this.ConductionTier;
+		d[0] = this.InsulationTier;
+		return d;
+	}
+
+	@Override
+	public int getXSize() {
+		return (masterEntity!=null && (mx!=0||my!=0||mz!=0))?(masterEntity.getXSize()):(0);
+	}
+
+	@Override
+	public int getYSize() {
+		return (masterEntity!=null && (mx!=0||my!=0||mz!=0))?(masterEntity.getYSize()):(0);
+	}
+
+	@Override
+	public int getZSize() {
+		return (masterEntity!=null && (mx!=0||my!=0||mz!=0))?(masterEntity.getZSize()):(0);
+	}
+
+	@Override
+	public String getType() {
+		return (masterEntity!=null && (mx!=0||my!=0||mz!=0))?(masterEntity.getType()):("");
+	}
+
+	@Override
+	public void setMaster(TileEntityMultiblockMaster m) {
+		masterEntity = m;
+		if(m != null)
+		{
+			mx = masterEntity.getX() - this.xCoord;
+			my = masterEntity.getY() - this.yCoord;
+			mz = masterEntity.getZ() - this.zCoord;
+		}
+		
+		loaded = true;
+	}
+
+	@Override
+	public ITileEntityMultiblock getMaster() {
+		return masterEntity;
+	}
+
+	@Override
+	public void initilize(Object[] params) {
+		//System.out.println("Dummy Initilized");
+		masterEntity = (ITileEntityMultiblock) params[0];
+		mx = masterEntity.getX() - this.xCoord;
+		my = masterEntity.getY() - this.yCoord;
+		mz = masterEntity.getZ() - this.zCoord;
+
+		loaded = true;
+	}
+
+	@Override
+	public void revert() {
+		//System.out.println("structure revert");
+		if(masterEntity != null && (mx!=0||my!=0||mz!=0))
+			masterEntity.revert();
+	}
+
+	@Override
+	public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
+		return(masterEntity != null && (mx!=0||my!=0||mz!=0))?(masterEntity.fill(from, resource, doFill)):(0);
+	}
+
+	@Override
+	public FluidStack drain(ForgeDirection from, FluidStack resource,boolean doDrain) {
+		return(masterEntity != null && (mx!=0||my!=0||mz!=0))?(masterEntity.drain(from, resource, doDrain)):(null);
+	}
+
+	@Override
+	public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
+		return(masterEntity != null && (mx!=0||my!=0||mz!=0))?(masterEntity.drain(from, maxDrain, doDrain)):(null);
+	}
+
+	@Override
+	public boolean canFill(ForgeDirection from, Fluid fluid) {
+		return(masterEntity != null && (mx!=0||my!=0||mz!=0))?(masterEntity.canFill(from, fluid)):(false);
+	}
+
+	@Override
+	public boolean canDrain(ForgeDirection from, Fluid fluid) {
+		return(masterEntity != null && (mx!=0||my!=0||mz!=0))?(masterEntity.canDrain(from, fluid)):(false);
+	}
+
+	@Override
+	public FluidTankInfo[] getTankInfo(ForgeDirection from) {
+		return(masterEntity != null && (mx!=0||my!=0||mz!=0))?(masterEntity.getTankInfo(from)):(null);
 	}
 }
 

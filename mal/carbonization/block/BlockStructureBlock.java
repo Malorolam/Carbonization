@@ -37,8 +37,9 @@ public class BlockStructureBlock extends BlockContainer{
 		this.setStepSound(Block.soundTypeMetal);
 		this.setHardness(3.0f);
 		this.setResistance(25.0f);
-		//this.setCreativeTab(carbonization.tabStructure);
+		this.setCreativeTab(carbonization.tabStructure);
 		this.setLightOpacity(15);
+		this.setHarvestLevel("pickaxe", 1, 0);
 	}
 
 	@Override
@@ -152,7 +153,7 @@ public class BlockStructureBlock extends BlockContainer{
         
         if(te instanceof TileEntityStructureBlock)
         {
-        	if(((TileEntityStructureBlock)te).baseMaterial == 18)
+        	if(((TileEntityStructureBlock)te).baseMaterial == 8)
         		return 10;
         	if(((TileEntityStructureBlock)te).purpose == 1)
         		return 2;
@@ -200,8 +201,6 @@ public class BlockStructureBlock extends BlockContainer{
     	TileEntity te = par1World.getTileEntity(par2, par3, par4);
     	if(te instanceof TileEntityStructureBlock)
     		((TileEntityStructureBlock)te).revert();
-    	
-    	par1World.setTileEntity(par2, par3, par4, null);
     }
     
     /**
@@ -244,10 +243,10 @@ public class BlockStructureBlock extends BlockContainer{
     		if(par5EntityPlayer.isSneaking())
     			return false;
     		TileEntity var10 = world.getTileEntity(x, y, z);
-    		if(!(world.getTileEntity(x, y, z) instanceof TileEntityStructureBlock))
+    		if(var10 == null || !(world.getTileEntity(x, y, z) instanceof TileEntityStructureBlock))
     			return false;
 
-            if (var10 == null || par5EntityPlayer.isSneaking())
+            if (par5EntityPlayer.isSneaking())
             {
             	return false;
             }
@@ -294,7 +293,15 @@ public class BlockStructureBlock extends BlockContainer{
 
 	@Override
 	public TileEntity createNewTileEntity(World var1, int var2) {
-		// TODO Auto-generated method stub
+    	try
+    	{
+    		//System.out.println("Made a new tile entity!");
+    		return new TileEntityStructureBlock();
+    	}
+    	catch(Exception e)
+    	{
+    		MalLogger.addLogMessage(Level.INFO, "Oh dear, something broke with the tile entities, prod Mal so he can fix it.");
+    	}
 		return null;
 	}
 	

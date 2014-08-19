@@ -1,8 +1,11 @@
 package mal.carbonization.network;
 
+import mal.carbonization.carbonizationItems;
+import mal.carbonization.containers.*;
 import mal.carbonization.network.*;
 import mal.carbonization.tileentity.*;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import cpw.mods.fml.common.network.IGuiHandler;
@@ -18,7 +21,7 @@ public class CommonProxy implements IGuiHandler
 	public Object getServerGuiElement(int ID, EntityPlayer player, World world,
 			int x, int y, int z) {
 		TileEntity tileEntity = world.getTileEntity(x,y,z);
-		/*if (tileEntity instanceof TileEntityFurnaces)
+		if (tileEntity instanceof TileEntityFurnaces)
 			return new ContainerFurnaces(player.inventory, (TileEntityFurnaces) tileEntity);
         if(tileEntity instanceof TileEntityMultiblockInit){
         	//System.out.println("got to make the gui server side");
@@ -30,16 +33,16 @@ public class CommonProxy implements IGuiHandler
         }
         if(tileEntity instanceof TileEntityAutocraftingBench)
         	return new ContainerAutocraftingBench(player.inventory, (TileEntityAutocraftingBench)tileEntity);
-        if(tileEntity instanceof TileEntityFuelConverter)
-        	return new ContainerFuelConverter(player.inventory, (TileEntityFuelConverter)tileEntity);
-        if(tileEntity instanceof TileEntityFuelCellFiller)
+        if(tileEntity instanceof TileEntityFuelConversionBench)
+        	return new ContainerFuelConverter(player.inventory, (TileEntityFuelConversionBench)tileEntity);
+        /*if(tileEntity instanceof TileEntityFuelCellFiller)
         	return new ContainerFuelCellFiller(player.inventory, (TileEntityFuelCellFiller)tileEntity);
         if(tileEntity instanceof TileEntityMultiblockBoreInit)
-        	return new ContainerBorerInit(player.inventory, (TileEntityMultiblockBoreInit)tileEntity);
+        	return new ContainerBorerInit(player.inventory, (TileEntityMultiblockBoreInit)tileEntity);*/
         if(tileEntity instanceof TileEntityTunnelBore)
         	return new ContainerTunnelBore(player.inventory, (TileEntityTunnelBore)tileEntity);
-        if(ID==4 && player.getCurrentEquippedItem() != null && player.getCurrentEquippedItem().getItem().itemID == carbonization.portableScanner.itemID)
-        	return new ContainerPortableScanner(player.inventory, new PortableScannerWrapper(player.getCurrentEquippedItem()));*/
+        if(ID==4 && player.getCurrentEquippedItem() != null && Item.getIdFromItem(player.getCurrentEquippedItem().getItem()) == Item.getIdFromItem(carbonizationItems.portablescannerItem))
+        	return new ContainerPortableScanner(player.inventory, new PortableScannerWrapper(player.getCurrentEquippedItem()));
 		return null;
 	}
 

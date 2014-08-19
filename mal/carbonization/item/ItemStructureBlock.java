@@ -28,8 +28,8 @@ public class ItemStructureBlock extends Item{
 	 * Item ID structure
 	 * xyzz
 	 * x: purpose, 0-2
-	 * y: secondary material, 0-4
-	 * zz: base material, 00-19
+	 * y: secondary material, 0-2
+	 * zz: base material, 00-09
 	 */
 	
 	public IIcon[] baseIcon = new IIcon[10];
@@ -103,7 +103,7 @@ public class ItemStructureBlock extends Item{
 			line2 += "titanium";
 			break;
 		case 7:
-			line2 += "carbon nanaotube";
+			line2 += "carbon nanotube";
 			break;
 		case 8:
 			line2 += "withered end";
@@ -359,7 +359,7 @@ public class ItemStructureBlock extends Item{
            
            if(te instanceof TileEntityStructureBlock)
            {
-        	   ((TileEntityStructureBlock)te).initilize(value[2], value[1], value[0]);
+        	   ((TileEntityStructureBlock)te).materialInitilize(value[2], value[1], value[0]);
            }
        }
 
@@ -372,9 +372,9 @@ public class ItemStructureBlock extends Item{
 	@SideOnly(Side.CLIENT)
     public void getSubItems(Item item, CreativeTabs par2CreativeTabs, List par3List)
     {
-		for(int i = 0; i<3; i++)
-			for(int j = 0; j<3; j++)
-				for(int k = 0; k<10; k++)
+		for(int i = 0; i<purposeIcon.length; i++)
+			for(int j = 0; j<1/*secondaryIcon.length*/; j++)
+				for(int k = 0; k<baseIcon.length; k++)
 				{
 					par3List.add(new ItemStack(item, 1, i*1000+j*100+k));
 				}

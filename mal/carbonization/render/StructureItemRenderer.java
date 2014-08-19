@@ -12,7 +12,8 @@ public class StructureItemRenderer implements IItemRenderer{
 
 	@Override
 	public boolean handleRenderType(ItemStack item, ItemRenderType type) {
-		switch (type) {
+		return true;
+/*		switch (type) {
 		case ENTITY:
 		case EQUIPPED:
 		case EQUIPPED_FIRST_PERSON:
@@ -21,12 +22,13 @@ public class StructureItemRenderer implements IItemRenderer{
 		default:
 			return false;
 		}
-	}
+*/	}
 
 	@Override
 	public boolean shouldUseRenderHelper(ItemRenderType type, ItemStack item,
 			ItemRendererHelper helper) {
-		switch (type) {
+		return true;
+/*		switch (type) {
 		case ENTITY: {
 			return (helper == ItemRendererHelper.ENTITY_BOBBING ||
 					helper == ItemRendererHelper.ENTITY_ROTATION ||
@@ -46,28 +48,32 @@ public class StructureItemRenderer implements IItemRenderer{
 			return false;
 		}
 		}
-	}
+*/	}
 
 	@Override
 	public void renderItem(ItemRenderType type, ItemStack item, Object... data) 
 	{
 		Tessellator tessellator = Tessellator.instance;
+		
 
 		//verify that the item is a ItemStructureBlock
 		if(!(item.getItem() instanceof ItemStructureBlock))
 			return;
-		
+		GL11.glPushMatrix();
+//		GL11.glDisable(GL11.GL_LIGHTING);
+        GL11.glEnable(GL11.GL_ALPHA_TEST);
+//        GL11.glEnable(GL11.GL_BLEND);
 		tessellator.startDrawingQuads();
 
 		// adjust rendering space to match what caller expects
 		boolean mustundotranslate = false;
 		switch (type) {
 		case EQUIPPED:
+		case INVENTORY:
 		case EQUIPPED_FIRST_PERSON: {
 			break; // caller expects us to render over [0,0,0] to [1,1,1], no translation necessary
 		}
-		case ENTITY:
-		case INVENTORY: {
+		case ENTITY: {
 			// translate our coordinates so that [0,0,0] to [1,1,1] translates to the [-0.5, -0.5, -0.5] to [0.5, 0.5, 0.5] expected by the caller.
 			GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
 			mustundotranslate = true; // must undo the translation when we're finished rendering
@@ -77,6 +83,7 @@ public class StructureItemRenderer implements IItemRenderer{
 			break; // never here
 		}
 		
+		GL11.glPushMatrix();
 		for(int i = 0; i<3; i++)
 		{
 
@@ -153,8 +160,13 @@ public class StructureItemRenderer implements IItemRenderer{
 
 		}
 		tessellator.draw();
+		GL11.glPopMatrix();
+/*		GL11.glEnable(GL11.GL_LIGHTING);
+        GL11.glDisable(GL11.GL_ALPHA_TEST);
+        GL11.glDisable(GL11.GL_BLEND);*/
 
 		if (mustundotranslate) GL11.glTranslatef(0.5F, 0.5F, 0.5F);
+        GL11.glPopMatrix();
 
 		
 	}

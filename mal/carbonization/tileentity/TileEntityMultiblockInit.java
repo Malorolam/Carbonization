@@ -4,13 +4,16 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import mal.carbonization.carbonization;
+import mal.carbonization.carbonizationBlocks;
 import mal.carbonization.network.MultiblockInitMessage;
+import mal.carbonization.network.MultiblockInitMessageServer;
 import mal.core.MalCore;
 import mal.core.multiblock.MultiBlockInstantiator;
 import mal.core.multiblock.MultiBlockMatcher;
 import mal.core.multiblock.Multiblock;
 import mal.carbonization.network.CarbonizationPacketHandler;
-import mal.core.tileentity.TileEntityMultiblockSlave;
+import mal.core.tileentity.ITileEntityMultiblockSlave;
 import net.minecraft.block.Block;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.entity.player.EntityPlayer;
@@ -27,8 +30,8 @@ import net.minecraft.world.World;
  */
 public class TileEntityMultiblockInit extends TileEntity {
 
-	private Block masterBlock = null;
-	private Block slaveBlock = null;
+	private Block masterBlock = carbonizationBlocks.multiblockFurnaceControlBlock;
+	private Block slaveBlock = carbonizationBlocks.structureBlock;
 	
 	private MultiBlockMatcher match;
 	private MultiBlockMatcher mbEmpty;
@@ -126,6 +129,7 @@ public class TileEntityMultiblockInit extends TileEntity {
 	 */
 	public void activate(int x, int y, int z, World world, EntityPlayer player)
 	{
+		player.openGui(carbonization.carbonizationInstance, 2, world, x, y, z);
     }
 	
 	public void closeGui(EntityPlayer player, int xd, int yd, int zd, boolean activated)
@@ -146,7 +150,7 @@ public class TileEntityMultiblockInit extends TileEntity {
 	
 	public IMessage getDescriptionMessage()
 	{
-		return new MultiblockInitMessage(this);
+		return new MultiblockInitMessageServer(this);
 	}
 	
 	/*
@@ -160,10 +164,10 @@ public class TileEntityMultiblockInit extends TileEntity {
 
 		int[] value;
 		TileEntity te = worldObj.getTileEntity(xCoord, yCoord, zCoord);
-		TileEntityMultiblockSlave ste = null;
+		ITileEntityMultiblockSlave ste = null;
 		TileEntityMultiblockInit ite = null;
-		if(te instanceof TileEntityMultiblockSlave)
-			ste = (TileEntityMultiblockSlave) te;
+		if(te instanceof ITileEntityMultiblockSlave)
+			ste = (ITileEntityMultiblockSlave) te;
 		if(te instanceof TileEntityMultiblockInit)
 			ite = (TileEntityMultiblockInit) te;
 		
@@ -173,11 +177,11 @@ public class TileEntityMultiblockInit extends TileEntity {
 		else//an actual offset
 			value = MultiBlockInstantiator.matchPatternWithOffset(match, xCoord, yCoord, zCoord, worldObj, new Multiblock(worldObj.getBlock(xCoord, yCoord, zCoord),te.blockMetadata, true), offset);
 		
-		//System.out.println("Offset: " + offset[0] +", "+ offset[1] +", "+ offset[2]);
+		System.out.println("Offset: " + offset[0] +", "+ offset[1] +", "+ offset[2]);
 		
 		if(value != null)
 		{
-			//System.out.println("Value: " + value[0] +", "+ value[1] +", "+ value[2]);
+			System.out.println("Value: " + value[0] +", "+ value[1] +", "+ value[2]);
 			MultiBlockInstantiator.createMultiBlock(match, xCoord, yCoord, zCoord, worldObj, value, masterBlock, slaveBlock);
 		}
 		else
