@@ -396,7 +396,7 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
 	 * Will take all the inventory and save it to a NBT array to be loaded later.
 	 * Unused right now, doesn't work right
 	 */
-	public NBTTagCompound saveInventory()
+	private NBTTagCompound saveInventory()
 	{
 		NBTTagCompound nbt = new NBTTagCompound();
 		
@@ -449,7 +449,7 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
 	
 	 //Will load up the inventory data
 	 
-	public void loadInventory(NBTTagCompound nbt)
+	private void loadInventory(NBTTagCompound nbt)
 	{
 		NBTTagList input = nbt.getTagList("inputItems", 10);
 		for (int i = 0; i < input.tagCount(); ++i)
@@ -509,37 +509,6 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
     	return insertOutputItem(recipeStacks[9].copy(), -1);
     }
     
-  //add fuel
-  	//if this would overfill the fuel storage, don't add any fuel
-  	//to preserve a fuel item
-  	public boolean addFuel(int time)
-  	{
-  		if(getFuelStack()+time<=tank.getCapacity())
-  		{
-  			setFuelStack(getFuelStack() + time);
-  			return true;
-  		}
-  		return false;
-  	}
-  	
-  //overloaded version for a fuel item itself
-  	public boolean addFuel(ItemStack item)
-  	{
-  		if(item == null)
-  			return false;
-  		int time = UtilReference.getItemBurnTime(item,(int) (tank.getCapacity()-tank.getFluidAmount()),true);
-  		if(time <= 0)
-  			return false;
-  		
-  		if(getFuelStack()+time<=tank.getCapacity())
-  		{
-  			setFuelStack(getFuelStack() + time);
-  			return true;
-  		}
-  		
-  		return false;
-  	}
-    
   //check to see if the output has empty space or a fitting slot for the input
   	/**
   	 * This will find the first slot that meets the criteria of either a slot with the same item that has room (any room, stack splitting
@@ -547,20 +516,12 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
   	 */
   	public int hasOutputSpace(ItemStack input)
   	{
-/*  		if(ejectSide != -1)
-  		{
-  			IInventory te = findExternalInventory();
-  			if(te != null)
-  			{
-  				return ejectSide;
-  			}
-  		}*/
   		for(int i = 0; i<outputStacks.length; i++)
   		{
   			if(outputStacks[i] == null)
   				return i;
   			//see if the stack
-  			if((outputStacks[i].getItem() == input.getItem() && outputStacks[i].getItemDamage()== input.getItemDamage()) && outputStacks[i].stackSize+input.stackSize <= outputStacks[i].getMaxStackSize())
+  			if(UtilReference.areItemStacksEqualItem(outputStacks[i], input, true, false) && outputStacks[i].stackSize+input.stackSize <= outputStacks[i].getMaxStackSize())
   				return i;
   		}
   		return -1;
@@ -624,7 +585,7 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
   			if(inputStacks[i] == null)
   				return i;
   			//see if the stack
-  			if((inputStacks[i].getItem() == input.getItem() && inputStacks[i].getItemDamage()== input.getItemDamage()) && inputStacks[i].stackSize < inputStacks[i].getMaxStackSize())
+  			if(UtilReference.areItemStacksEqualItem(inputStacks[i], input, true, false) && inputStacks[i].stackSize < inputStacks[i].getMaxStackSize())
   				return i;
   		}
   		return -1;
@@ -686,11 +647,6 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
   			int slot = hasInputSpace(item);
   			if(slot == -1)//there is no slot free, so just dump it
   			{
-  				/*this.dumpItem(item);
-  				if(index != -1)
-  				{
-  					inputStacks[index] = null;
-  				}*/
   				return false;
   			}
   			if(inputStacks[slot] == null)//the slot is empty
@@ -1058,8 +1014,7 @@ public class TileEntityAutocraftingBench extends TileEntity implements IInventor
 	public boolean canInsertItem(int slot, ItemStack itemstack, int j) {
 		if(j==1)
 			return this.isItemValidForSlot(slot, itemstack);
-		else
-			return (UtilReference.getItemBurnTime(itemstack,1,false) > 0);
+		return false;
 	}
 
 	/*

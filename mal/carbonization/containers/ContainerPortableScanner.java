@@ -68,7 +68,7 @@ public class ContainerPortableScanner extends Container{
 	@Override
 	public void onContainerClosed(EntityPlayer player)
 	{
-		if(UtilReference.compareStacks(player.inventory.mainInventory[islot], stack.getStack(), false))
+		if(UtilReference.areItemStacksEqualItem(player.inventory.mainInventory[islot], stack.getStack(), true, false))
 		{
 			player.inventory.mainInventory[islot] = stack.getStack();
 		}

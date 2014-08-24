@@ -19,6 +19,7 @@ public class carbonizationBlocks {
 	public static final BlockMultiblockFurnaceControl multiblockFurnaceControlBlock = new BlockMultiblockFurnaceControl(Material.iron);
 	public static final BlockAutocraftingBench autocraftingbenchBlock = new BlockAutocraftingBench(Material.iron);
 	public static final BlockTunnelBore tunnelboreBlock = new BlockTunnelBore(Material.iron);
+	public static final BlockTransport transportBlock = new BlockTransport(Material.iron);
 	
 	public static Fluid fluidFuelPotential = new Fluid("fuelpotential").setViscosity(5000);
 	public static BlockFluidFuelPotential blockFuelPotential;
@@ -34,11 +35,17 @@ public class carbonizationBlocks {
 		GameRegistry.registerBlock(multiblockFurnaceControlBlock, "blockmultiblockfurnacecontrol");
 		GameRegistry.registerBlock(autocraftingbenchBlock, ItemBlockAutocraftingBench.class, "blockautocraftingbench");
 		GameRegistry.registerBlock(tunnelboreBlock, ItemBlockTunnelBore.class, "blocktunnelbore");
+		GameRegistry.registerBlock(transportBlock, ItemBlockTransport.class, "transportBlock");
 		
 		FluidRegistry.registerFluid(fluidFuelPotential);
 		blockFuelPotential = new BlockFluidFuelPotential(fluidFuelPotential, Material.water);
 		GameRegistry.registerBlock(blockFuelPotential, "blockFuelPotential");
+	}
+	
+	public static void postinit()
+	{
 		fluidFuelPotential.setUnlocalizedName(blockFuelPotential.getUnlocalizedName()).setStillIcon(blockFuelPotential.getIcon(0, 0)).setFlowingIcon(blockFuelPotential.getIcon(2, 0));
+		System.out.println(fluidFuelPotential.getIcon().getIconName());
 	}
 }
 /*******************************************************************************

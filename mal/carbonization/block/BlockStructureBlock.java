@@ -39,7 +39,6 @@ public class BlockStructureBlock extends BlockContainer{
 		this.setResistance(25.0f);
 		this.setCreativeTab(carbonization.tabStructure);
 		this.setLightOpacity(15);
-		this.setHarvestLevel("pickaxe", 1, 0);
 	}
 
 	@Override
@@ -200,7 +199,13 @@ public class BlockStructureBlock extends BlockContainer{
     	//System.out.println("We broke!");
     	TileEntity te = par1World.getTileEntity(par2, par3, par4);
     	if(te instanceof TileEntityStructureBlock)
+    	{
     		((TileEntityStructureBlock)te).revert();
+    		int data = ((TileEntityStructureBlock)te).getData();
+            ItemStack is = new ItemStack(carbonizationItems.structureItem, 1, data);
+            this.dropBlockAsItem(par1World, par2, par3, par4, is);
+    	}
+    	super.breakBlock(par1World, par2, par3, par4, block, meta);
     }
     
     /**

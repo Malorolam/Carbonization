@@ -82,6 +82,8 @@ public class MultiblockFurnaceMessageServer implements IMessage, IMessageHandler
 	@Override
 	public IMessage onMessage(MultiblockFurnaceMessageServer message,
 			MessageContext ctx) {
+		if(FMLClientHandler.instance().getClient().theWorld==null)
+			return null;
 		TileEntity te = FMLClientHandler.instance().getClient().theWorld.getTileEntity(message.xpos, message.ypos, message.zpos);
 		
 		if(te instanceof TileEntityMultiblockFurnace)

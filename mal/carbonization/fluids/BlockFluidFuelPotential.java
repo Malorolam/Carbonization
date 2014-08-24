@@ -13,9 +13,7 @@ import net.minecraftforge.fluids.Fluid;
 
 public class BlockFluidFuelPotential extends BlockFluidClassic{
 
-	@SideOnly(Side.CLIENT)
     protected IIcon stillIcon;
-    @SideOnly(Side.CLIENT)
     protected IIcon flowingIcon;
    
     public BlockFluidFuelPotential(Fluid fluid, Material material) {

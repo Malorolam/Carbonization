@@ -10,6 +10,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import mal.carbonization.fluids.BucketHandler;
 import mal.carbonization.item.*;
 import mal.carbonization.network.CommonProxy;
+import mal.core.item.ItemFuelPotentialBucket;
 
 public class carbonizationItems {
 

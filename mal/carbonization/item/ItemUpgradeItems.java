@@ -101,24 +101,29 @@ public class ItemUpgradeItems extends Item implements IMachineUpgrade {
 		switch(is.getItemDamage())
 		{
 		case 0:
-			list.add(setTooltipData("Decreases Fuel Consumption by",ColorReference.DARKGREY));
-			list.add(setTooltipData("10% multiplicatively.", ColorReference.DARKGREY));
+			list.add(setTooltipData("Decreases Fuel Consumption and",ColorReference.DARKGREY));
+			list.add(setTooltipData("increases transfer size by 10%", ColorReference.DARKGREY));
+			list.add(setTooltipData("multiplicatively.", ColorReference.DARKGREY));
 			break;
 		case 1:
-			list.add(setTooltipData("Decreases Fuel Consumption by",ColorReference.DARKGREY));
-			list.add(setTooltipData("30% multiplicatively.", ColorReference.DARKGREY));
+			list.add(setTooltipData("Decreases Fuel Consumption and",ColorReference.DARKGREY));
+			list.add(setTooltipData("increases transfer size by 30%", ColorReference.DARKGREY));
+			list.add(setTooltipData("multiplicatively.", ColorReference.DARKGREY));
 			break;
 		case 2:
-			list.add(setTooltipData("Decreases Fuel Consumption by",ColorReference.DARKGREY));
-			list.add(setTooltipData("50% multiplicatively.", ColorReference.DARKGREY));
+			list.add(setTooltipData("Decreases Fuel Consumption and",ColorReference.DARKGREY));
+			list.add(setTooltipData("increases transfer size by 50%", ColorReference.DARKGREY));
+			list.add(setTooltipData("multiplicatively.", ColorReference.DARKGREY));
 			break;
 		case 3:
-			list.add(setTooltipData("Decreases Fuel Consumption by",ColorReference.DARKGREY));
-			list.add(setTooltipData("70% multiplicatively.", ColorReference.DARKGREY));
+			list.add(setTooltipData("Decreases Fuel Consumption and",ColorReference.DARKGREY));
+			list.add(setTooltipData("increases transfer size by 70%", ColorReference.DARKGREY));
+			list.add(setTooltipData("multiplicatively.", ColorReference.DARKGREY));
 			break;
 		case 4:
-			list.add(setTooltipData("Decreases Fuel Consumption by",ColorReference.DARKGREY));
-			list.add(setTooltipData("90% multiplicatively.", ColorReference.DARKGREY));
+			list.add(setTooltipData("Decreases Fuel Consumption and",ColorReference.DARKGREY));
+			list.add(setTooltipData("increases transfer size by 90%", ColorReference.DARKGREY));
+			list.add(setTooltipData("multiplicatively.", ColorReference.DARKGREY));
 			break;
 		case 5:
 			list.add(setTooltipData("Increases Fortune Level by",ColorReference.DARKGREY));

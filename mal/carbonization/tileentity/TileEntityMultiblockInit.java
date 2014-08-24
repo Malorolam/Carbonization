@@ -13,6 +13,7 @@ import mal.core.multiblock.MultiBlockInstantiator;
 import mal.core.multiblock.MultiBlockMatcher;
 import mal.core.multiblock.Multiblock;
 import mal.carbonization.network.CarbonizationPacketHandler;
+import mal.core.tileentity.ITileEntityMultiblockInit;
 import mal.core.tileentity.ITileEntityMultiblockSlave;
 import net.minecraft.block.Block;
 import net.minecraft.client.entity.EntityClientPlayerMP;
@@ -28,7 +29,7 @@ import net.minecraft.world.World;
  * @author Mal
  *
  */
-public class TileEntityMultiblockInit extends TileEntity {
+public class TileEntityMultiblockInit extends TileEntity implements ITileEntityMultiblockInit{
 
 	private Block masterBlock = carbonizationBlocks.multiblockFurnaceControlBlock;
 	private Block slaveBlock = carbonizationBlocks.structureBlock;

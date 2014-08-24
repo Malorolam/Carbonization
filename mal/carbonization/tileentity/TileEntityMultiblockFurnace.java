@@ -21,7 +21,6 @@ import mal.core.tileentity.ITileEntityMultiblockSlave;
 import mal.carbonization.CarbonizationRecipeHandler;
 import mal.carbonization.carbonization;
 import mal.carbonization.carbonizationBlocks;
-import mal.carbonization.item.ItemFuelPotentialBucket;
 import mal.carbonization.network.CarbonizationPacketHandler;
 import mal.carbonization.network.MultiblockFurnaceMessageClient;
 import mal.carbonization.network.MultiblockFurnaceMessageServer;
@@ -29,6 +28,7 @@ import mal.core.reference.ColorReference;
 import mal.core.reference.UtilReference;
 import mal.core.tileentity.TileEntityMultiblockMaster;
 import mal.core.util.MalLogger;
+import mal.core.item.ItemFuelPotentialBucket;
 import mal.core.multiblock.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -418,14 +418,14 @@ public class TileEntityMultiblockFurnace extends TileEntityMultiblockMaster impl
 	{
 		oreCapacity = (xsize-2)*(ysize-2)*(zsize-2);//how much stuff the queue can hold
 		slagCapacity = oreCapacity*1000;//how much liquid slag can be held
-		tank.setCapacity(xsize*zsize*1500);//how much fuel can be held
+		tank.setCapacity(xsize*zsize*1500);//how much FP can be held
 		
-		slagDistribution = (int) Math.floor(300+(componentTiers[0]+componentTiers[1])*50)*2;//how much slag is produced
-		double lv = Math.pow(xsize*ysize*zsize, 0.6);//a scaling factor based off of volume
+		slagDistribution = (int) Math.floor(300+(componentTiers[0]+componentTiers[1])*100);//how much slag is produced
+		double lv = Math.pow(xsize*ysize*zsize, 0.2);//a scaling factor based off of volume
 		//fuelTimeModifier = (float) (1.6/Math.pow(componentTiers[0]-0.15*componentTiers[1]+1,0.8)*Math.log10(lv));
-		fuelTimeModifier = (float)(1-0.0712*componentTiers[0]/lv);
+		fuelTimeModifier = (float)(1-0.145*componentTiers[0]/lv);
 		
-		cookTimeModifier = (float)(1-0.0712*componentTiers[1]/lv);
+		cookTimeModifier = (float)(1-0.145*componentTiers[1]/lv);
 		
 		if(worldObj != null)//make sure the data is all loaded properly before we try to initialize everything
 		{	
@@ -1503,12 +1503,12 @@ public class TileEntityMultiblockFurnace extends TileEntityMultiblockMaster impl
 	}
 	@Override
 	public void writeInventorytoNBT(NBTTagCompound nbt) {
-		// TODO Auto-generated method stub
+		
 		
 	}
 	@Override
 	public void buildInventoryfromNBT(NBTTagCompound nbt) {
-		// TODO Auto-generated method stub
+		
 		
 	}
 	public void setMaxFuelCapacity(int fc) {

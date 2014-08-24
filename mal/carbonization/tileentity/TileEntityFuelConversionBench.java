@@ -49,8 +49,8 @@ public class TileEntityFuelConversionBench extends TileEntity implements IInvent
 	private Random furnaceRand = new Random();
 	
 	//Lists
-	private HashMap<ItemStack, Integer> itemMap = new HashMap<ItemStack, Integer>();
-	private ArrayList<ItemStack> itemList = new ArrayList<ItemStack>();
+	//private HashMap<ItemStack, Integer> itemMap = new HashMap<ItemStack, Integer>();
+	//private ArrayList<ItemStack> itemList = new ArrayList<ItemStack>();
 	
 	//upgrades
 	public boolean voidUpgrade = false;
@@ -61,23 +61,23 @@ public class TileEntityFuelConversionBench extends TileEntity implements IInvent
 	
 	public TileEntityFuelConversionBench()
 	{
-		updateLists();
+		//updateLists();
 	}
 	/*
 	 * Add all the recipes to the correct lists
 	 */
-	private void updateLists()
+/*	private void updateLists()
 	{
 		for(ItemStack i : CarbonizationRecipeHandler.smelting().getFuelConversionRegistry())
 		{
 			itemMap.put(i, CarbonizationRecipeHandler.smelting().getFuelConversionOutputCost(i));
 			itemList.add(i);
 		}
-	}
+	}*/
 	
 	private boolean listContainsItem(ItemStack is)
 	{	
-		for(ItemStack ii : itemList)
+		for(ItemStack ii : CarbonizationRecipeHandler.smelting().getFuelConversionRegistry())
 		{
 			if(ii.isItemEqual(is))
 				return true;
@@ -87,11 +87,11 @@ public class TileEntityFuelConversionBench extends TileEntity implements IInvent
 	
 	private int getItemPotential(ItemStack is)
 	{
-		for(ItemStack ii : itemList)
+		for(ItemStack ii : CarbonizationRecipeHandler.smelting().getFuelConversionRegistry())
 		{
 			if(ii.isItemEqual(is))
 			{
-				return itemMap.get(ii);
+				return CarbonizationRecipeHandler.smelting().getFuelConversionOutputCost(ii);
 			}
 		}
 		return 0;
@@ -99,7 +99,7 @@ public class TileEntityFuelConversionBench extends TileEntity implements IInvent
 	
 	public ItemStack getCurrentItem()
 	{
-		return itemList.get(currentIndex);
+		return CarbonizationRecipeHandler.smelting().getFuelConversionRegistry().get(currentIndex);
 	}
 	
 	@Override
@@ -112,7 +112,7 @@ public class TileEntityFuelConversionBench extends TileEntity implements IInvent
 	{
 		if(pos)
 		{
-			if(currentIndex < itemList.size()-1)
+			if(currentIndex < CarbonizationRecipeHandler.smelting().getFuelConversionRegistry().size()-1)
 				return currentIndex+1;
 			else
 				return 0;
@@ -122,15 +122,15 @@ public class TileEntityFuelConversionBench extends TileEntity implements IInvent
 			if(currentIndex > 0)
 				return currentIndex-1;
 			else
-				return itemList.size()-1;
+				return CarbonizationRecipeHandler.smelting().getFuelConversionRegistry().size()-1;
 		}
 	}
 	
 	public int getCurrentCost()
 	{
 		double multiplyer = (fuelState)?(1):(2*(1-bonusYield/2));
-		if(itemMap.containsKey(getCurrentItem()))
-			return (int)Math.ceil(itemMap.get(getCurrentItem())*multiplyer);
+		if(CarbonizationRecipeHandler.smelting().getFuelConversionRegistry().contains(getCurrentItem()))
+			return (int)Math.ceil(CarbonizationRecipeHandler.smelting().getFuelConversionOutputCost(getCurrentItem())*multiplyer);
 		return -1;
 	}
 	
@@ -448,7 +448,7 @@ public class TileEntityFuelConversionBench extends TileEntity implements IInvent
   			if(inventoryStacks[i] == null)
   				return i;
   			//see if the stack
-  			if((inventoryStacks[i].getItem() == input.getItem() && inventoryStacks[i].getItemDamage()== input.getItemDamage()) && inventoryStacks[i].stackSize+input.stackSize <= inventoryStacks[i].getMaxStackSize())
+  			if(UtilReference.areItemStacksEqualItem(inventoryStacks[i], input, true, false) && inventoryStacks[i].stackSize+input.stackSize <= inventoryStacks[i].getMaxStackSize())
   				return i;
   		}
   		return (voidUpgrade)?(-2):-1;

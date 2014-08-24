@@ -24,6 +24,8 @@ public static final SimpleNetworkWrapper instance = NetworkRegistry.INSTANCE.new
 		instance.registerMessage(FuelConversionBenchMessageServer.class, FuelConversionBenchMessageServer.class, 10, Side.CLIENT);
 		instance.registerMessage(TunnelBoreMessageClient.class, TunnelBoreMessageClient.class, 11, Side.SERVER);
 		instance.registerMessage(TunnelBoreMessageServer.class, TunnelBoreMessageServer.class, 12, Side.CLIENT);
+		instance.registerMessage(FluidTransportMessageClient.class, FluidTransportMessageClient.class, 13, Side.SERVER);
+		instance.registerMessage(FluidTransportMessageServer.class, FluidTransportMessageServer.class, 14, Side.CLIENT);
 	}
 
 }

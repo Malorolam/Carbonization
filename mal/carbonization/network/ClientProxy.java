@@ -1,9 +1,13 @@
 package mal.carbonization.network;
 
 import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 import mal.carbonization.gui.*;
+import mal.carbonization.render.FluidTransportItemRenderer;
+import mal.carbonization.render.FluidTransportRenderer;
 import mal.carbonization.render.StructureBlockRenderer;
+import mal.carbonization.carbonizationBlocks;
 import mal.carbonization.carbonizationItems;
 import mal.carbonization.render.StructureItemRenderer;
 import mal.carbonization.tileentity.*;
@@ -22,6 +26,8 @@ public class ClientProxy extends CommonProxy {
 	{
 		MinecraftForgeClient.registerItemRenderer(carbonizationItems.structureItem, new StructureItemRenderer());
 		RenderingRegistry.registerBlockHandler(new StructureBlockRenderer());
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityFluidTransport.class, new FluidTransportRenderer());
+		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(carbonizationBlocks.transportBlock), new FluidTransportItemRenderer());
 	}
 	@Override
 	public void registerRenderThings()
@@ -46,10 +52,8 @@ public class ClientProxy extends CommonProxy {
         {
         	return new GuiMultiblockFurnaceInit((TileEntityMultiblockInit)tileEntity, player);
         }
- /*       if(tileEntity instanceof TileEntityMultiblockBoreInit)
-        {
-        	return new GuiBorerInit((TileEntityMultiblockBoreInit)tileEntity,player);
-        }*/
+        if(tileEntity instanceof TileEntityFluidTransport)
+        	return new GuiFluidTransport(player, (TileEntityFluidTransport)tileEntity);
         if(tileEntity instanceof TileEntityMultiblockFurnace){
         	//System.out.println("got to make the gui client side");
         	return new GuiMultiblockFurnace((TileEntityMultiblockFurnace)tileEntity, player.inventory);

@@ -27,6 +27,8 @@ public class CommonProxy implements IGuiHandler
         	//System.out.println("got to make the gui server side");
         	return new ContainerMultiblockInit(player.inventory, (TileEntityMultiblockInit)tileEntity);
         }
+        if(tileEntity instanceof TileEntityFluidTransport)
+        	return new ContainerFluidTransport(player.inventory, (TileEntityFluidTransport)tileEntity);
         if(tileEntity instanceof TileEntityMultiblockFurnace){
         	//System.out.println("got to make the gui server side");
         	return new ContainerMultiblockFurnace(player.inventory, (TileEntityMultiblockFurnace)tileEntity);

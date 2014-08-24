@@ -12,8 +12,7 @@ public class StructureItemRenderer implements IItemRenderer{
 
 	@Override
 	public boolean handleRenderType(ItemStack item, ItemRenderType type) {
-		return true;
-/*		switch (type) {
+		switch (type) {
 		case ENTITY:
 		case EQUIPPED:
 		case EQUIPPED_FIRST_PERSON:
@@ -22,13 +21,12 @@ public class StructureItemRenderer implements IItemRenderer{
 		default:
 			return false;
 		}
-*/	}
+	}
 
 	@Override
 	public boolean shouldUseRenderHelper(ItemRenderType type, ItemStack item,
 			ItemRendererHelper helper) {
-		return true;
-/*		switch (type) {
+		switch (type) {
 		case ENTITY: {
 			return (helper == ItemRendererHelper.ENTITY_BOBBING ||
 					helper == ItemRendererHelper.ENTITY_ROTATION ||
@@ -48,7 +46,7 @@ public class StructureItemRenderer implements IItemRenderer{
 			return false;
 		}
 		}
-*/	}
+	}
 
 	@Override
 	public void renderItem(ItemRenderType type, ItemStack item, Object... data) 
@@ -69,14 +67,16 @@ public class StructureItemRenderer implements IItemRenderer{
 		boolean mustundotranslate = false;
 		switch (type) {
 		case EQUIPPED:
+			break;
 		case INVENTORY:
+			GL11.glTranslatef(0.0f, -0.08f, 0.0f);
+			break;
 		case EQUIPPED_FIRST_PERSON: {
-			break; // caller expects us to render over [0,0,0] to [1,1,1], no translation necessary
+			break;
 		}
 		case ENTITY: {
-			// translate our coordinates so that [0,0,0] to [1,1,1] translates to the [-0.5, -0.5, -0.5] to [0.5, 0.5, 0.5] expected by the caller.
-			GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
-			mustundotranslate = true; // must undo the translation when we're finished rendering
+			GL11.glScalef(0.5f, 0.5f, 0.5f);
+			GL11.glTranslatef(-0.5f, -0.5f, -0.5f);
 			break;
 		}
 		default:
@@ -165,7 +165,6 @@ public class StructureItemRenderer implements IItemRenderer{
         GL11.glDisable(GL11.GL_ALPHA_TEST);
         GL11.glDisable(GL11.GL_BLEND);*/
 
-		if (mustundotranslate) GL11.glTranslatef(0.5F, 0.5F, 0.5F);
         GL11.glPopMatrix();
 
 		

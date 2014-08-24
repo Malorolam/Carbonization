@@ -14,6 +14,7 @@ public class carbonizationTileEntities {
 		GameRegistry.registerTileEntity(TileEntityAutocraftingBench.class, "TileEntityAutocraftingBench");
 		GameRegistry.registerTileEntity(TileEntityFuelConversionBench.class, "TileEntityFuelConversionBench");
 		GameRegistry.registerTileEntity(TileEntityTunnelBore.class, "TileEntityTunnelBore");
+		GameRegistry.registerTileEntity(TileEntityFluidTransport.class, "TileEntityFluidTransport");
 	}
 }
 /*******************************************************************************

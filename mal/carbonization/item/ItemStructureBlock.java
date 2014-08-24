@@ -160,44 +160,44 @@ public class ItemStructureBlock extends Item{
 		switch(baseMaterial)
 		{
 		case 0:
-			InsTier=2;
-			ConTier=1;
-			break;
-		case 1:
 			InsTier=1;
 			ConTier=2;
 			break;
-		case 2:
-			InsTier=4;
-			ConTier=2;
+		case 1:
+			InsTier=2;
+			ConTier=1;
 			break;
-		case 3:
+		case 2:
 			InsTier=2;
 			ConTier=4;
 			break;
+		case 3:
+			InsTier=4;
+			ConTier=2;
+			break;
 		case 4:
-			InsTier=8;
-			ConTier=4;
+			InsTier=3;
+			ConTier=6;
 			break;
 		case 5:
-			InsTier=4;
-			ConTier=8;
+			InsTier=6;
+			ConTier=3;
 			break;
 		case 6:
-			InsTier=16;
+			InsTier=4;
 			ConTier=8;
 			break;
 		case 7:
 			InsTier=8;
-			ConTier=16;
+			ConTier=4;
 			break;
 		case 8:
-			InsTier=32;
-			ConTier=16;
+			InsTier=5;
+			ConTier=10;
 			break;
 		case 9:
-			InsTier=16;
-			ConTier=32;
+			InsTier=10;
+			ConTier=5;
 			break;
 		}
 		

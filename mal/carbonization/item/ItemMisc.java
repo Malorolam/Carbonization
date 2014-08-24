@@ -295,15 +295,15 @@ public class ItemMisc extends Item{
         par3List.add(new ItemStack(par1, 1, 1));
         par3List.add(new ItemStack(par1, 1, 2));
         par3List.add(new ItemStack(par1, 1, 3));
-        par3List.add(new ItemStack(par1, 1, 4));
-        par3List.add(new ItemStack(par1, 1, 5));
+        //par3List.add(new ItemStack(par1, 1, 4));
+        //par3List.add(new ItemStack(par1, 1, 5));
         par3List.add(new ItemStack(par1, 1, 6));
         par3List.add(new ItemStack(par1, 1, 7));
         par3List.add(new ItemStack(par1, 1, 8));
         par3List.add(new ItemStack(par1, 1, 9));
         par3List.add(new ItemStack(par1, 1, 10));
         par3List.add(new ItemStack(par1, 1, 11));
-        par3List.add(new ItemStack(par1, 1, 12));
+        //par3List.add(new ItemStack(par1, 1, 12));
         par3List.add(new ItemStack(par1, 1, 13));
         par3List.add(new ItemStack(par1, 1, 14));
         par3List.add(new ItemStack(par1, 1, 15));
