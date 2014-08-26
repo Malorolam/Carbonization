@@ -59,7 +59,6 @@ public class GuiFuelConverter extends GuiContainer {
         	break;
         case 3:
         	bench.closeGui(-1);
-        	dustBtn.displayString = (bench.fuelState)?("Liquid"):("Solid");
         	break;
         }
     }
@@ -120,6 +119,7 @@ public class GuiFuelConverter extends GuiContainer {
 	public void drawScreen(int par1, int par2, float par3)
 	{
 		super.drawScreen(par1, par2, par3);
+    	dustBtn.displayString = (!bench.fuelState)?("Liquid"):("Solid");
 		
 		//see if the mouse is over the potential bar
 		if(UtilReference.isPointInRegion(54, 11, 16, 52, par1, par2, guiLeft, guiTop))

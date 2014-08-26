@@ -45,7 +45,6 @@ public class carbonizationBlocks {
 	public static void postinit()
 	{
 		fluidFuelPotential.setUnlocalizedName(blockFuelPotential.getUnlocalizedName()).setStillIcon(blockFuelPotential.getIcon(0, 0)).setFlowingIcon(blockFuelPotential.getIcon(2, 0));
-		System.out.println(fluidFuelPotential.getIcon().getIconName());
 	}
 }
 /*******************************************************************************

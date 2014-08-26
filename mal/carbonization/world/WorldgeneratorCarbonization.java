@@ -24,7 +24,7 @@ public class WorldgeneratorCarbonization implements IWorldGenerator {
 		default:
 		{
 			BiomeGenBase b = world.getBiomeGenForCoords(chunkX, chunkZ);
-			generateDirtSurface(world, random, chunkX*16, 40, 50, chunkZ*16, 0, 40, 5);
+			generateDirtSurface(world, random, chunkX*16, 40, 50, chunkZ*16, 0, 30, 5);
 			generateSurface(world, random, chunkX*16, 0, 50, chunkZ*16, 1, 16, 4);
 			generateSurface(world, random, chunkX*16, 0, 30, chunkZ*16, 2, 24, 3);
 		}

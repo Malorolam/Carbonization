@@ -31,7 +31,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 @Mod(modid=carbonization.MODID, version=carbonization.VERSION, dependencies="required-after:MalCore")
 public class carbonization {
     public static final String MODID = "Carbonization";
-    public static final String VERSION = "1.1.5";
+    public static final String VERSION = "1.1.6";
     public static final String VersionURL = "https://www.dropbox.com/s/7k0i9pbxmywhe2i/carbonizationVersion.info?dl=1";
     
 	public static int ORESLAGRATIO = 300;//number of millibuckets needed for an item

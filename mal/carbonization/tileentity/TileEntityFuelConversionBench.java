@@ -241,6 +241,7 @@ public class TileEntityFuelConversionBench extends TileEntity implements IInvent
 				craftingCooldown--;
 			
 			handleUpgrade();
+			//System.out.println(fuelState);
 			if(fuelState)
 				handleInventory();
 			else
@@ -365,6 +366,7 @@ public class TileEntityFuelConversionBench extends TileEntity implements IInvent
 			return;
 		
 		int cost = getCurrentCost();
+		
 		if(cost <0)
 			return;
 		if(tank.getFluidAmount()>=cost)
@@ -562,7 +564,7 @@ public class TileEntityFuelConversionBench extends TileEntity implements IInvent
   			}
   			if(inventoryStacks[slot] == null)//the slot is empty
   			{
-  				inventoryStacks[slot] = item;
+  				inventoryStacks[slot] = item.copy();
   				return true;
   			}
   			else

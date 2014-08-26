@@ -302,8 +302,13 @@ public class carbonizationRecipes {
 				CarbonizationRecipeHandler.smelting().addOreSlag("silverSlag", "ingotSilver");
 				CarbonizationRecipeHandler.smelting().addOreSlag("leadSlag", "ingotLead");
 				CarbonizationRecipeHandler.smelting().addOreSlag("nickelSlag", "ingotNickel");
-				boolean b = CarbonizationRecipeHandler.smelting().addOreSlag("aluminumSlag", "ingotNaturalAluminum");
-				if(!b)
+				CarbonizationRecipeHandler.smelting().addOreSlag("platinumSlag", "ingotPlatinum");
+				CarbonizationRecipeHandler.smelting().addOreSlag("osmiumSlag", "ingotOsmium");
+				CarbonizationRecipeHandler.smelting().addOreSlag("tungstenSlag", "ingotElnTungsten");
+				CarbonizationRecipeHandler.smelting().addOreSlag("arditeSlag", "ingotArdite");
+				CarbonizationRecipeHandler.smelting().addOreSlag("cobaltSlag", "ingotCobalt");
+				//boolean b = CarbonizationRecipeHandler.smelting().addOreSlag("aluminumSlag", "ingotNaturalAluminum");
+				//if(!b)
 					CarbonizationRecipeHandler.smelting().addOreSlag("aluminumSlag", "ingotAluminum");
 				
 				//Add in the recipes, normal metals and blocks
@@ -321,7 +326,12 @@ public class carbonizationRecipes {
 				CarbonizationRecipeHandler.smelting().addMultiblockSmelting("oreSilver", 400, 200, "silverSlag", false);
 				CarbonizationRecipeHandler.smelting().addMultiblockSmelting("oreLead", 400, 200, "leadSlag", false);
 				CarbonizationRecipeHandler.smelting().addMultiblockSmelting("oreNickel", 400, 200, "nickelSlag", false);
-				CarbonizationRecipeHandler.smelting().addMultiblockSmelting("oreNaturalAluminum", 400, 200, "aluminumSlag", false);
+				CarbonizationRecipeHandler.smelting().addMultiblockSmelting("orePlatinum", 400, 200, "platinumSlag", false);
+				CarbonizationRecipeHandler.smelting().addMultiblockSmelting("oreOsmium", 400, 200, "osmiumSlag", false);
+				CarbonizationRecipeHandler.smelting().addMultiblockSmelting("oreElnTungsten", 400, 200, "tungstenSlag", false);
+				CarbonizationRecipeHandler.smelting().addMultiblockSmelting("oreArdite", 400, 200, "arditeSlag", false);
+				CarbonizationRecipeHandler.smelting().addMultiblockSmelting("oreCobalt", 400, 200, "cobaltSlag", false);
+				CarbonizationRecipeHandler.smelting().addMultiblockSmelting("oreAluminum", 400, 200, "aluminumSlag", false);
 				
 				//food and wood items
 				//TODO: Find a way to do this easier
